@@ -3,6 +3,8 @@
 - Augmentation with `albumentation` library
 - Test using `CLAHE`/ histogram equalization for inference mode?
 #### Models
+[**Models and pre-trained weights**](https://docs.pytorch.org/vision/main/models.html)
+
 - One for spiral one for waves, or, one model for both?
 - VGG16 / VGG19
 - ResNet-50

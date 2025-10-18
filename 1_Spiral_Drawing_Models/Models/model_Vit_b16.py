@@ -5,6 +5,8 @@ def create_vit():
     """
     Creates a modified Vision Transformer (ViT-B/16) model for grayscale
     spiral drawing classification (e.g., Parkinson’s Disease detection).
+    
+    NOTE: This model only uses input size of '224' so make sure to change image_size in datasets
 
     The function performs the following steps:
         1. Loads a pretrained ViT-B/16 model with default ImageNet weights.
@@ -34,7 +36,8 @@ def create_vit():
     # 4. average the rgb weights across channels to form one grayscale channel
     with inference_mode():
         new_conv.weight[:] = old_conv.weight.mean(dim=1, keepdim=True)
-        new_conv.bias[:] = old_conv.bias
+        if old_conv.bias is not None:
+            new_conv.bias[:] = old_conv.bias
         
     # 5. replace the original conv (input) block
     vit_model.conv_proj = new_conv

@@ -27,9 +27,9 @@ def create_vgg():
 
     # 4. Initialize the grayscale layer by averaging the RGB weights
     with inference_mode():
-        new_conv.weight = nn.Parameter(old_conv.weight.mean(dim=1, keepdim=True))
+        new_conv.weight[:] = old_conv.weight.mean(dim=1, keepdim=True)
         if old_conv.bias is not None:
-            new_conv.bias = old_conv.bias
+            new_conv.bias[:] = old_conv.bias
 
     # 5. Replace the original conv layer with the new grayscale one
     vgg_model.features[0] = new_conv
