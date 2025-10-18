@@ -6,3 +6,8 @@ project_datasets/drawing/A Transfer Learning Approach with MobileNetV2 for Parki
 # Datasets
 # ---------
 project_datasets/
+
+
+# Cashe files
+# -------------
+__pycache__/

@@ -1,7 +1,7 @@
 ### Ideas
 #### Datasets
 - Augmentation with `albumentation` library
-- Test using `CLASHE`/ histogram equalization for inference mode?
+- Test using `CLAHE`/ histogram equalization for inference mode?
 #### Models
 - One for spiral one for waves, or, one model for both?
 - VGG16 / VGG19
