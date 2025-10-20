@@ -3,10 +3,8 @@ import torch
 
 # Training function loop for each epoch
 # ---------------------------------------
-
 def train_one_epoch(model:torch.nn.Module,
                     train_dataloader:torch.utils.data.DataLoader,
-                    val_dataloader:torch.utils.data.DataLoader,
 
                     loss_fn:torch.nn.Module,
                     optim:torch.optim,
@@ -14,9 +12,64 @@ def train_one_epoch(model:torch.nn.Module,
 
                     scaler,
                     device):
+    """
+    Runs one epoch of training using mixed precision, weighted BCE loss, 
+    and accuracy tracking with torchmetrics.
+    """
+    # 0. put model in train mode 
+    model.train()
     
-    pass
+    # 1. init total losses and reset the accuracy metric function (at the start of each epoch)
+    total_losses = 0
+    acc_fn.reset()
+    
+    # 1. loop through train_dataloader
+    pbar = tqdm(
+        iterable= train_dataloader,
+        total= len(train_dataloader),
+        desc="Training..."
+    )
+    
+    for batch in pbar:
+        # 2. move images and labels to device
+        imgs = batch['image'].to(device)
+        labels = batch['label'].to(device)
+        
+        # 3. enable auto mixed precision (AMP) for efficiency
+        with torch.amp.autocast(device_type= device):
+            # 4. forward pass
+            logits = model(imgs)
+            probs = torch.sigmoid(logits) # for accuracy metric
+            
+            # 5. calculate the losses, and the accuracy
+            loss = loss_fn(logits, labels)
+            acc_fn.update(probs, labels.int())
+            
+            
+        # 6. zero grad
+        optim.zero_grad()
+        
+        # 7. scale loss and back propagate
+        scaler.scale(loss).backward()
+        
+        # 8. step the opimizer and update the scaler
+        scaler.step(optim)
+        scaler.update()
 
+        # 9. compute total loss and average accuracy
+        total_losses += loss.item()
+        avg_acc = acc_fn.compute().item()
+        
+        # 10. update progress bar
+        pbar.set_postfix({
+            'Loss': f'{loss.item():.4f}',
+            'Accuracy': f'{avg_acc:.4f}'
+        })
+        
+    # 11. return average losses and accuracy
+    avg_losses = total_losses / len(train_dataloader)
+    return avg_losses, avg_acc
+            
 
 # Vaildation function loop
 # -------------------------
@@ -24,8 +77,52 @@ def validate(model: torch.nn.Module,
             val_dataloader: torch.utils.data.DataLoader,
             
             loss_fn: torch.nn.Module,
-            scheduler:torch.optim.lr_scheduler,
             
             acc_fn,
             device):
-    pass
+    """
+    Runs validation after each training epoch using mixed precision and accuracy tracking.
+    """
+    # 0. put model in eval mode 
+    model.eval()
+    
+    # 1. init total losses and reset the accuracy metric function (at the start of each epoch)
+    total_losses = 0
+    acc_fn.reset()
+    
+    # 2. loop through val_dataloader (in inference_mode)
+    with torch.inference_mode():
+        pbar = tqdm(
+            iterable=val_dataloader,
+            total=len(val_dataloader),
+            desc="Testing..."
+        )
+        
+        for batch in pbar:
+            # 3. move images and labels to device
+            imgs = batch['image'].to(device)
+            labels = batch['label'].to(device)
+            
+            # 4. enable auto mixed precision (AMP) for efficiency
+            with torch.amp.autocast(device_type= device):
+                # 5. forward pass
+                logits = model(imgs)
+                probs = torch.sigmoid(logits) # for accuracy metric
+                
+                # 6. calculate the losses, and the accuracy
+                loss = loss_fn(logits, labels)
+                acc_fn.update(probs, labels.int())
+                
+            # 7. compute total loss and average accuracy
+            total_losses += loss.item()
+            avg_acc = acc_fn.compute().item()
+            
+            # 8. update progress bar
+            pbar.set_postfix({
+                'Loss': f'{loss.item():.4f}',
+                'Accuracy': f'{avg_acc:.4f}'
+            })
+            
+        # 9. return average losses and accuracy
+        avg_losses = total_losses / len(val_dataloader)
+        return avg_losses, avg_acc

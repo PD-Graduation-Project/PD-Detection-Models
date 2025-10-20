@@ -69,7 +69,7 @@ def train(model:torch.nn.Module,
         patience=2,     # wait 2 epochs before reducing
     )
     
-    # 1.4. scaler
+    # 1.4. scaler (to prevent underflow)
     scaler = torch.amp.GradScaler(device = device)
     
     # 2. init accuracy metric and tensorboard writer
@@ -121,11 +121,13 @@ def train(model:torch.nn.Module,
             val_dataloader,
             
             loss_fn,
-            scheduler,
             
             acc_fn,
             device
         )
+        
+        # 6.1 step the scheduler AFTER validation
+        scheduler.step(val_loss)
         
         # 7.1 log metrics to tensorboard
         writer.add_scalar("Loss/train", train_loss, epoch)
