@@ -97,7 +97,7 @@ def train(model:torch.nn.Module,
     # 4. full training loop
     # ----------------------
     for epoch in range(epochs):
-        print(f"Training epoch no.{epoch+1} / {epochs}")
+        print(f"Training model:{model_name} epoch no.{epoch+1} / {epochs}")
         print("-"*35)
         
         # 5. train
@@ -132,6 +132,7 @@ def train(model:torch.nn.Module,
         writer.add_scalar("Loss/val", val_loss, epoch)
         writer.add_scalar("Accuracy/train", train_acc, epoch)
         writer.add_scalar("Accuracy/val", val_acc, epoch)
+        writer.flush()  # ensure logs are written immediately
         
         # 7.2. log learning rate (useful with ReduceLROnPlateau)
         current_lr = optim.param_groups[0]['lr']
@@ -149,7 +150,7 @@ def train(model:torch.nn.Module,
             'val_acc':val_acc
         }, os.path.join(checkpoint_dir, f"{model_name}_epoch_{epoch+1}.pth"))
 
-        print("Model saved.")
+        print(f"Model: {model_name} saved.\n")
         
         # 9. print epoch summary
         print(f"Epoch no.{epoch+1} / {epochs} summary")

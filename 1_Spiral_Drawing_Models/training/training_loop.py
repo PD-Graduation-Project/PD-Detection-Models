@@ -33,7 +33,7 @@ def train_one_epoch(model:torch.nn.Module,
     for batch in pbar:
         # 2. move images and labels to device
         imgs = batch['image'].to(device)
-        labels = batch['label'].to(device)
+        labels = batch['label'].to(device).unsqueeze(1).float()  # shape [batch_size, 1] (float for BCE)
         
         # 3. enable auto mixed precision (AMP) for efficiency
         with torch.amp.autocast(device_type= device):
@@ -101,7 +101,7 @@ def validate(model: torch.nn.Module,
         for batch in pbar:
             # 3. move images and labels to device
             imgs = batch['image'].to(device)
-            labels = batch['label'].to(device)
+            labels = batch['label'].to(device).unsqueeze(1).float()  # shape [batch_size, 1] (float for BCE)
             
             # 4. enable auto mixed precision (AMP) for efficiency
             with torch.amp.autocast(device_type= device):

@@ -1,8 +1,3 @@
-# Papers
-# --------
-project_datasets/drawing/A Transfer Learning Approach with MobileNetV2 for Parkinsons Disease Detection using Hand Drawings.pdf
-
-
 # Datasets
 # ---------
 project_datasets/
@@ -11,3 +6,9 @@ project_datasets/
 # Cashe files
 # -------------
 __pycache__/
+
+
+# Models
+# -------
+
+*.pth
