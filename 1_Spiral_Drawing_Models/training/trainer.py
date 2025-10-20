@@ -165,4 +165,5 @@ def train(model:torch.nn.Module,
         print("="*35, "\n")
         
     # 10. close writer
-    writer.close()
+    if Tboard:
+        writer.close()
