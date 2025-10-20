@@ -49,7 +49,7 @@ def create_vit():
     # 7. change the output to 2 classes only (healthy, pd)
     # this only unfreezes this block
     vit_model.heads = nn.Sequential(
-        nn.Linear(in_features=768, out_features=2)
+        nn.Linear(in_features=768, out_features=1)
     )
     
     return vit_model

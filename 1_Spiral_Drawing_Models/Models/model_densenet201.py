@@ -36,6 +36,6 @@ def create_densenet():
         param.requires_grad = False
 
     # 7. modify final classifier for binary classification
-    densenet_model.classifier = nn.Linear(in_features=1920, out_features=2, bias=True)
+    densenet_model.classifier = nn.Linear(in_features=1920, out_features=1, bias=True)
 
     return densenet_model

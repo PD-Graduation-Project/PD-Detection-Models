@@ -39,6 +39,6 @@ def create_vgg():
         param.requires_grad = False
 
     # 7. Replace the classifier head to output 2 classes (unfreezes only this layer)
-    vgg_model.classifier[-1] = nn.Linear(in_features=4096, out_features=2, bias=True)
+    vgg_model.classifier[-1] = nn.Linear(in_features=4096, out_features=1, bias=True)
     
     return vgg_model

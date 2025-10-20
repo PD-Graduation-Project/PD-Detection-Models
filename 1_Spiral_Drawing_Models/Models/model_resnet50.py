@@ -39,6 +39,6 @@ def create_resnet():
         param.requires_grad = False
 
     # 7. Replace the final classification layer (unfreezes only this one)
-    resnet_model.fc = nn.Linear(in_features=2048, out_features=2, bias=True)
+    resnet_model.fc = nn.Linear(in_features=2048, out_features=1, bias=True)
     
     return resnet_model

@@ -40,6 +40,6 @@ def create_inception():
         param.requires_grad = False
 
     # 8. modify final classifier for binary classification
-    inception_model.fc = nn.Linear(in_features=2048, out_features=2, bias=True)
+    inception_model.fc = nn.Linear(in_features=2048, out_features=1, bias=True)
 
     return inception_model
