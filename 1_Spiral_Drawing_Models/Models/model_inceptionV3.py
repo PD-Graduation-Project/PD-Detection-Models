@@ -34,7 +34,7 @@ def create_inception():
 
     # 6. disable RGB normalization step (Inception expects 3 channels by default)
     inception_model._transform_input = lambda x: x
-
+    
     # 7. freeze model parameters
     for param in inception_model.parameters():
         param.requires_grad = False

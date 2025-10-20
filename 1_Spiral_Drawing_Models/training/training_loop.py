@@ -39,7 +39,10 @@ def train_one_epoch(model:torch.nn.Module,
         with torch.amp.autocast(device_type= device):
             # 4. forward pass
             logits = model(imgs)
-            
+            # if it's an Inception model, it may return a tuple
+            if isinstance(logits, tuple):
+                logits = logits[0]
+                        
             # 5. calculate the losses, and the accuracy
             loss = loss_fn(logits, labels)
             acc = acc_fn(logits, labels)
@@ -107,7 +110,10 @@ def validate(model: torch.nn.Module,
             with torch.amp.autocast(device_type= device):
                 # 5. forward pass
                 logits = model(imgs)
-                
+                # if it's an Inception model, it may return a tuple
+                if isinstance(logits, tuple):
+                    logits = logits[0]
+                                
                 # 6. calculate the losses, and the accuracy
                 loss = loss_fn(logits, labels)
                 acc = acc_fn(logits, labels)

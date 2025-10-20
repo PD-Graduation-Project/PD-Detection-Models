@@ -15,7 +15,7 @@ class WeightedBCE(nn.Module):
                             Higher values make the model more sensitive to PD cases.
 
     Usage:
-        loss_fn = WeightedBCE(FN_penalty=1.5)
+        loss_fn = WeightedBCE(FN_penalty=1.3)
         loss = loss_fn(pred, label)
 
     Expected input:
@@ -23,7 +23,7 @@ class WeightedBCE(nn.Module):
         label: Tensor of shape (N, 1): binary ground-truth labels (0 or 1).
     """
     def __init__(self,
-                FN_penalty:float = 1.5,):
+                FN_penalty:float = 1.3,):
         super().__init__()
         
         self.FN_penalty = FN_penalty
