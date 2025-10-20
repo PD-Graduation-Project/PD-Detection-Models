@@ -1,6 +1,7 @@
-from .dataset import *
+from dataset import *
 from numpy import random
 from torch.utils.data import DataLoader, Subset
+from sklearn.model_selection import train_test_split
 
 def create_dataloaders(
                 healthy_dir:str,
@@ -44,14 +45,17 @@ def create_dataloaders(
         img_size=img_size,
     )
     
-    # 2. create random split of indices
+    # 2. create random split of indices (using sklearn, not manually, to avoid class imbalances)
     dataset_size = len(train_dataset) # total dataset size
     indices = list(range(dataset_size)) # list of all indices [0, 1, 2, ..., dataset_size - 1]
-    
-    split = int(train_val_split * dataset_size)
-    random.seed(random_seed)
-    random.shuffle(indices) # shuffle the dataset indices randomly
-    train_indices, val_indices = indices[:split], indices[split:]
+    labels = train_dataset.labels  # get labels from your dataset [0, 1, 0, 0, 1, 1, 0, ...]
+
+    train_indices, val_indices = train_test_split(
+        indices,
+        test_size= 1-train_val_split,
+        stratify=labels, # keeps PD/Healthy ratio same
+        random_state=random_seed
+    )
     
     # 3. create pytorch subsets of the original dataset
     train_subset = Subset(train_dataset, 

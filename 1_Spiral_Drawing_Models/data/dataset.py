@@ -113,7 +113,7 @@ class DrawingDataset(Dataset):
         img = np.array(img)
         
         # 4. apply transforms
-        img = self.transforms(Image=img)["image"]
+        img = self.transforms(image=img)["image"]
         
         # 5. return item as dict
         return{
