@@ -8,20 +8,20 @@ def train_one_epoch(model:torch.nn.Module,
 
                     loss_fn:torch.nn.Module,
                     optim:torch.optim,
-                    acc_fn,
+                    acc_fn, # now this is a function: binary_accuracy(preds, labels)
 
                     scaler,
                     device):
     """
     Runs one epoch of training using mixed precision, weighted BCE loss, 
-    and accuracy tracking with torchmetrics.
+    and binary accuracy tracking.
     """
     # 0. put model in train mode 
     model.train()
     
-    # 1. init total losses and reset the accuracy metric function (at the start of each epoch)
+    # 1. init total losses and accuracy
     total_losses = 0
-    acc_fn.reset()
+    total_acc = 0
     
     # 1. loop through train_dataloader
     pbar = tqdm(
@@ -39,11 +39,10 @@ def train_one_epoch(model:torch.nn.Module,
         with torch.amp.autocast(device_type= device):
             # 4. forward pass
             logits = model(imgs)
-            probs = torch.sigmoid(logits) # for accuracy metric
             
             # 5. calculate the losses, and the accuracy
             loss = loss_fn(logits, labels)
-            acc_fn.update(probs, labels.int())
+            acc = acc_fn(logits, labels)
             
             
         # 6. zero grad
@@ -56,18 +55,19 @@ def train_one_epoch(model:torch.nn.Module,
         scaler.step(optim)
         scaler.update()
 
-        # 9. compute total loss and average accuracy
+        # 9. compute total loss and accuracy
         total_losses += loss.item()
-        avg_acc = acc_fn.compute().item()
+        total_acc += acc.item()
         
         # 10. update progress bar
         pbar.set_postfix({
             'Loss': f'{loss.item():.4f}',
-            'Accuracy': f'{avg_acc:.4f}'
+            'Accuracy': f'{acc.item():.4f}'
         })
         
     # 11. return average losses and accuracy
     avg_losses = total_losses / len(train_dataloader)
+    avg_acc = total_acc/ len(train_dataloader)
     return avg_losses, avg_acc
             
 
@@ -86,9 +86,9 @@ def validate(model: torch.nn.Module,
     # 0. put model in eval mode 
     model.eval()
     
-    # 1. init total losses and reset the accuracy metric function (at the start of each epoch)
+    # 1. init total losses and accuracy
     total_losses = 0
-    acc_fn.reset()
+    total_acc = 0
     
     # 2. loop through val_dataloader (in inference_mode)
     with torch.inference_mode():
@@ -107,22 +107,22 @@ def validate(model: torch.nn.Module,
             with torch.amp.autocast(device_type= device):
                 # 5. forward pass
                 logits = model(imgs)
-                probs = torch.sigmoid(logits) # for accuracy metric
                 
                 # 6. calculate the losses, and the accuracy
                 loss = loss_fn(logits, labels)
-                acc_fn.update(probs, labels.int())
+                acc = acc_fn(logits, labels)
                 
-            # 7. compute total loss and average accuracy
+            # 7. compute total loss and accuracy
             total_losses += loss.item()
-            avg_acc = acc_fn.compute().item()
+            total_acc += acc.item()
             
             # 8. update progress bar
             pbar.set_postfix({
                 'Loss': f'{loss.item():.4f}',
-                'Accuracy': f'{avg_acc:.4f}'
+                'Accuracy': f'{acc.item():.4f}'
             })
             
         # 9. return average losses and accuracy
         avg_losses = total_losses / len(val_dataloader)
+        avg_acc = total_acc/ len(val_dataloader)
         return avg_losses, avg_acc

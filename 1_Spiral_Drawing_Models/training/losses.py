@@ -1,5 +1,5 @@
 from torch.nn import BCEWithLogitsLoss
-from torch import nn, ones_like
+from torch import nn, ones_like, sigmoid
 
 # Weighted Binary Cross-Entropy Loss
 # -------------------------------------
@@ -47,3 +47,21 @@ class WeightedBCE(nn.Module):
         
         # 5. return loss
         return weighted_loss 
+    
+    
+    
+# Simple binary accuracy function
+# --------------------------------
+def binary_accuracy(preds, labels, threshold=0.5):
+    """
+    Computes binary accuracy for predictions vs. labels.
+    Args:
+        preds: raw logits from model
+        labels: ground truth labels
+        threshold: probability threshold for classification
+    Returns:
+        accuracy as a float tensor
+    """
+    probs = sigmoid(preds)
+    preds_bin = (probs > threshold).float()
+    return (preds_bin == labels).float().mean()

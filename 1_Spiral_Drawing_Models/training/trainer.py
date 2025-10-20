@@ -1,8 +1,7 @@
 import torch
-from .losses import WeightedBCE
+from .losses import WeightedBCE, binary_accuracy
 from .training_loop import train_one_epoch, validate
 
-from torchmetrics.classification import BinaryAccuracy
 from torch.utils.tensorboard import SummaryWriter
 import os
 
@@ -36,7 +35,7 @@ def train(model:torch.nn.Module,
         - Uses `WeightedBCE` loss to emphasize false negatives.
         - Optimizer: AdamW with weight decay.
         - Scheduler: ReduceLROnPlateau (reduces LR when validation loss plateaus).
-        - Accuracy metric: torchmetrics.BinaryAccuracy.
+        - Accuracy metric: simple binary accuracy function.
         - Logs train/val loss, accuracy, and LR to TensorBoard.
         - Saves a checkpoint after each epoch with model and optimizer states.
 
@@ -72,9 +71,8 @@ def train(model:torch.nn.Module,
     # 1.4. scaler (to prevent underflow)
     scaler = torch.amp.GradScaler(device = device)
     
-    # 2. init accuracy metric and tensorboard writer
+    # 2. init tensorboard writer
     # -----------------------------------------------
-    acc_fn = BinaryAccuracy().to(device)
     writer = SummaryWriter(log_dir=os.path.join("runs", run_name))
     
     # 3. load pretrained model if available
@@ -109,7 +107,7 @@ def train(model:torch.nn.Module,
             
             loss_fn,
             optim,
-            acc_fn,
+            binary_accuracy,
             
             scaler,
             device
@@ -122,7 +120,7 @@ def train(model:torch.nn.Module,
             
             loss_fn,
             
-            acc_fn,
+            binary_accuracy,
             device
         )
         
