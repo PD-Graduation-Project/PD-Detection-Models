@@ -1,5 +1,5 @@
 import torch
-from .losses import CombinedLoss, binary_metrics
+from .losses import WeightedBCE, binary_accuracy
 from .training_loop import train_one_epoch, validate
 
 from torch.utils.tensorboard import SummaryWriter
@@ -17,7 +17,7 @@ def train(model:torch.nn.Module,
         Tboard:bool = True,
         
         epochs:int = 5,
-        max_lr:float = 3e-4,):
+        max_lr:float = 1e-4,):
     
     """
     Train a binary classification model with TensorBoard logging and checkpoint saving.
@@ -37,7 +37,7 @@ def train(model:torch.nn.Module,
     Notes:
         - Uses `WeightedBCE` loss to emphasize false negatives.
         - Optimizer: AdamW with weight decay.
-        - Scheduler: replaced `ReduceLROnPlateau` with `OneCycleLR` (More aggressive).
+        - Scheduler: ReduceLROnPlateau (reduces LR when validation loss plateaus).
         - Accuracy metric: simple binary accuracy function.
         - Logs train/val loss, accuracy, and LR to TensorBoard.
         - Saves a checkpoint after each epoch with model and optimizer states.
@@ -54,7 +54,7 @@ def train(model:torch.nn.Module,
     # ------------------------------------------------
     
     # 1.1. custome weighted loss function
-    loss_fn = CombinedLoss()
+    loss_fn = WeightedBCE()
     
     # 1.2. optimizer (with weight decay)
     optim = torch.optim.AdamW(
@@ -64,12 +64,11 @@ def train(model:torch.nn.Module,
     )
     
     # 1.3. scheduler 
-    scheduler = torch.optim.lr_scheduler.OneCycleLR(
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer= optim,
-        max_lr= max_lr,
-        epochs=epochs,
-        steps_per_epoch=len(train_dataloader),
-        pct_start=0.3  # warm up for 30% of training
+        mode='min',     # monitor validation loss
+        factor=0.1,     # reduce LR by 10x
+        patience=2,     # wait 2 epochs before reducing
     )
     
     # 1.4. scaler (to prevent underflow)
@@ -106,30 +105,31 @@ def train(model:torch.nn.Module,
         print("-"*35)
         
         # 5. train
-        train_loss, train_acc, train_recall  = train_one_epoch(
+        train_loss, train_acc = train_one_epoch(
             model,
             train_dataloader,
             
             loss_fn,
-            binary_metrics,
             optim,
-            scheduler,
+            binary_accuracy,
             
             scaler,
             device
         )
         
         # 6. validate
-        val_loss, val_acc, val_recall = validate(
+        val_loss, val_acc= validate(
             model,
             val_dataloader,
             
             loss_fn,
             
-            binary_metrics,
+            binary_accuracy,
             device
         )
         
+        # 6.1 step the scheduler AFTER validation
+        scheduler.step(val_loss)
         
         if Tboard:
             # 7.1 log metrics to tensorboard
@@ -137,8 +137,6 @@ def train(model:torch.nn.Module,
             writer.add_scalar("Loss/val", val_loss, epoch)
             writer.add_scalar("Accuracy/train", train_acc, epoch)
             writer.add_scalar("Accuracy/val", val_acc, epoch)
-            writer.add_scalar("Recall/train", train_recall, epoch)
-            writer.add_scalar("Recall/val", val_recall, epoch)
             writer.flush()  # ensure logs are written immediately
             
             # 7.2. log learning rate (useful with ReduceLROnPlateau)
@@ -162,8 +160,8 @@ def train(model:torch.nn.Module,
         # 9. print epoch summary
         print(f"Epoch no.{epoch+1} / {epochs} summary")
         print("-"*35)
-        print(f"Average train losses = {train_loss:.3f} | Train Acc: {train_acc:.3f} | Train Recall: {train_recall:.3f}")
-        print(f"Average validation losses = {val_loss:.3f} | Val Acc:   {val_acc:.3f} | Val Recall:   {val_recall:.3f}")
+        print(f"Average train losses = {train_loss:.3f} | Train Acc: {train_acc:.3f}")
+        print(f"Average validation losses = {val_loss:.3f} | Val Acc:   {val_acc:.3f}")
         print("="*35, "\n")
         
     # 10. close writer

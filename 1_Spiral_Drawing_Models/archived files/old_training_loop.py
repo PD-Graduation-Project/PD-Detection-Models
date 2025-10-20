@@ -7,10 +7,8 @@ def train_one_epoch(model:torch.nn.Module,
                     train_dataloader:torch.utils.data.DataLoader,
 
                     loss_fn:torch.nn.Module,
-                    acc_fn, 
                     optim:torch.optim,
-                    scheduler,
-                    
+                    acc_fn, # now this is a function: binary_accuracy(preds, labels)
 
                     scaler,
                     device):
@@ -24,7 +22,6 @@ def train_one_epoch(model:torch.nn.Module,
     # 1. init total losses and accuracy
     total_losses = 0
     total_acc = 0
-    total_recall = 0
     
     # 1. loop through train_dataloader
     pbar = tqdm(
@@ -48,7 +45,7 @@ def train_one_epoch(model:torch.nn.Module,
                         
             # 5. calculate the losses, and the accuracy
             loss = loss_fn(logits, labels)
-            acc, recall = acc_fn(logits, labels)
+            acc = acc_fn(logits, labels)
             
             
         # 6. zero grad
@@ -57,28 +54,24 @@ def train_one_epoch(model:torch.nn.Module,
         # 7. scale loss and back propagate
         scaler.scale(loss).backward()
         
-        # 8. step the opimizer, the scheduler, and update the scaler
+        # 8. step the opimizer and update the scaler
         scaler.step(optim)
-        scheduler.step()
         scaler.update()
 
         # 9. compute total loss and accuracy
         total_losses += loss.item()
-        total_acc += acc
-        total_recall += recall
+        total_acc += acc.item()
         
         # 10. update progress bar
         pbar.set_postfix({
             'Loss': f'{loss.item():.4f}',
-            'Accuracy': f'{acc:.4f}',
-            'Recall': f'{recall:.4f}'
+            'Accuracy': f'{acc.item():.4f}'
         })
         
     # 11. return average losses and accuracy
     avg_losses = total_losses / len(train_dataloader)
     avg_acc = total_acc/ len(train_dataloader)
-    avg_recall = total_recall / len(train_dataloader)
-    return avg_losses, avg_acc, avg_recall
+    return avg_losses, avg_acc
             
 
 # Vaildation function loop
@@ -99,7 +92,6 @@ def validate(model: torch.nn.Module,
     # 1. init total losses and accuracy
     total_losses = 0
     total_acc = 0
-    total_recall = 0
     
     # 2. loop through val_dataloader (in inference_mode)
     with torch.inference_mode():
@@ -124,22 +116,19 @@ def validate(model: torch.nn.Module,
                                 
                 # 6. calculate the losses, and the accuracy
                 loss = loss_fn(logits, labels)
-                acc, recall = acc_fn(logits, labels)
+                acc = acc_fn(logits, labels)
                 
             # 7. compute total loss and accuracy
             total_losses += loss.item()
-            total_acc += acc
-            total_recall += recall
+            total_acc += acc.item()
             
             # 8. update progress bar
             pbar.set_postfix({
                 'Loss': f'{loss.item():.4f}',
-                'Accuracy': f'{acc:.4f}',
-                'Recall': f'{recall:.4f}'
+                'Accuracy': f'{acc.item():.4f}'
             })
             
         # 9. return average losses and accuracy
         avg_losses = total_losses / len(val_dataloader)
         avg_acc = total_acc/ len(val_dataloader)
-        avg_recall = total_recall / len(val_dataloader)
-        return avg_losses, avg_acc, avg_recall
+        return avg_losses, avg_acc
