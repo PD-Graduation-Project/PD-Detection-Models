@@ -12,7 +12,9 @@ def train(model:torch.nn.Module,
         load_pretrained:str = None,
         checkpoint_dir:str = "checkpoints/",
         model_name:str = "MODEL",
+        
         run_name:str = "MODEL",
+        Tboard:bool = True,
         
         epochs:int = 5,
         max_lr:float = 1e-4,):
@@ -28,6 +30,7 @@ def train(model:torch.nn.Module,
         checkpoint_dir (str, optional): Directory to save checkpoints. Defaults to "checkpoints/".
         model_name (str, optional): Base name for checkpoint files. Defaults to "MODEL".
         run_name (str, optional): TensorBoard run name (used for log directory). Defaults to "MODEL".
+        Tboard (bool, optional): wheater to use SummaryWriter or not
         epochs (int, optional): Number of training epochs. Defaults to 5.
         max_lr (float, optional): Initial learning rate. Defaults to 1e-4.
 
@@ -73,7 +76,8 @@ def train(model:torch.nn.Module,
     
     # 2. init tensorboard writer
     # -----------------------------------------------
-    writer = SummaryWriter(log_dir=os.path.join("runs", run_name))
+    if Tboard:
+        writer = SummaryWriter(log_dir=os.path.join("runs", run_name))
     
     # 3. load pretrained model if available
     # -------------------------------------
@@ -127,16 +131,17 @@ def train(model:torch.nn.Module,
         # 6.1 step the scheduler AFTER validation
         scheduler.step(val_loss)
         
-        # 7.1 log metrics to tensorboard
-        writer.add_scalar("Loss/train", train_loss, epoch)
-        writer.add_scalar("Loss/val", val_loss, epoch)
-        writer.add_scalar("Accuracy/train", train_acc, epoch)
-        writer.add_scalar("Accuracy/val", val_acc, epoch)
-        writer.flush()  # ensure logs are written immediately
-        
-        # 7.2. log learning rate (useful with ReduceLROnPlateau)
-        current_lr = optim.param_groups[0]['lr']
-        writer.add_scalar("LearningRate", current_lr, epoch)
+        if Tboard:
+            # 7.1 log metrics to tensorboard
+            writer.add_scalar("Loss/train", train_loss, epoch)
+            writer.add_scalar("Loss/val", val_loss, epoch)
+            writer.add_scalar("Accuracy/train", train_acc, epoch)
+            writer.add_scalar("Accuracy/val", val_acc, epoch)
+            writer.flush()  # ensure logs are written immediately
+            
+            # 7.2. log learning rate (useful with ReduceLROnPlateau)
+            current_lr = optim.param_groups[0]['lr']
+            writer.add_scalar("LearningRate", current_lr, epoch)
         
         
         # 8. save checkpoint
