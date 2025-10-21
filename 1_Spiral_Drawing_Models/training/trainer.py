@@ -17,7 +17,7 @@ def train(model:torch.nn.Module,
         Tboard:bool = True,
         
         epochs:int = 5,
-        max_lr:float = 3e-4,):
+        max_lr:float = 1e-3,):
     
     """
     Train a binary classification model with TensorBoard logging and checkpoint saving.
@@ -32,7 +32,7 @@ def train(model:torch.nn.Module,
         run_name (str, optional): TensorBoard run name (used for log directory). Defaults to "MODEL".
         Tboard (bool, optional): wheater to use SummaryWriter or not
         epochs (int, optional): Number of training epochs. Defaults to 5.
-        max_lr (float, optional): Initial learning rate. Defaults to 1e-4.
+        max_lr (float, optional): Initial learning rate. Defaults to 1e-3.
 
     Notes:
         - Uses `WeightedBCE` loss to emphasize false negatives.
@@ -69,7 +69,9 @@ def train(model:torch.nn.Module,
         max_lr= max_lr,
         epochs=epochs,
         steps_per_epoch=len(train_dataloader),
-        pct_start=0.3  # warm up for 30% of training
+        pct_start=0.3,            # warm up for 30% of training (default)
+        div_factor=25,            # Start LR = max_lr/25 (more conservative start) (default)
+        final_div_factor=1e4      # End LR = max_lr/10000 (fine-tune at end) (default)
     )
     
     # 1.4. scaler (to prevent underflow)
@@ -106,7 +108,7 @@ def train(model:torch.nn.Module,
         print("-"*35)
         
         # 5. train
-        train_loss, train_acc, train_recall  = train_one_epoch(
+        train_loss, train_acc, train_recall, train_precision, train_f1  = train_one_epoch(
             model,
             train_dataloader,
             
@@ -120,7 +122,7 @@ def train(model:torch.nn.Module,
         )
         
         # 6. validate
-        val_loss, val_acc, val_recall = validate(
+        val_loss, val_acc, val_recall, val_precision, val_f1 = validate(
             model,
             val_dataloader,
             
@@ -135,10 +137,18 @@ def train(model:torch.nn.Module,
             # 7.1 log metrics to tensorboard
             writer.add_scalar("Loss/train", train_loss, epoch)
             writer.add_scalar("Loss/val", val_loss, epoch)
+            
             writer.add_scalar("Accuracy/train", train_acc, epoch)
             writer.add_scalar("Accuracy/val", val_acc, epoch)
+            
             writer.add_scalar("Recall/train", train_recall, epoch)
             writer.add_scalar("Recall/val", val_recall, epoch)
+            
+            writer.add_scalar("Precision/train", train_precision, epoch)
+            writer.add_scalar("Precision/val", val_precision, epoch)
+            
+            writer.add_scalar("F1/train", train_f1, epoch)
+            writer.add_scalar("F1/val", val_f1, epoch)
             writer.flush()  # ensure logs are written immediately
             
             # 7.2. log learning rate (useful with ReduceLROnPlateau)
@@ -156,6 +166,8 @@ def train(model:torch.nn.Module,
             'val_loss': val_loss,
             'val_acc':val_acc,
             'val_recall':val_recall,
+            'val_precision': val_precision,
+            'val_f1': val_f1,
         }, os.path.join(checkpoint_dir, f"{model_name}_epoch_{epoch+1}.pth"))
 
         print(f"Model: {model_name} saved.\n")
@@ -163,8 +175,8 @@ def train(model:torch.nn.Module,
         # 9. print epoch summary
         print(f"Epoch no.{epoch+1} / {epochs} summary")
         print("-"*35)
-        print(f"Average train losses = {train_loss:.3f} | Train Acc: {train_acc:.3f} | Train Recall: {train_recall:.3f}")
-        print(f"Average validation losses = {val_loss:.3f} | Val Acc:   {val_acc:.3f} | Val Recall:   {val_recall:.3f}")
+        print(f"Average train losses = {train_loss:.3f} | Train Acc: {train_acc:.3f} | Train Recall: {train_recall:.3f} | Train Precision: {train_precision:.3f} | Train F1: {train_f1:.3f}")
+        print(f"Average validation losses = {val_loss:.3f} | Val Acc:   {val_acc:.3f} | Val Recall:   {val_recall:.3f} | Val Precision: {val_precision:.3f} | Val F1: {val_f1:.3f}")
         print("="*35, "\n")
         
     # 10. close writer

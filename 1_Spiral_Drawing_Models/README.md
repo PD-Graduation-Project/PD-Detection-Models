@@ -49,5 +49,11 @@
 
 > **NOTE:**  In the final model we will **increase** the prediction threshold from being just `50%` to maybe `48%` or `49%` to minimize false negatives even more.
 
+---
 
+# Phase THREE
+- Updated the calssifier of the model, taking inspiration from [This paper](https://ieeexplore.ieee.org/document/10307641) (for more details see the `improved_classifier.md` file)
+- Added gradient clipping to training loop.
+- Updated max_lr from `3e-4` to `1e-3`.
+- Added precision,and F1-score calculations.
 

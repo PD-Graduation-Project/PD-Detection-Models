@@ -107,15 +107,17 @@ class CombinedLoss(nn.Module):
     
     
     
-# Simple binary accuracy function
+# Simple binary metrics function
 # --------------------------------
 def binary_metrics(preds, labels, threshold=0.5):
     """
-    Compute binary accuracy and recall.
+    Compute binary accuracy, recall, percision, and F1-score
     
     Returns:
         accuracy (float): Overall accuracy
         recall (float): Recall/Sensitivity (TP / (TP + FN))
+        precision (float): Precision (TP / (TP + FP))
+        f1_score (float): F1-score
     """
     probs = torch.sigmoid(preds).view(-1)
     labels = labels.view(-1)
@@ -123,9 +125,16 @@ def binary_metrics(preds, labels, threshold=0.5):
     
     tp = ((preds_bin == 1) & (labels == 1)).float().sum()
     fn = ((preds_bin == 0) & (labels == 1)).float().sum()
+    fp = ((preds_bin == 1) & (labels == 0)).float().sum()
     
+    # accuracy
     accuracy = (preds_bin == labels).float().mean()
+    # recall
     recall = tp / (tp + fn + 1e-8)
+    # precision
+    precision = tp / (tp + fp + 1e-8)
+    # f1-score
+    f1_score = 2 * (precision * recall) / (precision + recall + 1e-8) 
     
-    return accuracy.item(), recall.item()
+    return accuracy.item(), recall.item(), precision.item(), f1_score.item()
 
