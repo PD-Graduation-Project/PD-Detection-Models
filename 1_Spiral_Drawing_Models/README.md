@@ -32,22 +32,15 @@
 ## Best results from **PHASE TWO**
 - Validation Accuracy: **89.37%**
 - Validation Recall: **0.8407**
+- Number of trained epochs: **15** (initial model comparisons) + **31** (fine-tuning with early stopping; planned 50).
 - ![](imgs/PastedImage.png)
+
 ## Conclusion
 - Changing the *scheduler* made the accuracy increase way faster.
 - The new *loss function* needed many hyperparameters tuning, but now it is balanced.
 - After only 10 epochs the model gave comparable outputs to the one trained for over 50 epochs. (found in 'experiments/finetuning/finetune_test2.iypnb')
 - `DenseNet50` is still superior in accuracy, recall, and model size. 
 - `VGG19_bn` is very promising, and has better recall, but the model is so much larger than `DenseNet50`. (may experiment with it more later)
-
-## TO DO (for phase three maybe)
-- Keep testing new hyperparameters until we reach the best balance between *accuracy* and *recall*.
-- Unfreeze some layers in the middle of the model.
-- Compare `DenseNet50` with and without `CLAHE` in `val_dataloader`.
-- Compare `DenseNet50` with the trained image size of `(224, 224)` and with `(512, 512)`.
-- Just search for ways to **increase overall accuracy**.
-
-> **NOTE:**  In the final model we will **increase** the prediction threshold from being just `50%` to maybe `48%` or `49%` to minimize false negatives even more.
 
 ---
 
@@ -57,3 +50,21 @@
 - Updated max_lr from `3e-4` to `1e-3`.
 - Added precision,and F1-score calculations.
 
+## Best results from **PHASE THREE**
+- Validation Accuracy: **97.02%**
+- Validation Recall: **0.9787**
+- Validation precision: **0.9609**
+- Validation F1-Score: **0.9689**
+- Number of trained epochs: **15** (initial model comparisons) + **43** (fine-tuning with early stopping; planned 50).
+![alt text](imgs/image-1.png)
+
+## Conclusion
+- Massive improvement in accuracy and recall, along with a sharp drop in losses.
+- Comaprison in accuracy and losses between phase 2 and phase 3:
+    - ![](results/Phase%20THREE/finetuning/val_acc.png)
+    - ![](results/Phase%20THREE/finetuning/val_loss.png)
+
+## TO DO (for phase four maybe)
+- Unfreeze some layers in the middle of the model or add more hidden layers.
+- Compare `DenseNet50` with and without `CLAHE` in `val_dataloader`.
+- Compare `DenseNet50` with the trained image size of `(224, 224)` and with `(512, 512)`.

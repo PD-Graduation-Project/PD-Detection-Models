@@ -1,0 +1,605 @@
+Loaded pretrained model:
+- val_loss=0.4033
+- val_acc=0.8951
+- val_recall=0.8714
+- val_precision=0.9140
+- val_f1=0.8883
+Training model:DenseNet201_improved_finetuned epoch no.1 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:46<00:00,  1.73it/s, Loss=0.4558, Accuracy=0.8438, Recall=0.8125, Precision=0.8667, F1=0.8387]
+Testing...: 100%|██████████| 21/21 [00:07<00:00,  2.83it/s, Loss=0.4245, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.1 / 50 summary
+-----------------------------------
+Average train losses = 0.526 | Train Acc: 0.858 | Train Recall: 0.877 | Train Precision: 0.846 | Train F1: 0.857
+Average validation losses = 0.397 | Val Acc:   0.897 | Val Recall:   0.888 | Val Precision: 0.897 | Val F1: 0.888
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.2 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.85it/s, Loss=0.4532, Accuracy=0.8438, Recall=0.8000, Precision=0.9412, F1=0.8649]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.11it/s, Loss=0.4787, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.2 / 50 summary
+-----------------------------------
+Average train losses = 0.501 | Train Acc: 0.873 | Train Recall: 0.885 | Train Precision: 0.871 | Train F1: 0.873
+Average validation losses = 0.389 | Val Acc:   0.904 | Val Recall:   0.876 | Val Precision: 0.924 | Val F1: 0.896
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.3 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.76it/s, Loss=0.6312, Accuracy=0.8750, Recall=0.8500, Precision=0.9444, F1=0.8947]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.94it/s, Loss=0.4696, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.3 / 50 summary
+-----------------------------------
+Average train losses = 0.526 | Train Acc: 0.851 | Train Recall: 0.871 | Train Precision: 0.845 | Train F1: 0.851
+Average validation losses = 0.373 | Val Acc:   0.917 | Val Recall:   0.888 | Val Precision: 0.936 | Val F1: 0.909
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.4 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.77it/s, Loss=0.5737, Accuracy=0.8438, Recall=0.8125, Precision=0.8667, F1=0.8387]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.96it/s, Loss=0.4418, Accuracy=0.8462, Recall=0.6000, Precision=1.0000, F1=0.7500]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.4 / 50 summary
+-----------------------------------
+Average train losses = 0.533 | Train Acc: 0.856 | Train Recall: 0.881 | Train Precision: 0.845 | Train F1: 0.855
+Average validation losses = 0.374 | Val Acc:   0.902 | Val Recall:   0.856 | Val Precision: 0.927 | Val F1: 0.886
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.5 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.76it/s, Loss=0.5453, Accuracy=0.8125, Recall=0.7778, Precision=0.8750, F1=0.8235]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.85it/s, Loss=0.3874, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.5 / 50 summary
+-----------------------------------
+Average train losses = 0.524 | Train Acc: 0.858 | Train Recall: 0.882 | Train Precision: 0.851 | Train F1: 0.857
+Average validation losses = 0.380 | Val Acc:   0.904 | Val Recall:   0.873 | Val Precision: 0.922 | Val F1: 0.894
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.6 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.69it/s, Loss=0.6498, Accuracy=0.8125, Recall=0.8333, Precision=0.8333, F1=0.8333]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.78it/s, Loss=0.4033, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.6 / 50 summary
+-----------------------------------
+Average train losses = 0.553 | Train Acc: 0.841 | Train Recall: 0.863 | Train Precision: 0.835 | Train F1: 0.840
+Average validation losses = 0.363 | Val Acc:   0.898 | Val Recall:   0.881 | Val Precision: 0.907 | Val F1: 0.889
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.7 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.78it/s, Loss=0.4524, Accuracy=0.9062, Recall=0.8947, Precision=0.9444, F1=0.9189]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.85it/s, Loss=0.4651, Accuracy=0.8462, Recall=0.6000, Precision=1.0000, F1=0.7500]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.7 / 50 summary
+-----------------------------------
+Average train losses = 0.537 | Train Acc: 0.849 | Train Recall: 0.886 | Train Precision: 0.834 | Train F1: 0.850
+Average validation losses = 0.395 | Val Acc:   0.899 | Val Recall:   0.857 | Val Precision: 0.926 | Val F1: 0.884
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.8 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.78it/s, Loss=0.7026, Accuracy=0.7188, Recall=0.8571, Precision=0.6316, F1=0.7273]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.84it/s, Loss=0.3048, Accuracy=0.9231, Recall=1.0000, Precision=0.8333, F1=0.9091]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.8 / 50 summary
+-----------------------------------
+Average train losses = 0.563 | Train Acc: 0.841 | Train Recall: 0.880 | Train Precision: 0.827 | Train F1: 0.845
+Average validation losses = 0.375 | Val Acc:   0.903 | Val Recall:   0.923 | Val Precision: 0.886 | Val F1: 0.901
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.9 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.80it/s, Loss=0.4019, Accuracy=0.8438, Recall=0.8235, Precision=0.8750, F1=0.8485]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.81it/s, Loss=0.3223, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.9 / 50 summary
+-----------------------------------
+Average train losses = 0.543 | Train Acc: 0.851 | Train Recall: 0.882 | Train Precision: 0.837 | Train F1: 0.851
+Average validation losses = 0.355 | Val Acc:   0.897 | Val Recall:   0.917 | Val Precision: 0.880 | Val F1: 0.894
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.10 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.67it/s, Loss=0.8755, Accuracy=0.7500, Recall=0.7778, Precision=0.7778, F1=0.7778]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.57it/s, Loss=0.4305, Accuracy=0.8462, Recall=0.6000, Precision=1.0000, F1=0.7500]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.10 / 50 summary
+-----------------------------------
+Average train losses = 0.557 | Train Acc: 0.848 | Train Recall: 0.877 | Train Precision: 0.840 | Train F1: 0.850
+Average validation losses = 0.338 | Val Acc:   0.906 | Val Recall:   0.866 | Val Precision: 0.933 | Val F1: 0.895
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.11 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.80it/s, Loss=0.4335, Accuracy=0.7812, Recall=0.8947, Precision=0.7727, F1=0.8293]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.93it/s, Loss=0.3532, Accuracy=0.8462, Recall=0.8000, Precision=0.8000, F1=0.8000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.11 / 50 summary
+-----------------------------------
+Average train losses = 0.546 | Train Acc: 0.845 | Train Recall: 0.869 | Train Precision: 0.846 | Train F1: 0.847
+Average validation losses = 0.337 | Val Acc:   0.894 | Val Recall:   0.920 | Val Precision: 0.868 | Val F1: 0.891
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.12 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.70it/s, Loss=0.9484, Accuracy=0.7500, Recall=0.7000, Precision=0.8750, F1=0.7778]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.95it/s, Loss=0.5276, Accuracy=0.8462, Recall=0.6000, Precision=1.0000, F1=0.7500]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.12 / 50 summary
+-----------------------------------
+Average train losses = 0.543 | Train Acc: 0.857 | Train Recall: 0.884 | Train Precision: 0.854 | Train F1: 0.860
+Average validation losses = 0.368 | Val Acc:   0.903 | Val Recall:   0.857 | Val Precision: 0.936 | Val F1: 0.891
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.13 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.72it/s, Loss=0.5927, Accuracy=0.8125, Recall=0.8333, Precision=0.8333, F1=0.8333]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.93it/s, Loss=0.4356, Accuracy=0.8462, Recall=0.8000, Precision=0.8000, F1=0.8000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.13 / 50 summary
+-----------------------------------
+Average train losses = 0.543 | Train Acc: 0.854 | Train Recall: 0.883 | Train Precision: 0.846 | Train F1: 0.856
+Average validation losses = 0.306 | Val Acc:   0.911 | Val Recall:   0.908 | Val Precision: 0.908 | Val F1: 0.905
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.14 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.78it/s, Loss=0.5717, Accuracy=0.8750, Recall=0.9286, Precision=0.8125, F1=0.8667]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.79it/s, Loss=0.4332, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.14 / 50 summary
+-----------------------------------
+Average train losses = 0.570 | Train Acc: 0.844 | Train Recall: 0.882 | Train Precision: 0.837 | Train F1: 0.848
+Average validation losses = 0.341 | Val Acc:   0.919 | Val Recall:   0.894 | Val Precision: 0.936 | Val F1: 0.912
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.15 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.81it/s, Loss=0.7195, Accuracy=0.7812, Recall=0.9091, Precision=0.6250, F1=0.7407]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.81it/s, Loss=0.2133, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.15 / 50 summary
+-----------------------------------
+Average train losses = 0.538 | Train Acc: 0.848 | Train Recall: 0.886 | Train Precision: 0.831 | Train F1: 0.850
+Average validation losses = 0.312 | Val Acc:   0.915 | Val Recall:   0.919 | Val Precision: 0.906 | Val F1: 0.910
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.16 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.76it/s, Loss=0.5558, Accuracy=0.7812, Recall=1.0000, Precision=0.6957, F1=0.8205]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.92it/s, Loss=0.3207, Accuracy=0.9231, Recall=1.0000, Precision=0.8333, F1=0.9091]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.16 / 50 summary
+-----------------------------------
+Average train losses = 0.571 | Train Acc: 0.835 | Train Recall: 0.863 | Train Precision: 0.835 | Train F1: 0.837
+Average validation losses = 0.326 | Val Acc:   0.923 | Val Recall:   0.930 | Val Precision: 0.914 | Val F1: 0.919
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.17 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.79it/s, Loss=0.4223, Accuracy=0.9062, Recall=0.8333, Precision=1.0000, F1=0.9091]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.86it/s, Loss=0.5098, Accuracy=0.8462, Recall=0.6000, Precision=1.0000, F1=0.7500]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.17 / 50 summary
+-----------------------------------
+Average train losses = 0.544 | Train Acc: 0.850 | Train Recall: 0.864 | Train Precision: 0.850 | Train F1: 0.850
+Average validation losses = 0.336 | Val Acc:   0.912 | Val Recall:   0.854 | Val Precision: 0.959 | Val F1: 0.899
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.18 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.75it/s, Loss=0.4271, Accuracy=0.8438, Recall=0.9167, Precision=0.7333, F1=0.8148]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.86it/s, Loss=0.5887, Accuracy=0.8462, Recall=0.6000, Precision=1.0000, F1=0.7500]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.18 / 50 summary
+-----------------------------------
+Average train losses = 0.505 | Train Acc: 0.862 | Train Recall: 0.880 | Train Precision: 0.857 | Train F1: 0.861
+Average validation losses = 0.377 | Val Acc:   0.899 | Val Recall:   0.839 | Val Precision: 0.938 | Val F1: 0.881
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.19 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.75it/s, Loss=0.5517, Accuracy=0.8750, Recall=0.9444, Precision=0.8500, F1=0.8947]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.98it/s, Loss=0.2706, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.19 / 50 summary
+-----------------------------------
+Average train losses = 0.506 | Train Acc: 0.857 | Train Recall: 0.880 | Train Precision: 0.851 | Train F1: 0.857
+Average validation losses = 0.263 | Val Acc:   0.929 | Val Recall:   0.907 | Val Precision: 0.941 | Val F1: 0.922
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.20 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.70it/s, Loss=0.3531, Accuracy=0.9375, Recall=1.0000, Precision=0.8750, F1=0.9333]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.98it/s, Loss=0.3952, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.20 / 50 summary
+-----------------------------------
+Average train losses = 0.502 | Train Acc: 0.866 | Train Recall: 0.884 | Train Precision: 0.859 | Train F1: 0.865
+Average validation losses = 0.267 | Val Acc:   0.932 | Val Recall:   0.922 | Val Precision: 0.938 | Val F1: 0.927
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.21 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.80it/s, Loss=0.6930, Accuracy=0.7500, Recall=0.9167, Precision=0.6111, F1=0.7333]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.79it/s, Loss=0.5033, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.21 / 50 summary
+-----------------------------------
+Average train losses = 0.509 | Train Acc: 0.853 | Train Recall: 0.886 | Train Precision: 0.837 | Train F1: 0.854
+Average validation losses = 0.274 | Val Acc:   0.931 | Val Recall:   0.905 | Val Precision: 0.948 | Val F1: 0.923
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.22 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.70it/s, Loss=0.7345, Accuracy=0.7500, Recall=0.9231, Precision=0.6316, F1=0.7500]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.79it/s, Loss=0.3347, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.22 / 50 summary
+-----------------------------------
+Average train losses = 0.525 | Train Acc: 0.849 | Train Recall: 0.887 | Train Precision: 0.837 | Train F1: 0.851
+Average validation losses = 0.264 | Val Acc:   0.940 | Val Recall:   0.950 | Val Precision: 0.926 | Val F1: 0.935
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.23 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.77it/s, Loss=0.5358, Accuracy=0.8438, Recall=0.9231, Precision=0.7500, F1=0.8276]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.83it/s, Loss=0.1900, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.23 / 50 summary
+-----------------------------------
+Average train losses = 0.475 | Train Acc: 0.872 | Train Recall: 0.897 | Train Precision: 0.861 | Train F1: 0.872
+Average validation losses = 0.246 | Val Acc:   0.933 | Val Recall:   0.971 | Val Precision: 0.899 | Val F1: 0.932
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.24 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.68it/s, Loss=0.8114, Accuracy=0.7188, Recall=1.0000, Precision=0.5714, F1=0.7273]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.88it/s, Loss=0.2710, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.24 / 50 summary
+-----------------------------------
+Average train losses = 0.513 | Train Acc: 0.864 | Train Recall: 0.889 | Train Precision: 0.855 | Train F1: 0.864
+Average validation losses = 0.226 | Val Acc:   0.943 | Val Recall:   0.949 | Val Precision: 0.931 | Val F1: 0.937
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.25 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.79it/s, Loss=0.4412, Accuracy=0.9062, Recall=0.9375, Precision=0.8824, F1=0.9091]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.82it/s, Loss=0.3864, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.25 / 50 summary
+-----------------------------------
+Average train losses = 0.482 | Train Acc: 0.865 | Train Recall: 0.897 | Train Precision: 0.850 | Train F1: 0.865
+Average validation losses = 0.249 | Val Acc:   0.938 | Val Recall:   0.919 | Val Precision: 0.949 | Val F1: 0.931
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.26 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.82it/s, Loss=0.3265, Accuracy=0.8750, Recall=0.9333, Precision=0.8235, F1=0.8750]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.75it/s, Loss=0.4251, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.26 / 50 summary
+-----------------------------------
+Average train losses = 0.449 | Train Acc: 0.887 | Train Recall: 0.900 | Train Precision: 0.881 | Train F1: 0.885
+Average validation losses = 0.267 | Val Acc:   0.932 | Val Recall:   0.899 | Val Precision: 0.955 | Val F1: 0.924
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.27 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.77it/s, Loss=0.5584, Accuracy=0.8750, Recall=0.8571, Precision=0.8571, F1=0.8571]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.83it/s, Loss=0.4034, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.27 / 50 summary
+-----------------------------------
+Average train losses = 0.447 | Train Acc: 0.875 | Train Recall: 0.896 | Train Precision: 0.864 | Train F1: 0.875
+Average validation losses = 0.235 | Val Acc:   0.955 | Val Recall:   0.915 | Val Precision: 0.989 | Val F1: 0.949
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.28 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.78it/s, Loss=0.3710, Accuracy=0.8750, Recall=0.8125, Precision=0.9286, F1=0.8667]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.84it/s, Loss=0.3489, Accuracy=0.8462, Recall=0.6000, Precision=1.0000, F1=0.7500]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.28 / 50 summary
+-----------------------------------
+Average train losses = 0.453 | Train Acc: 0.883 | Train Recall: 0.901 | Train Precision: 0.875 | Train F1: 0.883
+Average validation losses = 0.245 | Val Acc:   0.929 | Val Recall:   0.896 | Val Precision: 0.951 | Val F1: 0.918
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.29 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.79it/s, Loss=0.4173, Accuracy=0.8438, Recall=0.8947, Precision=0.8500, F1=0.8718]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.84it/s, Loss=0.2207, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.29 / 50 summary
+-----------------------------------
+Average train losses = 0.467 | Train Acc: 0.875 | Train Recall: 0.900 | Train Precision: 0.865 | Train F1: 0.875
+Average validation losses = 0.220 | Val Acc:   0.946 | Val Recall:   0.953 | Val Precision: 0.935 | Val F1: 0.942
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.30 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.79it/s, Loss=0.2486, Accuracy=0.9688, Recall=0.9524, Precision=1.0000, F1=0.9756]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.97it/s, Loss=0.2930, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.30 / 50 summary
+-----------------------------------
+Average train losses = 0.406 | Train Acc: 0.896 | Train Recall: 0.908 | Train Precision: 0.888 | Train F1: 0.894
+Average validation losses = 0.211 | Val Acc:   0.941 | Val Recall:   0.953 | Val Precision: 0.926 | Val F1: 0.937
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.31 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.75it/s, Loss=0.4574, Accuracy=0.8125, Recall=1.0000, Precision=0.6471, F1=0.7857]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.82it/s, Loss=0.1396, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.31 / 50 summary
+-----------------------------------
+Average train losses = 0.452 | Train Acc: 0.880 | Train Recall: 0.917 | Train Precision: 0.858 | Train F1: 0.880
+Average validation losses = 0.179 | Val Acc:   0.960 | Val Recall:   0.968 | Val Precision: 0.948 | Val F1: 0.956
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.32 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.75it/s, Loss=0.4842, Accuracy=0.9062, Recall=1.0000, Precision=0.8000, F1=0.8889]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.73it/s, Loss=0.0721, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.32 / 50 summary
+-----------------------------------
+Average train losses = 0.427 | Train Acc: 0.889 | Train Recall: 0.909 | Train Precision: 0.879 | Train F1: 0.888
+Average validation losses = 0.171 | Val Acc:   0.945 | Val Recall:   0.977 | Val Precision: 0.915 | Val F1: 0.943
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.33 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.77it/s, Loss=0.1552, Accuracy=0.9375, Recall=0.9375, Precision=0.9375, F1=0.9375]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.77it/s, Loss=0.1791, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.33 / 50 summary
+-----------------------------------
+Average train losses = 0.399 | Train Acc: 0.894 | Train Recall: 0.911 | Train Precision: 0.886 | Train F1: 0.894
+Average validation losses = 0.177 | Val Acc:   0.958 | Val Recall:   0.954 | Val Precision: 0.957 | Val F1: 0.954
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.34 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.87it/s, Loss=0.3065, Accuracy=0.9688, Recall=0.9167, Precision=1.0000, F1=0.9565]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.86it/s, Loss=0.2946, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.34 / 50 summary
+-----------------------------------
+Average train losses = 0.399 | Train Acc: 0.893 | Train Recall: 0.905 | Train Precision: 0.889 | Train F1: 0.892
+Average validation losses = 0.179 | Val Acc:   0.955 | Val Recall:   0.963 | Val Precision: 0.944 | Val F1: 0.952
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.35 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.73it/s, Loss=0.6007, Accuracy=0.9062, Recall=0.9474, Precision=0.9000, F1=0.9231]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.93it/s, Loss=0.2390, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.35 / 50 summary
+-----------------------------------
+Average train losses = 0.400 | Train Acc: 0.894 | Train Recall: 0.912 | Train Precision: 0.881 | Train F1: 0.892
+Average validation losses = 0.192 | Val Acc:   0.964 | Val Recall:   0.954 | Val Precision: 0.969 | Val F1: 0.960
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.36 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.71it/s, Loss=0.6865, Accuracy=0.8438, Recall=0.7895, Precision=0.9375, F1=0.8571]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.78it/s, Loss=0.1524, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.36 / 50 summary
+-----------------------------------
+Average train losses = 0.441 | Train Acc: 0.889 | Train Recall: 0.910 | Train Precision: 0.883 | Train F1: 0.889
+Average validation losses = 0.156 | Val Acc:   0.958 | Val Recall:   0.963 | Val Precision: 0.950 | Val F1: 0.955
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.37 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.70it/s, Loss=0.2485, Accuracy=0.9375, Recall=0.9444, Precision=0.9444, F1=0.9444]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.86it/s, Loss=0.2336, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.37 / 50 summary
+-----------------------------------
+Average train losses = 0.398 | Train Acc: 0.895 | Train Recall: 0.906 | Train Precision: 0.888 | Train F1: 0.892
+Average validation losses = 0.173 | Val Acc:   0.947 | Val Recall:   0.958 | Val Precision: 0.931 | Val F1: 0.942
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.38 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.89it/s, Loss=0.3715, Accuracy=0.9062, Recall=0.9375, Precision=0.8824, F1=0.9091]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.92it/s, Loss=0.1697, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.38 / 50 summary
+-----------------------------------
+Average train losses = 0.393 | Train Acc: 0.894 | Train Recall: 0.911 | Train Precision: 0.883 | Train F1: 0.893
+Average validation losses = 0.166 | Val Acc:   0.952 | Val Recall:   0.972 | Val Precision: 0.930 | Val F1: 0.949
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.39 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.81it/s, Loss=0.3174, Accuracy=0.9062, Recall=0.8667, Precision=0.9286, F1=0.8966]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.87it/s, Loss=0.1259, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.39 / 50 summary
+-----------------------------------
+Average train losses = 0.397 | Train Acc: 0.898 | Train Recall: 0.912 | Train Precision: 0.892 | Train F1: 0.897
+Average validation losses = 0.161 | Val Acc:   0.964 | Val Recall:   0.958 | Val Precision: 0.969 | Val F1: 0.962
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.40 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.80it/s, Loss=0.2660, Accuracy=0.9062, Recall=0.9375, Precision=0.8824, F1=0.9091]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.77it/s, Loss=0.1767, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.40 / 50 summary
+-----------------------------------
+Average train losses = 0.371 | Train Acc: 0.902 | Train Recall: 0.922 | Train Precision: 0.893 | Train F1: 0.902
+Average validation losses = 0.158 | Val Acc:   0.963 | Val Recall:   0.965 | Val Precision: 0.959 | Val F1: 0.960
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.41 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.77it/s, Loss=0.5963, Accuracy=0.7812, Recall=0.7895, Precision=0.8333, F1=0.8108]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.83it/s, Loss=0.2121, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.41 / 50 summary
+-----------------------------------
+Average train losses = 0.387 | Train Acc: 0.898 | Train Recall: 0.916 | Train Precision: 0.885 | Train F1: 0.897
+Average validation losses = 0.157 | Val Acc:   0.958 | Val Recall:   0.969 | Val Precision: 0.945 | Val F1: 0.956
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.42 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.89it/s, Loss=0.6196, Accuracy=0.8438, Recall=0.7778, Precision=0.9333, F1=0.8485]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.88it/s, Loss=0.0988, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.42 / 50 summary
+-----------------------------------
+Average train losses = 0.379 | Train Acc: 0.902 | Train Recall: 0.916 | Train Precision: 0.893 | Train F1: 0.899
+Average validation losses = 0.146 | Val Acc:   0.970 | Val Recall:   0.972 | Val Precision: 0.965 | Val F1: 0.967
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.43 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.80it/s, Loss=0.2554, Accuracy=0.9375, Recall=1.0000, Precision=0.8824, F1=0.9375]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.88it/s, Loss=0.1461, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.43 / 50 summary
+-----------------------------------
+Average train losses = 0.354 | Train Acc: 0.906 | Train Recall: 0.930 | Train Precision: 0.892 | Train F1: 0.907
+Average validation losses = 0.144 | Val Acc:   0.970 | Val Recall:   0.979 | Val Precision: 0.961 | Val F1: 0.969
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.44 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.79it/s, Loss=0.4702, Accuracy=0.9375, Recall=0.9375, Precision=0.9375, F1=0.9375]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.83it/s, Loss=0.1378, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.44 / 50 summary
+-----------------------------------
+Average train losses = 0.356 | Train Acc: 0.908 | Train Recall: 0.922 | Train Precision: 0.900 | Train F1: 0.907
+Average validation losses = 0.153 | Val Acc:   0.963 | Val Recall:   0.966 | Val Precision: 0.957 | Val F1: 0.960
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.45 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.76it/s, Loss=0.3632, Accuracy=0.9062, Recall=0.8636, Precision=1.0000, F1=0.9268]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.45it/s, Loss=0.1371, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.45 / 50 summary
+-----------------------------------
+Average train losses = 0.357 | Train Acc: 0.909 | Train Recall: 0.937 | Train Precision: 0.887 | Train F1: 0.907
+Average validation losses = 0.143 | Val Acc:   0.961 | Val Recall:   0.979 | Val Precision: 0.944 | Val F1: 0.960
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.46 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.72it/s, Loss=0.4164, Accuracy=0.9062, Recall=0.8947, Precision=0.9444, F1=0.9189]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.62it/s, Loss=0.1586, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.46 / 50 summary
+-----------------------------------
+Average train losses = 0.367 | Train Acc: 0.910 | Train Recall: 0.925 | Train Precision: 0.899 | Train F1: 0.909
+Average validation losses = 0.164 | Val Acc:   0.957 | Val Recall:   0.952 | Val Precision: 0.956 | Val F1: 0.953
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.47 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.68it/s, Loss=0.1785, Accuracy=0.9688, Recall=0.9333, Precision=1.0000, F1=0.9655]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.70it/s, Loss=0.2559, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.47 / 50 summary
+-----------------------------------
+Average train losses = 0.344 | Train Acc: 0.908 | Train Recall: 0.925 | Train Precision: 0.897 | Train F1: 0.907
+Average validation losses = 0.153 | Val Acc:   0.962 | Val Recall:   0.951 | Val Precision: 0.968 | Val F1: 0.958
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.48 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.74it/s, Loss=0.3073, Accuracy=0.8750, Recall=0.8500, Precision=0.9444, F1=0.8947]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.75it/s, Loss=0.2231, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.48 / 50 summary
+-----------------------------------
+Average train losses = 0.345 | Train Acc: 0.911 | Train Recall: 0.918 | Train Precision: 0.908 | Train F1: 0.909
+Average validation losses = 0.158 | Val Acc:   0.962 | Val Recall:   0.955 | Val Precision: 0.962 | Val F1: 0.957
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.49 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.75it/s, Loss=0.6547, Accuracy=0.8438, Recall=0.7647, Precision=0.9286, F1=0.8387]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.75it/s, Loss=0.1951, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.49 / 50 summary
+-----------------------------------
+Average train losses = 0.375 | Train Acc: 0.905 | Train Recall: 0.928 | Train Precision: 0.888 | Train F1: 0.903
+Average validation losses = 0.152 | Val Acc:   0.967 | Val Recall:   0.973 | Val Precision: 0.960 | Val F1: 0.965
+=================================== 
+
+Training model:DenseNet201_improved_finetuned epoch no.50 / 50
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.84it/s, Loss=0.2059, Accuracy=0.9688, Recall=1.0000, Precision=0.9412, F1=0.9697]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.93it/s, Loss=0.1508, Accuracy=1.0000, Recall=1.0000, Precision=1.0000, F1=1.0000]
+Model: DenseNet201_improved_finetuned saved.
+
+Epoch no.50 / 50 summary
+-----------------------------------
+Average train losses = 0.349 | Train Acc: 0.911 | Train Recall: 0.931 | Train Precision: 0.899 | Train F1: 0.911
+Average validation losses = 0.161 | Val Acc:   0.963 | Val Recall:   0.952 | Val Precision: 0.968 | Val F1: 0.959
+===================================
