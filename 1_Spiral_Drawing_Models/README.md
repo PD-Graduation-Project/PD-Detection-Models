@@ -1,9 +1,9 @@
-# Phase ONE **DONE**
+# Phase ONE [**DONE**]
 - All files created and working.
 - Compared between all 5 models, accuracy and losses, when training them for:
     - 5 epochs
     - 10 epochs
-- Finetuned the best model , `DenseNet50`, and trained it for extra 50 epochs. (found in 'experiments/fintuning/finetune_test1.iypnb')
+- Finetuned the best model , `DenseNet50`, and trained it for extra 50 epochs. (found in 'experiments/finetuning/finetune_test1.iypnb')
 
 ## Best results from **PHASE ONE**
 - Validation Accuracy: **87.7%**
@@ -16,20 +16,30 @@
 
 ---
 
-# Phase TWO **IN PROGRESS**
+# Phase TWO [**DONE**]
 - Updated the loss function to include **focal** and **tversky**, by manually getting their equations in code form.
 - Updated the metric function to measure *recall*.
 - Updated scheduler from `ReduceLROnPlateau` to `OneCycleLR` for more aggressive LR changes with fewer epochs.
 - Increased inital LR from `1e-4` to `3e-4`.
 
-## TO DO
-- Compare all the models again with the new changes. (only 10 epochs)
-- Tune the best model, most likely `DenseNet50`, for 50 extra epochs.
-- Keep testing new hyperparameters untill we reach the best balance between *accuracy* and *recall*.
+## Best results from **PHASE TWO**
+- Validation Accuracy: **89.37%**
+- Validation Recall: **0.8407**
+- ![](imgs/PastedImage.png)
+## Conclusion
+- Changing the *scheduler* made the accuracy increase way faster.
+- The new *loss function* needed many hyperparameters tuning, but now it is balanced.
+- After only 10 epochs the model gave comparable outputs to the one trained for over 50 epochs. (found in 'experiments/finetuning/finetune_test2.iypnb')
+- `DenseNet50` is still superior in accuracy, recall, and model size. 
+- `VGG19_bn` is very promising, and has better recall, but the model is so much larger than `DenseNet50`. (may experiment with it more later)
 
-## Conclusion (so far)
-- Changing the scheduler made the accuracy increase way faster.
-- The new loss function needed many hyperparameters tuning, but now it is balanced.
-- after only 10 epochs the model gave comparable outputs to the one trained for over 50 epochs. (found in 'experiments/fintuning/finetune_test2.iypnb')
-    - Validation Accuracy: **85.1%**
-    - ![alt text](imgs/image-2.png)
+## TO DO (for phase three maybe)
+- Keep testing new hyperparameters until we reach the best balance between *accuracy* and *recall*.
+- Compare `DenseNet50` with and without `CLAHE` in `val_dataloader`.
+- Compare `DenseNet50` with the trained image size of `(224, 224)` and with `(512, 512)`.
+- Just search for ways to **increase overall accuracy**.
+
+> **NOTE:**  In the final model we will **increase** the prediction threshold from being just `50%` to maybe `48%` or `49%` to minimize false negatives even more.
+
+
+

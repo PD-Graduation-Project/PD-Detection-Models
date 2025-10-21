@@ -154,7 +154,8 @@ def train(model:torch.nn.Module,
             'optim_state_dict': optim.state_dict(),
             
             'val_loss': val_loss,
-            'val_acc':val_acc
+            'val_acc':val_acc,
+            'val_recall':val_recall,
         }, os.path.join(checkpoint_dir, f"{model_name}_epoch_{epoch+1}.pth"))
 
         print(f"Model: {model_name} saved.\n")
