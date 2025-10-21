@@ -897,3 +897,183 @@ Epoch no.15 / 15 summary
 Average train losses = 0.681 | Train Acc: 0.811 | Train Recall: 0.828
 Average validation losses = 0.650 | Val Acc:   0.836 | Val Recall:   0.848
 ===================================
+
+Training model:MobileNetV3-Large epoch no.1 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.51it/s, Loss=1.1323, Accuracy=0.5625, Recall=0.7059]
+Testing...: 100%|██████████| 21/21 [00:05<00:00,  4.01it/s, Loss=1.1282, Accuracy=0.5385, Recall=0.4000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.1 / 15 summary
+-----------------------------------
+Average train losses = 1.166 | Train Acc: 0.508 | Train Recall: 0.556
+Average validation losses = 1.181 | Val Acc:   0.485 | Val Recall:   0.291
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.2 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.80it/s, Loss=1.0915, Accuracy=0.5938, Recall=0.8750]
+Testing...: 100%|██████████| 21/21 [00:01<00:00, 10.92it/s, Loss=1.0789, Accuracy=0.6923, Recall=0.4000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.2 / 15 summary
+-----------------------------------
+Average train losses = 1.124 | Train Acc: 0.576 | Train Recall: 0.724
+Average validation losses = 1.151 | Val Acc:   0.576 | Val Recall:   0.403
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.3 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:26<00:00,  3.01it/s, Loss=0.9786, Accuracy=0.6562, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  9.66it/s, Loss=1.0259, Accuracy=0.7692, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.3 / 15 summary
+-----------------------------------
+Average train losses = 1.045 | Train Acc: 0.630 | Train Recall: 0.880
+Average validation losses = 1.085 | Val Acc:   0.715 | Val Recall:   0.629
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.4 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.77it/s, Loss=0.8991, Accuracy=0.7188, Recall=0.8824]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  8.31it/s, Loss=0.9498, Accuracy=0.7692, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.4 / 15 summary
+-----------------------------------
+Average train losses = 0.965 | Train Acc: 0.668 | Train Recall: 0.890
+Average validation losses = 1.006 | Val Acc:   0.752 | Val Recall:   0.735
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.5 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:27<00:00,  2.96it/s, Loss=0.9382, Accuracy=0.6562, Recall=0.8421]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  9.09it/s, Loss=0.9255, Accuracy=0.6923, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.5 / 15 summary
+-----------------------------------
+Average train losses = 0.912 | Train Acc: 0.688 | Train Recall: 0.888
+Average validation losses = 0.934 | Val Acc:   0.767 | Val Recall:   0.788
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.6 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.87it/s, Loss=0.8308, Accuracy=0.7188, Recall=0.8750]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.79it/s, Loss=0.8882, Accuracy=0.7692, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.6 / 15 summary
+-----------------------------------
+Average train losses = 0.860 | Train Acc: 0.723 | Train Recall: 0.874
+Average validation losses = 0.890 | Val Acc:   0.785 | Val Recall:   0.781
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.7 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.88it/s, Loss=0.7974, Accuracy=0.8125, Recall=0.9412]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  8.62it/s, Loss=0.8526, Accuracy=0.7692, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.7 / 15 summary
+-----------------------------------
+Average train losses = 0.827 | Train Acc: 0.740 | Train Recall: 0.870
+Average validation losses = 0.845 | Val Acc:   0.796 | Val Recall:   0.831
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.8 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.60it/s, Loss=0.6986, Accuracy=0.8125, Recall=0.8462]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.28it/s, Loss=0.7920, Accuracy=0.7692, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.8 / 15 summary
+-----------------------------------
+Average train losses = 0.799 | Train Acc: 0.757 | Train Recall: 0.877
+Average validation losses = 0.802 | Val Acc:   0.800 | Val Recall:   0.830
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.9 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.81it/s, Loss=0.6479, Accuracy=0.8750, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  7.00it/s, Loss=0.7887, Accuracy=0.7692, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.9 / 15 summary
+-----------------------------------
+Average train losses = 0.798 | Train Acc: 0.745 | Train Recall: 0.857
+Average validation losses = 0.767 | Val Acc:   0.796 | Val Recall:   0.844
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.10 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:27<00:00,  2.91it/s, Loss=0.6192, Accuracy=0.8438, Recall=0.8750]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  9.20it/s, Loss=0.7606, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.10 / 15 summary
+-----------------------------------
+Average train losses = 0.794 | Train Acc: 0.751 | Train Recall: 0.861
+Average validation losses = 0.732 | Val Acc:   0.817 | Val Recall:   0.873
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.11 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.76it/s, Loss=0.6660, Accuracy=0.8125, Recall=0.9412]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  9.02it/s, Loss=0.6850, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.11 / 15 summary
+-----------------------------------
+Average train losses = 0.791 | Train Acc: 0.755 | Train Recall: 0.861
+Average validation losses = 0.710 | Val Acc:   0.811 | Val Recall:   0.869
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.12 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.69it/s, Loss=0.7131, Accuracy=0.7812, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  8.00it/s, Loss=0.6960, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.12 / 15 summary
+-----------------------------------
+Average train losses = 0.762 | Train Acc: 0.772 | Train Recall: 0.867
+Average validation losses = 0.698 | Val Acc:   0.822 | Val Recall:   0.867
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.13 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.82it/s, Loss=0.7560, Accuracy=0.8125, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  9.07it/s, Loss=0.6572, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.13 / 15 summary
+-----------------------------------
+Average train losses = 0.776 | Train Acc: 0.762 | Train Recall: 0.857
+Average validation losses = 0.692 | Val Acc:   0.829 | Val Recall:   0.865
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.14 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.73it/s, Loss=0.8797, Accuracy=0.7188, Recall=0.7857]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  8.03it/s, Loss=0.6418, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.14 / 15 summary
+-----------------------------------
+Average train losses = 0.769 | Train Acc: 0.768 | Train Recall: 0.868
+Average validation losses = 0.688 | Val Acc:   0.833 | Val Recall:   0.865
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.15 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:27<00:00,  2.93it/s, Loss=0.8389, Accuracy=0.7188, Recall=0.7222]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  8.18it/s, Loss=0.6356, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.15 / 15 summary
+-----------------------------------
+Average train losses = 0.758 | Train Acc: 0.772 | Train Recall: 0.870
+Average validation losses = 0.692 | Val Acc:   0.830 | Val Recall:   0.854
+===================================
