@@ -1,0 +1,1259 @@
+Training model:DenseNet201 epoch no.1 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:49<00:00,  1.62it/s, Loss=1.1980, Accuracy=0.3750, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:08<00:00,  2.39it/s, Loss=1.1469, Accuracy=0.3846, Recall=1.0000]
+Model: DenseNet201 saved.
+
+Epoch no.1 / 15 summary
+-----------------------------------
+Average train losses = 1.125 | Train Acc: 0.513 | Train Recall: 0.888
+Average validation losses = 1.094 | Val Acc:   0.512 | Val Recall:   0.974
+=================================== 
+
+Training model:DenseNet201 epoch no.2 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.60it/s, Loss=0.9935, Accuracy=0.6562, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.39it/s, Loss=1.0713, Accuracy=0.4615, Recall=1.0000]
+Model: DenseNet201 saved.
+
+Epoch no.2 / 15 summary
+-----------------------------------
+Average train losses = 1.075 | Train Acc: 0.517 | Train Recall: 0.985
+Average validation losses = 1.009 | Val Acc:   0.555 | Val Recall:   0.969
+=================================== 
+
+Training model:DenseNet201 epoch no.3 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.55it/s, Loss=0.8484, Accuracy=0.7188, Recall=0.9444]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.15it/s, Loss=0.9234, Accuracy=0.7692, Recall=1.0000]
+Model: DenseNet201 saved.
+
+Epoch no.3 / 15 summary
+-----------------------------------
+Average train losses = 0.974 | Train Acc: 0.599 | Train Recall: 0.950
+Average validation losses = 0.875 | Val Acc:   0.702 | Val Recall:   0.909
+=================================== 
+
+Training model:DenseNet201 epoch no.4 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.62it/s, Loss=0.8717, Accuracy=0.6250, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.63it/s, Loss=0.8812, Accuracy=0.6923, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.4 / 15 summary
+-----------------------------------
+Average train losses = 0.886 | Train Acc: 0.690 | Train Recall: 0.899
+Average validation losses = 0.792 | Val Acc:   0.728 | Val Recall:   0.894
+=================================== 
+
+Training model:DenseNet201 epoch no.5 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.54it/s, Loss=0.7825, Accuracy=0.8750, Recall=0.8421]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.55it/s, Loss=0.7453, Accuracy=0.8462, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.5 / 15 summary
+-----------------------------------
+Average train losses = 0.815 | Train Acc: 0.743 | Train Recall: 0.884
+Average validation losses = 0.738 | Val Acc:   0.835 | Val Recall:   0.790
+=================================== 
+
+Training model:DenseNet201 epoch no.6 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.57it/s, Loss=0.6773, Accuracy=0.8125, Recall=0.8235]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.42it/s, Loss=0.7115, Accuracy=0.8462, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.6 / 15 summary
+-----------------------------------
+Average train losses = 0.770 | Train Acc: 0.767 | Train Recall: 0.862
+Average validation losses = 0.700 | Val Acc:   0.850 | Val Recall:   0.788
+=================================== 
+
+Training model:DenseNet201 epoch no.7 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.55it/s, Loss=0.6915, Accuracy=0.8438, Recall=0.7500]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.49it/s, Loss=0.7111, Accuracy=0.8462, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.7 / 15 summary
+-----------------------------------
+Average train losses = 0.739 | Train Acc: 0.786 | Train Recall: 0.868
+Average validation losses = 0.665 | Val Acc:   0.859 | Val Recall:   0.794
+=================================== 
+
+Training model:DenseNet201 epoch no.8 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.62it/s, Loss=0.7772, Accuracy=0.7500, Recall=0.8125]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.27it/s, Loss=0.6394, Accuracy=0.9231, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.8 / 15 summary
+-----------------------------------
+Average train losses = 0.744 | Train Acc: 0.772 | Train Recall: 0.852
+Average validation losses = 0.639 | Val Acc:   0.843 | Val Recall:   0.810
+=================================== 
+
+Training model:DenseNet201 epoch no.9 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:33<00:00,  2.45it/s, Loss=0.5949, Accuracy=0.9062, Recall=0.9500]
+Testing...: 100%|██████████| 21/21 [00:08<00:00,  2.45it/s, Loss=0.6737, Accuracy=0.8462, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.9 / 15 summary
+-----------------------------------
+Average train losses = 0.713 | Train Acc: 0.792 | Train Recall: 0.862
+Average validation losses = 0.638 | Val Acc:   0.847 | Val Recall:   0.816
+=================================== 
+
+Training model:DenseNet201 epoch no.10 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:51<00:00,  1.56it/s, Loss=0.7602, Accuracy=0.6875, Recall=0.8667]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.42it/s, Loss=0.6223, Accuracy=0.8462, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.10 / 15 summary
+-----------------------------------
+Average train losses = 0.708 | Train Acc: 0.789 | Train Recall: 0.860
+Average validation losses = 0.613 | Val Acc:   0.841 | Val Recall:   0.835
+=================================== 
+
+Training model:DenseNet201 epoch no.11 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.64it/s, Loss=0.6451, Accuracy=0.9062, Recall=0.9375]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.51it/s, Loss=0.7145, Accuracy=0.8462, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.11 / 15 summary
+-----------------------------------
+Average train losses = 0.704 | Train Acc: 0.802 | Train Recall: 0.853
+Average validation losses = 0.627 | Val Acc:   0.862 | Val Recall:   0.806
+=================================== 
+
+Training model:DenseNet201 epoch no.12 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.63it/s, Loss=0.7864, Accuracy=0.7812, Recall=0.8000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.38it/s, Loss=0.6737, Accuracy=0.8462, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.12 / 15 summary
+-----------------------------------
+Average train losses = 0.695 | Train Acc: 0.801 | Train Recall: 0.860
+Average validation losses = 0.630 | Val Acc:   0.866 | Val Recall:   0.793
+=================================== 
+
+Training model:DenseNet201 epoch no.13 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.68it/s, Loss=0.6527, Accuracy=0.8438, Recall=0.8750]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.53it/s, Loss=0.6005, Accuracy=0.9231, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.13 / 15 summary
+-----------------------------------
+Average train losses = 0.700 | Train Acc: 0.804 | Train Recall: 0.865
+Average validation losses = 0.610 | Val Acc:   0.867 | Val Recall:   0.806
+=================================== 
+
+Training model:DenseNet201 epoch no.14 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.59it/s, Loss=0.6187, Accuracy=0.8750, Recall=0.8333]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.43it/s, Loss=0.6347, Accuracy=0.9231, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.14 / 15 summary
+-----------------------------------
+Average train losses = 0.681 | Train Acc: 0.808 | Train Recall: 0.864
+Average validation losses = 0.624 | Val Acc:   0.868 | Val Recall:   0.799
+=================================== 
+
+Training model:DenseNet201 epoch no.15 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:33<00:00,  2.43it/s, Loss=0.6009, Accuracy=0.9375, Recall=0.9524]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.21it/s, Loss=0.6439, Accuracy=0.9231, Recall=0.8000]
+Model: DenseNet201 saved.
+
+Epoch no.15 / 15 summary
+-----------------------------------
+Average train losses = 0.675 | Train Acc: 0.815 | Train Recall: 0.871
+Average validation losses = 0.621 | Val Acc:   0.862 | Val Recall:   0.779
+=================================== 
+
+Training model:InceptionV3 epoch no.1 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.63it/s, Loss=1.1741, Accuracy=0.4062, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  5.97it/s, Loss=1.1618, Accuracy=0.3846, Recall=1.0000]
+Model: InceptionV3 saved.
+
+Epoch no.1 / 15 summary
+-----------------------------------
+Average train losses = 1.141 | Train Acc: 0.505 | Train Recall: 0.817
+Average validation losses = 1.096 | Val Acc:   0.495 | Val Recall:   0.997
+=================================== 
+
+Training model:InceptionV3 epoch no.2 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.58it/s, Loss=1.0993, Accuracy=0.4375, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.27it/s, Loss=1.1043, Accuracy=0.3846, Recall=1.0000]
+Model: InceptionV3 saved.
+
+Epoch no.2 / 15 summary
+-----------------------------------
+Average train losses = 1.092 | Train Acc: 0.516 | Train Recall: 0.978
+Average validation losses = 1.055 | Val Acc:   0.495 | Val Recall:   0.997
+=================================== 
+
+Training model:InceptionV3 epoch no.3 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.54it/s, Loss=0.9466, Accuracy=0.5938, Recall=0.9412]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.60it/s, Loss=1.0360, Accuracy=0.5385, Recall=1.0000]
+Model: InceptionV3 saved.
+
+Epoch no.3 / 15 summary
+-----------------------------------
+Average train losses = 1.040 | Train Acc: 0.540 | Train Recall: 0.969
+Average validation losses = 0.988 | Val Acc:   0.554 | Val Recall:   0.982
+=================================== 
+
+Training model:InceptionV3 epoch no.4 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.55it/s, Loss=0.9619, Accuracy=0.6875, Recall=0.9333]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.33it/s, Loss=0.9385, Accuracy=0.8462, Recall=1.0000]
+Model: InceptionV3 saved.
+
+Epoch no.4 / 15 summary
+-----------------------------------
+Average train losses = 0.987 | Train Acc: 0.579 | Train Recall: 0.929
+Average validation losses = 0.926 | Val Acc:   0.764 | Val Recall:   0.871
+=================================== 
+
+Training model:InceptionV3 epoch no.5 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.62it/s, Loss=0.8232, Accuracy=0.8750, Recall=0.9474]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.50it/s, Loss=0.8623, Accuracy=0.9231, Recall=1.0000]
+Model: InceptionV3 saved.
+
+Epoch no.5 / 15 summary
+-----------------------------------
+Average train losses = 0.930 | Train Acc: 0.645 | Train Recall: 0.908
+Average validation losses = 0.866 | Val Acc:   0.809 | Val Recall:   0.853
+=================================== 
+
+Training model:InceptionV3 epoch no.6 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.60it/s, Loss=0.9207, Accuracy=0.6250, Recall=0.7000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.54it/s, Loss=0.8142, Accuracy=0.9231, Recall=0.8000]
+Model: InceptionV3 saved.
+
+Epoch no.6 / 15 summary
+-----------------------------------
+Average train losses = 0.891 | Train Acc: 0.674 | Train Recall: 0.890
+Average validation losses = 0.839 | Val Acc:   0.812 | Val Recall:   0.771
+=================================== 
+
+Training model:InceptionV3 epoch no.7 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.55it/s, Loss=0.8988, Accuracy=0.6562, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.40it/s, Loss=0.7737, Accuracy=0.9231, Recall=0.8000]
+Model: InceptionV3 saved.
+
+Epoch no.7 / 15 summary
+-----------------------------------
+Average train losses = 0.877 | Train Acc: 0.691 | Train Recall: 0.868
+Average validation losses = 0.794 | Val Acc:   0.810 | Val Recall:   0.864
+=================================== 
+
+Training model:InceptionV3 epoch no.8 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.49it/s, Loss=0.7947, Accuracy=0.6875, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.25it/s, Loss=0.7817, Accuracy=0.8462, Recall=1.0000]
+Model: InceptionV3 saved.
+
+Epoch no.8 / 15 summary
+-----------------------------------
+Average train losses = 0.856 | Train Acc: 0.712 | Train Recall: 0.856
+Average validation losses = 0.769 | Val Acc:   0.789 | Val Recall:   0.912
+=================================== 
+
+Training model:InceptionV3 epoch no.9 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.50it/s, Loss=0.8656, Accuracy=0.6562, Recall=0.9091]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.42it/s, Loss=0.7244, Accuracy=1.0000, Recall=1.0000]
+Model: InceptionV3 saved.
+
+Epoch no.9 / 15 summary
+-----------------------------------
+Average train losses = 0.856 | Train Acc: 0.709 | Train Recall: 0.861
+Average validation losses = 0.763 | Val Acc:   0.823 | Val Recall:   0.847
+=================================== 
+
+Training model:InceptionV3 epoch no.10 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.51it/s, Loss=1.0211, Accuracy=0.6875, Recall=0.6875]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.58it/s, Loss=0.7908, Accuracy=0.8462, Recall=0.6000]
+Model: InceptionV3 saved.
+
+Epoch no.10 / 15 summary
+-----------------------------------
+Average train losses = 0.830 | Train Acc: 0.719 | Train Recall: 0.857
+Average validation losses = 0.762 | Val Acc:   0.839 | Val Recall:   0.796
+=================================== 
+
+Training model:InceptionV3 epoch no.11 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.53it/s, Loss=0.9761, Accuracy=0.5312, Recall=0.7692]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.67it/s, Loss=0.7218, Accuracy=0.9231, Recall=0.8000]
+Model: InceptionV3 saved.
+
+Epoch no.11 / 15 summary
+-----------------------------------
+Average train losses = 0.823 | Train Acc: 0.726 | Train Recall: 0.857
+Average validation losses = 0.737 | Val Acc:   0.830 | Val Recall:   0.850
+=================================== 
+
+Training model:InceptionV3 epoch no.12 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.49it/s, Loss=0.7154, Accuracy=0.8125, Recall=0.8889]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.44it/s, Loss=0.7132, Accuracy=0.9231, Recall=0.8000]
+Model: InceptionV3 saved.
+
+Epoch no.12 / 15 summary
+-----------------------------------
+Average train losses = 0.810 | Train Acc: 0.736 | Train Recall: 0.866
+Average validation losses = 0.738 | Val Acc:   0.824 | Val Recall:   0.845
+=================================== 
+
+Training model:InceptionV3 epoch no.13 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.52it/s, Loss=0.6899, Accuracy=0.7500, Recall=0.7778]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.50it/s, Loss=0.7121, Accuracy=0.9231, Recall=0.8000]
+Model: InceptionV3 saved.
+
+Epoch no.13 / 15 summary
+-----------------------------------
+Average train losses = 0.819 | Train Acc: 0.731 | Train Recall: 0.863
+Average validation losses = 0.739 | Val Acc:   0.846 | Val Recall:   0.817
+=================================== 
+
+Training model:InceptionV3 epoch no.14 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.51it/s, Loss=0.7399, Accuracy=0.7812, Recall=0.8824]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.41it/s, Loss=0.7497, Accuracy=0.9231, Recall=0.8000]
+Model: InceptionV3 saved.
+
+Epoch no.14 / 15 summary
+-----------------------------------
+Average train losses = 0.806 | Train Acc: 0.731 | Train Recall: 0.866
+Average validation losses = 0.747 | Val Acc:   0.834 | Val Recall:   0.810
+=================================== 
+
+Training model:InceptionV3 epoch no.15 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.46it/s, Loss=0.9586, Accuracy=0.6562, Recall=0.9091]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.57it/s, Loss=0.7441, Accuracy=0.8462, Recall=0.6000]
+Model: InceptionV3 saved.
+
+Epoch no.15 / 15 summary
+-----------------------------------
+Average train losses = 0.830 | Train Acc: 0.722 | Train Recall: 0.847
+Average validation losses = 0.737 | Val Acc:   0.832 | Val Recall:   0.828
+=================================== 
+
+Training model:ResNet50 epoch no.1 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.72it/s, Loss=1.1022, Accuracy=0.4688, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.81it/s, Loss=1.0961, Accuracy=0.3846, Recall=1.0000]
+Model: ResNet50 saved.
+
+Epoch no.1 / 15 summary
+-----------------------------------
+Average train losses = 1.130 | Train Acc: 0.515 | Train Recall: 0.920
+Average validation losses = 1.117 | Val Acc:   0.497 | Val Recall:   0.998
+=================================== 
+
+Training model:ResNet50 epoch no.2 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.76it/s, Loss=0.9981, Accuracy=0.6562, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.06it/s, Loss=1.0879, Accuracy=0.3846, Recall=1.0000]
+Model: ResNet50 saved.
+
+Epoch no.2 / 15 summary
+-----------------------------------
+Average train losses = 1.081 | Train Acc: 0.506 | Train Recall: 0.999
+Average validation losses = 1.037 | Val Acc:   0.518 | Val Recall:   0.977
+=================================== 
+
+Training model:ResNet50 epoch no.3 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.64it/s, Loss=0.9506, Accuracy=0.5312, Recall=0.9333]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.78it/s, Loss=0.9641, Accuracy=0.6154, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.3 / 15 summary
+-----------------------------------
+Average train losses = 1.008 | Train Acc: 0.577 | Train Recall: 0.957
+Average validation losses = 0.938 | Val Acc:   0.700 | Val Recall:   0.870
+=================================== 
+
+Training model:ResNet50 epoch no.4 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.51it/s, Loss=0.8845, Accuracy=0.7500, Recall=0.8500]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.61it/s, Loss=0.8413, Accuracy=0.7692, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.4 / 15 summary
+-----------------------------------
+Average train losses = 0.918 | Train Acc: 0.672 | Train Recall: 0.897
+Average validation losses = 0.842 | Val Acc:   0.788 | Val Recall:   0.850
+=================================== 
+
+Training model:ResNet50 epoch no.5 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.63it/s, Loss=0.8252, Accuracy=0.7812, Recall=0.8824]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  7.00it/s, Loss=0.8300, Accuracy=0.7692, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.5 / 15 summary
+-----------------------------------
+Average train losses = 0.848 | Train Acc: 0.723 | Train Recall: 0.890
+Average validation losses = 0.785 | Val Acc:   0.793 | Val Recall:   0.823
+=================================== 
+
+Training model:ResNet50 epoch no.6 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.63it/s, Loss=0.7717, Accuracy=0.7188, Recall=0.9286]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.62it/s, Loss=0.7507, Accuracy=0.8462, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.6 / 15 summary
+-----------------------------------
+Average train losses = 0.814 | Train Acc: 0.751 | Train Recall: 0.879
+Average validation losses = 0.743 | Val Acc:   0.822 | Val Recall:   0.825
+=================================== 
+
+Training model:ResNet50 epoch no.7 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.72it/s, Loss=0.7753, Accuracy=0.8438, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.37it/s, Loss=0.7194, Accuracy=0.8462, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.7 / 15 summary
+-----------------------------------
+Average train losses = 0.791 | Train Acc: 0.763 | Train Recall: 0.875
+Average validation losses = 0.719 | Val Acc:   0.827 | Val Recall:   0.839
+=================================== 
+
+Training model:ResNet50 epoch no.8 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.79it/s, Loss=0.6731, Accuracy=0.7812, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.38it/s, Loss=0.7208, Accuracy=0.8462, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.8 / 15 summary
+-----------------------------------
+Average train losses = 0.773 | Train Acc: 0.755 | Train Recall: 0.863
+Average validation losses = 0.701 | Val Acc:   0.835 | Val Recall:   0.798
+=================================== 
+
+Training model:ResNet50 epoch no.9 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.67it/s, Loss=0.7818, Accuracy=0.7812, Recall=0.9167]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.06it/s, Loss=0.7129, Accuracy=0.8462, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.9 / 15 summary
+-----------------------------------
+Average train losses = 0.756 | Train Acc: 0.772 | Train Recall: 0.867
+Average validation losses = 0.684 | Val Acc:   0.847 | Val Recall:   0.814
+=================================== 
+
+Training model:ResNet50 epoch no.10 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.63it/s, Loss=0.5507, Accuracy=0.8750, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.92it/s, Loss=0.6374, Accuracy=0.8462, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.10 / 15 summary
+-----------------------------------
+Average train losses = 0.720 | Train Acc: 0.790 | Train Recall: 0.872
+Average validation losses = 0.670 | Val Acc:   0.847 | Val Recall:   0.830
+=================================== 
+
+Training model:ResNet50 epoch no.11 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.61it/s, Loss=0.8323, Accuracy=0.6875, Recall=0.8571]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.63it/s, Loss=0.5846, Accuracy=0.9231, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.11 / 15 summary
+-----------------------------------
+Average train losses = 0.732 | Train Acc: 0.772 | Train Recall: 0.857
+Average validation losses = 0.662 | Val Acc:   0.856 | Val Recall:   0.817
+=================================== 
+
+Training model:ResNet50 epoch no.12 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.62it/s, Loss=0.8146, Accuracy=0.7188, Recall=0.9333]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.61it/s, Loss=0.6771, Accuracy=0.8462, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.12 / 15 summary
+-----------------------------------
+Average train losses = 0.714 | Train Acc: 0.784 | Train Recall: 0.881
+Average validation losses = 0.652 | Val Acc:   0.839 | Val Recall:   0.838
+=================================== 
+
+Training model:ResNet50 epoch no.13 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.72it/s, Loss=0.8126, Accuracy=0.6562, Recall=0.9167]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.35it/s, Loss=0.6602, Accuracy=0.8462, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.13 / 15 summary
+-----------------------------------
+Average train losses = 0.727 | Train Acc: 0.781 | Train Recall: 0.867
+Average validation losses = 0.659 | Val Acc:   0.847 | Val Recall:   0.824
+=================================== 
+
+Training model:ResNet50 epoch no.14 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.69it/s, Loss=0.7099, Accuracy=0.6875, Recall=0.8462]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.07it/s, Loss=0.6832, Accuracy=0.8462, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.14 / 15 summary
+-----------------------------------
+Average train losses = 0.720 | Train Acc: 0.780 | Train Recall: 0.867
+Average validation losses = 0.655 | Val Acc:   0.845 | Val Recall:   0.824
+=================================== 
+
+Training model:ResNet50 epoch no.15 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.78it/s, Loss=0.8211, Accuracy=0.7188, Recall=0.8125]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.46it/s, Loss=0.6123, Accuracy=0.8462, Recall=0.8000]
+Model: ResNet50 saved.
+
+Epoch no.15 / 15 summary
+-----------------------------------
+Average train losses = 0.726 | Train Acc: 0.772 | Train Recall: 0.862
+Average validation losses = 0.651 | Val Acc:   0.845 | Val Recall:   0.837
+=================================== 
+
+Training model:VGG19_bn epoch no.1 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.76it/s, Loss=1.1115, Accuracy=0.5938, Recall=0.9375]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  5.83it/s, Loss=1.1969, Accuracy=0.3077, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.1 / 15 summary
+-----------------------------------
+Average train losses = 1.144 | Train Acc: 0.517 | Train Recall: 0.721
+Average validation losses = 1.066 | Val Acc:   0.509 | Val Recall:   0.974
+=================================== 
+
+Training model:VGG19_bn epoch no.2 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.62it/s, Loss=1.0057, Accuracy=0.5625, Recall=0.8571]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  5.78it/s, Loss=1.0535, Accuracy=0.6154, Recall=1.0000]
+Model: VGG19_bn saved.
+
+Epoch no.2 / 15 summary
+-----------------------------------
+Average train losses = 1.006 | Train Acc: 0.590 | Train Recall: 0.942
+Average validation losses = 0.893 | Val Acc:   0.668 | Val Recall:   0.933
+=================================== 
+
+Training model:VGG19_bn epoch no.3 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.64it/s, Loss=0.6897, Accuracy=0.8125, Recall=0.8824]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  5.65it/s, Loss=0.9031, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.3 / 15 summary
+-----------------------------------
+Average train losses = 0.877 | Train Acc: 0.696 | Train Recall: 0.879
+Average validation losses = 0.771 | Val Acc:   0.816 | Val Recall:   0.782
+=================================== 
+
+Training model:VGG19_bn epoch no.4 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:33<00:00,  2.45it/s, Loss=0.8714, Accuracy=0.5625, Recall=0.8462]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  5.59it/s, Loss=0.7803, Accuracy=0.7692, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.4 / 15 summary
+-----------------------------------
+Average train losses = 0.805 | Train Acc: 0.736 | Train Recall: 0.851
+Average validation losses = 0.692 | Val Acc:   0.803 | Val Recall:   0.835
+=================================== 
+
+Training model:VGG19_bn epoch no.5 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.55it/s, Loss=0.5372, Accuracy=0.9062, Recall=0.8889]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  5.54it/s, Loss=0.7373, Accuracy=0.7692, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.5 / 15 summary
+-----------------------------------
+Average train losses = 0.760 | Train Acc: 0.754 | Train Recall: 0.840
+Average validation losses = 0.655 | Val Acc:   0.831 | Val Recall:   0.832
+=================================== 
+
+Training model:VGG19_bn epoch no.6 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.45it/s, Loss=0.7506, Accuracy=0.7500, Recall=0.9231]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.25it/s, Loss=0.6910, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.6 / 15 summary
+-----------------------------------
+Average train losses = 0.749 | Train Acc: 0.756 | Train Recall: 0.838
+Average validation losses = 0.644 | Val Acc:   0.841 | Val Recall:   0.786
+=================================== 
+
+Training model:VGG19_bn epoch no.7 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:35<00:00,  2.27it/s, Loss=0.5606, Accuracy=0.8438, Recall=0.8947]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.07it/s, Loss=0.6897, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.7 / 15 summary
+-----------------------------------
+Average train losses = 0.725 | Train Acc: 0.775 | Train Recall: 0.841
+Average validation losses = 0.621 | Val Acc:   0.841 | Val Recall:   0.810
+=================================== 
+
+Training model:VGG19_bn epoch no.8 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:35<00:00,  2.30it/s, Loss=0.8521, Accuracy=0.6875, Recall=0.8667]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.16it/s, Loss=0.6956, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.8 / 15 summary
+-----------------------------------
+Average train losses = 0.718 | Train Acc: 0.779 | Train Recall: 0.844
+Average validation losses = 0.610 | Val Acc:   0.857 | Val Recall:   0.822
+=================================== 
+
+Training model:VGG19_bn epoch no.9 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:36<00:00,  2.25it/s, Loss=0.6254, Accuracy=0.7500, Recall=0.7368]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.08it/s, Loss=0.6847, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.9 / 15 summary
+-----------------------------------
+Average train losses = 0.725 | Train Acc: 0.775 | Train Recall: 0.851
+Average validation losses = 0.601 | Val Acc:   0.854 | Val Recall:   0.809
+=================================== 
+
+Training model:VGG19_bn epoch no.10 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:36<00:00,  2.24it/s, Loss=0.5493, Accuracy=0.9062, Recall=0.9375]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.17it/s, Loss=0.6746, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.10 / 15 summary
+-----------------------------------
+Average train losses = 0.707 | Train Acc: 0.792 | Train Recall: 0.847
+Average validation losses = 0.591 | Val Acc:   0.865 | Val Recall:   0.813
+=================================== 
+
+Training model:VGG19_bn epoch no.11 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.37it/s, Loss=0.7068, Accuracy=0.7188, Recall=0.8462]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.21it/s, Loss=0.6908, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.11 / 15 summary
+-----------------------------------
+Average train losses = 0.720 | Train Acc: 0.769 | Train Recall: 0.851
+Average validation losses = 0.610 | Val Acc:   0.859 | Val Recall:   0.805
+=================================== 
+
+Training model:VGG19_bn epoch no.12 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.35it/s, Loss=0.5630, Accuracy=0.8438, Recall=0.8333]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.17it/s, Loss=0.6404, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.12 / 15 summary
+-----------------------------------
+Average train losses = 0.712 | Train Acc: 0.775 | Train Recall: 0.821
+Average validation losses = 0.581 | Val Acc:   0.856 | Val Recall:   0.832
+=================================== 
+
+Training model:VGG19_bn epoch no.13 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.32it/s, Loss=0.5604, Accuracy=0.8438, Recall=0.8667]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.11it/s, Loss=0.7052, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.13 / 15 summary
+-----------------------------------
+Average train losses = 0.699 | Train Acc: 0.784 | Train Recall: 0.858
+Average validation losses = 0.589 | Val Acc:   0.853 | Val Recall:   0.858
+=================================== 
+
+Training model:VGG19_bn epoch no.14 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.37it/s, Loss=0.9024, Accuracy=0.6562, Recall=0.7333]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.24it/s, Loss=0.6444, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.14 / 15 summary
+-----------------------------------
+Average train losses = 0.703 | Train Acc: 0.786 | Train Recall: 0.842
+Average validation losses = 0.579 | Val Acc:   0.851 | Val Recall:   0.843
+=================================== 
+
+Training model:VGG19_bn epoch no.15 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:33<00:00,  2.40it/s, Loss=0.5350, Accuracy=0.8438, Recall=0.8333]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.13it/s, Loss=0.6689, Accuracy=0.8462, Recall=0.8000]
+Model: VGG19_bn saved.
+
+Epoch no.15 / 15 summary
+-----------------------------------
+Average train losses = 0.720 | Train Acc: 0.774 | Train Recall: 0.837
+Average validation losses = 0.586 | Val Acc:   0.863 | Val Recall:   0.817
+=================================== 
+
+Training model:ViT_b16 epoch no.1 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.34it/s, Loss=1.1014, Accuracy=0.5938, Recall=0.9375]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.07it/s, Loss=1.1753, Accuracy=0.3846, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.1 / 15 summary
+-----------------------------------
+Average train losses = 1.129 | Train Acc: 0.532 | Train Recall: 0.853
+Average validation losses = 1.101 | Val Acc:   0.502 | Val Recall:   1.000
+=================================== 
+
+Training model:ViT_b16 epoch no.2 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.37it/s, Loss=1.0641, Accuracy=0.4688, Recall=0.9286]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.07it/s, Loss=1.0631, Accuracy=0.4615, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.2 / 15 summary
+-----------------------------------
+Average train losses = 1.044 | Train Acc: 0.536 | Train Recall: 0.976
+Average validation losses = 0.992 | Val Acc:   0.510 | Val Recall:   1.000
+=================================== 
+
+Training model:ViT_b16 epoch no.3 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:33<00:00,  2.40it/s, Loss=0.9320, Accuracy=0.6875, Recall=0.6923]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.05it/s, Loss=0.9070, Accuracy=0.6923, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.3 / 15 summary
+-----------------------------------
+Average train losses = 0.945 | Train Acc: 0.620 | Train Recall: 0.908
+Average validation losses = 0.869 | Val Acc:   0.713 | Val Recall:   0.885
+=================================== 
+
+Training model:ViT_b16 epoch no.4 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:33<00:00,  2.43it/s, Loss=0.7238, Accuracy=0.9062, Recall=0.8824]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.10it/s, Loss=0.7494, Accuracy=0.7692, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.4 / 15 summary
+-----------------------------------
+Average train losses = 0.844 | Train Acc: 0.714 | Train Recall: 0.847
+Average validation losses = 0.785 | Val Acc:   0.782 | Val Recall:   0.789
+=================================== 
+
+Training model:ViT_b16 epoch no.5 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:35<00:00,  2.29it/s, Loss=0.7397, Accuracy=0.7500, Recall=0.9231]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  4.88it/s, Loss=0.7313, Accuracy=0.7692, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.5 / 15 summary
+-----------------------------------
+Average train losses = 0.785 | Train Acc: 0.764 | Train Recall: 0.831
+Average validation losses = 0.738 | Val Acc:   0.776 | Val Recall:   0.858
+=================================== 
+
+Training model:ViT_b16 epoch no.6 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.31it/s, Loss=0.8581, Accuracy=0.8125, Recall=0.7059]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.06it/s, Loss=0.6938, Accuracy=0.7692, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.6 / 15 summary
+-----------------------------------
+Average train losses = 0.762 | Train Acc: 0.773 | Train Recall: 0.814
+Average validation losses = 0.705 | Val Acc:   0.796 | Val Recall:   0.896
+=================================== 
+
+Training model:ViT_b16 epoch no.7 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:35<00:00,  2.30it/s, Loss=0.6918, Accuracy=0.9062, Recall=0.9444]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.07it/s, Loss=0.7172, Accuracy=0.7692, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.7 / 15 summary
+-----------------------------------
+Average train losses = 0.742 | Train Acc: 0.780 | Train Recall: 0.810
+Average validation losses = 0.683 | Val Acc:   0.813 | Val Recall:   0.861
+=================================== 
+
+Training model:ViT_b16 epoch no.8 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.38it/s, Loss=0.7725, Accuracy=0.8438, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.10it/s, Loss=0.6540, Accuracy=0.7692, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.8 / 15 summary
+-----------------------------------
+Average train losses = 0.720 | Train Acc: 0.785 | Train Recall: 0.817
+Average validation losses = 0.668 | Val Acc:   0.818 | Val Recall:   0.866
+=================================== 
+
+Training model:ViT_b16 epoch no.9 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.32it/s, Loss=0.7943, Accuracy=0.6875, Recall=0.6667]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  4.83it/s, Loss=0.6405, Accuracy=0.7692, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.9 / 15 summary
+-----------------------------------
+Average train losses = 0.719 | Train Acc: 0.784 | Train Recall: 0.811
+Average validation losses = 0.664 | Val Acc:   0.815 | Val Recall:   0.841
+=================================== 
+
+Training model:ViT_b16 epoch no.10 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:35<00:00,  2.28it/s, Loss=0.6826, Accuracy=0.8438, Recall=0.8421]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.04it/s, Loss=0.6019, Accuracy=0.7692, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.10 / 15 summary
+-----------------------------------
+Average train losses = 0.708 | Train Acc: 0.797 | Train Recall: 0.824
+Average validation losses = 0.656 | Val Acc:   0.822 | Val Recall:   0.823
+=================================== 
+
+Training model:ViT_b16 epoch no.11 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.36it/s, Loss=0.7348, Accuracy=0.7812, Recall=0.7692]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  4.98it/s, Loss=0.6483, Accuracy=0.7692, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.11 / 15 summary
+-----------------------------------
+Average train losses = 0.698 | Train Acc: 0.799 | Train Recall: 0.814
+Average validation losses = 0.655 | Val Acc:   0.831 | Val Recall:   0.829
+=================================== 
+
+Training model:ViT_b16 epoch no.12 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:33<00:00,  2.41it/s, Loss=0.9090, Accuracy=0.6562, Recall=0.7368]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.08it/s, Loss=0.6361, Accuracy=0.8462, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.12 / 15 summary
+-----------------------------------
+Average train losses = 0.689 | Train Acc: 0.811 | Train Recall: 0.812
+Average validation losses = 0.653 | Val Acc:   0.830 | Val Recall:   0.856
+=================================== 
+
+Training model:ViT_b16 epoch no.13 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.37it/s, Loss=0.6237, Accuracy=0.8438, Recall=0.8421]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.08it/s, Loss=0.6202, Accuracy=0.8462, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.13 / 15 summary
+-----------------------------------
+Average train losses = 0.696 | Train Acc: 0.794 | Train Recall: 0.812
+Average validation losses = 0.643 | Val Acc:   0.820 | Val Recall:   0.815
+=================================== 
+
+Training model:ViT_b16 epoch no.14 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:34<00:00,  2.33it/s, Loss=0.7045, Accuracy=0.8125, Recall=0.9167]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.09it/s, Loss=0.6445, Accuracy=0.8462, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.14 / 15 summary
+-----------------------------------
+Average train losses = 0.688 | Train Acc: 0.800 | Train Recall: 0.821
+Average validation losses = 0.652 | Val Acc:   0.832 | Val Recall:   0.845
+=================================== 
+
+Training model:ViT_b16 epoch no.15 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:35<00:00,  2.31it/s, Loss=0.6856, Accuracy=0.8125, Recall=0.9333]
+Testing...: 100%|██████████| 21/21 [00:04<00:00,  5.10it/s, Loss=0.6473, Accuracy=0.8462, Recall=1.0000]
+Model: ViT_b16 saved.
+
+Epoch no.15 / 15 summary
+-----------------------------------
+Average train losses = 0.681 | Train Acc: 0.811 | Train Recall: 0.828
+Average validation losses = 0.650 | Val Acc:   0.836 | Val Recall:   0.848
+===================================
+
+Training model:MobileNetV3-Large epoch no.1 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:32<00:00,  2.51it/s, Loss=1.1323, Accuracy=0.5625, Recall=0.7059]
+Testing...: 100%|██████████| 21/21 [00:05<00:00,  4.01it/s, Loss=1.1282, Accuracy=0.5385, Recall=0.4000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.1 / 15 summary
+-----------------------------------
+Average train losses = 1.166 | Train Acc: 0.508 | Train Recall: 0.556
+Average validation losses = 1.181 | Val Acc:   0.485 | Val Recall:   0.291
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.2 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.80it/s, Loss=1.0915, Accuracy=0.5938, Recall=0.8750]
+Testing...: 100%|██████████| 21/21 [00:01<00:00, 10.92it/s, Loss=1.0789, Accuracy=0.6923, Recall=0.4000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.2 / 15 summary
+-----------------------------------
+Average train losses = 1.124 | Train Acc: 0.576 | Train Recall: 0.724
+Average validation losses = 1.151 | Val Acc:   0.576 | Val Recall:   0.403
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.3 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:26<00:00,  3.01it/s, Loss=0.9786, Accuracy=0.6562, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  9.66it/s, Loss=1.0259, Accuracy=0.7692, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.3 / 15 summary
+-----------------------------------
+Average train losses = 1.045 | Train Acc: 0.630 | Train Recall: 0.880
+Average validation losses = 1.085 | Val Acc:   0.715 | Val Recall:   0.629
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.4 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.77it/s, Loss=0.8991, Accuracy=0.7188, Recall=0.8824]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  8.31it/s, Loss=0.9498, Accuracy=0.7692, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.4 / 15 summary
+-----------------------------------
+Average train losses = 0.965 | Train Acc: 0.668 | Train Recall: 0.890
+Average validation losses = 1.006 | Val Acc:   0.752 | Val Recall:   0.735
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.5 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:27<00:00,  2.96it/s, Loss=0.9382, Accuracy=0.6562, Recall=0.8421]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  9.09it/s, Loss=0.9255, Accuracy=0.6923, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.5 / 15 summary
+-----------------------------------
+Average train losses = 0.912 | Train Acc: 0.688 | Train Recall: 0.888
+Average validation losses = 0.934 | Val Acc:   0.767 | Val Recall:   0.788
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.6 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.87it/s, Loss=0.8308, Accuracy=0.7188, Recall=0.8750]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.79it/s, Loss=0.8882, Accuracy=0.7692, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.6 / 15 summary
+-----------------------------------
+Average train losses = 0.860 | Train Acc: 0.723 | Train Recall: 0.874
+Average validation losses = 0.890 | Val Acc:   0.785 | Val Recall:   0.781
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.7 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.88it/s, Loss=0.7974, Accuracy=0.8125, Recall=0.9412]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  8.62it/s, Loss=0.8526, Accuracy=0.7692, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.7 / 15 summary
+-----------------------------------
+Average train losses = 0.827 | Train Acc: 0.740 | Train Recall: 0.870
+Average validation losses = 0.845 | Val Acc:   0.796 | Val Recall:   0.831
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.8 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:31<00:00,  2.60it/s, Loss=0.6986, Accuracy=0.8125, Recall=0.8462]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  7.28it/s, Loss=0.7920, Accuracy=0.7692, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.8 / 15 summary
+-----------------------------------
+Average train losses = 0.799 | Train Acc: 0.757 | Train Recall: 0.877
+Average validation losses = 0.802 | Val Acc:   0.800 | Val Recall:   0.830
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.9 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.81it/s, Loss=0.6479, Accuracy=0.8750, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  7.00it/s, Loss=0.7887, Accuracy=0.7692, Recall=0.6000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.9 / 15 summary
+-----------------------------------
+Average train losses = 0.798 | Train Acc: 0.745 | Train Recall: 0.857
+Average validation losses = 0.767 | Val Acc:   0.796 | Val Recall:   0.844
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.10 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:27<00:00,  2.91it/s, Loss=0.6192, Accuracy=0.8438, Recall=0.8750]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  9.20it/s, Loss=0.7606, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.10 / 15 summary
+-----------------------------------
+Average train losses = 0.794 | Train Acc: 0.751 | Train Recall: 0.861
+Average validation losses = 0.732 | Val Acc:   0.817 | Val Recall:   0.873
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.11 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.76it/s, Loss=0.6660, Accuracy=0.8125, Recall=0.9412]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  9.02it/s, Loss=0.6850, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.11 / 15 summary
+-----------------------------------
+Average train losses = 0.791 | Train Acc: 0.755 | Train Recall: 0.861
+Average validation losses = 0.710 | Val Acc:   0.811 | Val Recall:   0.869
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.12 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.69it/s, Loss=0.7131, Accuracy=0.7812, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  8.00it/s, Loss=0.6960, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.12 / 15 summary
+-----------------------------------
+Average train losses = 0.762 | Train Acc: 0.772 | Train Recall: 0.867
+Average validation losses = 0.698 | Val Acc:   0.822 | Val Recall:   0.867
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.13 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.82it/s, Loss=0.7560, Accuracy=0.8125, Recall=1.0000]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  9.07it/s, Loss=0.6572, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.13 / 15 summary
+-----------------------------------
+Average train losses = 0.776 | Train Acc: 0.762 | Train Recall: 0.857
+Average validation losses = 0.692 | Val Acc:   0.829 | Val Recall:   0.865
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.14 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.73it/s, Loss=0.8797, Accuracy=0.7188, Recall=0.7857]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  8.03it/s, Loss=0.6418, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.14 / 15 summary
+-----------------------------------
+Average train losses = 0.769 | Train Acc: 0.768 | Train Recall: 0.868
+Average validation losses = 0.688 | Val Acc:   0.833 | Val Recall:   0.865
+=================================== 
+
+Training model:MobileNetV3-Large epoch no.15 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:27<00:00,  2.93it/s, Loss=0.8389, Accuracy=0.7188, Recall=0.7222]
+Testing...: 100%|██████████| 21/21 [00:02<00:00,  8.18it/s, Loss=0.6356, Accuracy=0.8462, Recall=0.8000]
+Model: MobileNetV3-Large saved.
+
+Epoch no.15 / 15 summary
+-----------------------------------
+Average train losses = 0.758 | Train Acc: 0.772 | Train Recall: 0.870
+Average validation losses = 0.692 | Val Acc:   0.830 | Val Recall:   0.854
+===================================
+
+Training model:DenseNet201_improved epoch no.1 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.76it/s, Loss=1.0600, Accuracy=0.5938, Recall=1.0000, Precision=0.5806, F1=0.7347]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.39it/s, Loss=1.0430, Accuracy=0.3846, Recall=1.0000, Precision=0.3846, F1=0.5556]
+Model: DenseNet201_improved saved.
+
+Epoch no.1 / 15 summary
+-----------------------------------
+Average train losses = 1.099 | Train Acc: 0.511 | Train Recall: 0.928 | Train Precision: 0.507 | Train F1: 0.641
+Average validation losses = 0.984 | Val Acc:   0.508 | Val Recall:   0.993 | Val Precision: 0.502 | Val F1: 0.663
+=================================== 
+
+Training model:DenseNet201_improved epoch no.2 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.81it/s, Loss=0.9976, Accuracy=0.5938, Recall=0.7500, Precision=0.5714, F1=0.6486]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.95it/s, Loss=0.5977, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved saved.
+
+Epoch no.2 / 15 summary
+-----------------------------------
+Average train losses = 0.867 | Train Acc: 0.685 | Train Recall: 0.866 | Train Precision: 0.658 | Train F1: 0.733
+Average validation losses = 0.664 | Val Acc:   0.843 | Val Recall:   0.737 | Val Precision: 0.922 | Val F1: 0.816
+=================================== 
+
+Training model:DenseNet201_improved epoch no.3 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.78it/s, Loss=0.9127, Accuracy=0.8125, Recall=0.6667, Precision=0.8000, F1=0.7273]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.93it/s, Loss=0.9354, Accuracy=0.7692, Recall=0.4000, Precision=1.0000, F1=0.5714]
+Model: DenseNet201_improved saved.
+
+Epoch no.3 / 15 summary
+-----------------------------------
+Average train losses = 0.777 | Train Acc: 0.758 | Train Recall: 0.824 | Train Precision: 0.752 | Train F1: 0.772
+Average validation losses = 0.784 | Val Acc:   0.796 | Val Recall:   0.590 | Val Precision: 0.972 | Val F1: 0.724
+=================================== 
+
+Training model:DenseNet201_improved epoch no.4 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.73it/s, Loss=0.5246, Accuracy=0.8125, Recall=1.0000, Precision=0.7391, F1=0.8500]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.84it/s, Loss=0.5261, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved saved.
+
+Epoch no.4 / 15 summary
+-----------------------------------
+Average train losses = 0.777 | Train Acc: 0.760 | Train Recall: 0.830 | Train Precision: 0.763 | Train F1: 0.772
+Average validation losses = 0.527 | Val Acc:   0.870 | Val Recall:   0.837 | Val Precision: 0.889 | Val F1: 0.859
+=================================== 
+
+Training model:DenseNet201_improved epoch no.5 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.77it/s, Loss=0.6019, Accuracy=0.7188, Recall=0.8462, Precision=0.6111, F1=0.7097]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.84it/s, Loss=0.5655, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved saved.
+
+Epoch no.5 / 15 summary
+-----------------------------------
+Average train losses = 0.761 | Train Acc: 0.764 | Train Recall: 0.807 | Train Precision: 0.786 | Train F1: 0.771
+Average validation losses = 0.501 | Val Acc:   0.883 | Val Recall:   0.811 | Val Precision: 0.941 | Val F1: 0.868
+=================================== 
+
+Training model:DenseNet201_improved epoch no.6 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.81it/s, Loss=0.6019, Accuracy=0.8750, Recall=0.7647, Precision=1.0000, F1=0.8667]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.86it/s, Loss=0.5959, Accuracy=0.8462, Recall=0.8000, Precision=0.8000, F1=0.8000]
+Model: DenseNet201_improved saved.
+
+Epoch no.6 / 15 summary
+-----------------------------------
+Average train losses = 0.688 | Train Acc: 0.806 | Train Recall: 0.822 | Train Precision: 0.811 | Train F1: 0.803
+Average validation losses = 0.549 | Val Acc:   0.862 | Val Recall:   0.833 | Val Precision: 0.874 | Val F1: 0.849
+=================================== 
+
+Training model:DenseNet201_improved epoch no.7 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.78it/s, Loss=0.6081, Accuracy=0.8438, Recall=0.7368, Precision=1.0000, F1=0.8485]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.83it/s, Loss=0.5862, Accuracy=0.8462, Recall=0.8000, Precision=0.8000, F1=0.8000]
+Model: DenseNet201_improved saved.
+
+Epoch no.7 / 15 summary
+-----------------------------------
+Average train losses = 0.676 | Train Acc: 0.797 | Train Recall: 0.841 | Train Precision: 0.796 | Train F1: 0.804
+Average validation losses = 0.518 | Val Acc:   0.872 | Val Recall:   0.834 | Val Precision: 0.892 | Val F1: 0.860
+=================================== 
+
+Training model:DenseNet201_improved epoch no.8 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.73it/s, Loss=0.5800, Accuracy=0.8438, Recall=0.8667, Precision=0.8125, F1=0.8387]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.73it/s, Loss=0.5623, Accuracy=0.8462, Recall=0.8000, Precision=0.8000, F1=0.8000]
+Model: DenseNet201_improved saved.
+
+Epoch no.8 / 15 summary
+-----------------------------------
+Average train losses = 0.652 | Train Acc: 0.807 | Train Recall: 0.828 | Train Precision: 0.805 | Train F1: 0.805
+Average validation losses = 0.462 | Val Acc:   0.878 | Val Recall:   0.909 | Val Precision: 0.849 | Val F1: 0.875
+=================================== 
+
+Training model:DenseNet201_improved epoch no.9 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.80it/s, Loss=0.3839, Accuracy=0.9688, Recall=0.9444, Precision=1.0000, F1=0.9714]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.90it/s, Loss=0.5012, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved saved.
+
+Epoch no.9 / 15 summary
+-----------------------------------
+Average train losses = 0.630 | Train Acc: 0.822 | Train Recall: 0.850 | Train Precision: 0.822 | Train F1: 0.824
+Average validation losses = 0.441 | Val Acc:   0.901 | Val Recall:   0.847 | Val Precision: 0.945 | Val F1: 0.890
+=================================== 
+
+Training model:DenseNet201_improved epoch no.10 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:30<00:00,  2.70it/s, Loss=0.5872, Accuracy=0.8125, Recall=0.9286, Precision=0.7222, F1=0.8125]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.69it/s, Loss=0.6000, Accuracy=0.8462, Recall=0.6000, Precision=1.0000, F1=0.7500]
+Model: DenseNet201_improved saved.
+
+Epoch no.10 / 15 summary
+-----------------------------------
+Average train losses = 0.593 | Train Acc: 0.837 | Train Recall: 0.867 | Train Precision: 0.826 | Train F1: 0.839
+Average validation losses = 0.487 | Val Acc:   0.877 | Val Recall:   0.793 | Val Precision: 0.944 | Val F1: 0.856
+=================================== 
+
+Training model:DenseNet201_improved epoch no.11 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.76it/s, Loss=0.5270, Accuracy=0.7812, Recall=0.9286, Precision=0.6842, F1=0.7879]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.87it/s, Loss=0.4400, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved saved.
+
+Epoch no.11 / 15 summary
+-----------------------------------
+Average train losses = 0.578 | Train Acc: 0.835 | Train Recall: 0.875 | Train Precision: 0.818 | Train F1: 0.837
+Average validation losses = 0.423 | Val Acc:   0.886 | Val Recall:   0.869 | Val Precision: 0.890 | Val F1: 0.876
+=================================== 
+
+Training model:DenseNet201_improved epoch no.12 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.73it/s, Loss=0.3764, Accuracy=0.9062, Recall=0.9474, Precision=0.9000, F1=0.9231]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.86it/s, Loss=0.3399, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved saved.
+
+Epoch no.12 / 15 summary
+-----------------------------------
+Average train losses = 0.563 | Train Acc: 0.846 | Train Recall: 0.865 | Train Precision: 0.844 | Train F1: 0.846
+Average validation losses = 0.406 | Val Acc:   0.892 | Val Recall:   0.918 | Val Precision: 0.873 | Val F1: 0.890
+=================================== 
+
+Training model:DenseNet201_improved epoch no.13 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:29<00:00,  2.70it/s, Loss=0.3802, Accuracy=0.9375, Recall=0.9375, Precision=0.9375, F1=0.9375]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.84it/s, Loss=0.6644, Accuracy=0.8462, Recall=0.6000, Precision=1.0000, F1=0.7500]
+Model: DenseNet201_improved saved.
+
+Epoch no.13 / 15 summary
+-----------------------------------
+Average train losses = 0.562 | Train Acc: 0.845 | Train Recall: 0.869 | Train Precision: 0.838 | Train F1: 0.846
+Average validation losses = 0.428 | Val Acc:   0.890 | Val Recall:   0.827 | Val Precision: 0.936 | Val F1: 0.872
+=================================== 
+
+Training model:DenseNet201_improved epoch no.14 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.85it/s, Loss=0.5220, Accuracy=0.8750, Recall=1.0000, Precision=0.7647, F1=0.8667]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.97it/s, Loss=0.4541, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved saved.
+
+Epoch no.14 / 15 summary
+-----------------------------------
+Average train losses = 0.538 | Train Acc: 0.841 | Train Recall: 0.874 | Train Precision: 0.825 | Train F1: 0.842
+Average validation losses = 0.402 | Val Acc:   0.895 | Val Recall:   0.861 | Val Precision: 0.920 | Val F1: 0.886
+=================================== 
+
+Training model:DenseNet201_improved epoch no.15 / 15
+-----------------------------------
+Training...: 100%|██████████| 81/81 [00:28<00:00,  2.80it/s, Loss=0.5337, Accuracy=0.7812, Recall=0.7647, Precision=0.8125, F1=0.7879]
+Testing...: 100%|██████████| 21/21 [00:03<00:00,  6.84it/s, Loss=0.5758, Accuracy=0.9231, Recall=0.8000, Precision=1.0000, F1=0.8889]
+Model: DenseNet201_improved saved.
+
+Epoch no.15 / 15 summary
+-----------------------------------
+Average train losses = 0.534 | Train Acc: 0.857 | Train Recall: 0.850 | Train Precision: 0.866 | Train F1: 0.853
+Average validation losses = 0.403 | Val Acc:   0.895 | Val Recall:   0.871 | Val Precision: 0.914 | Val F1: 0.888
+===================================

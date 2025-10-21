@@ -1,11 +1,11 @@
 ## **7.1. Dense Layers with Dropout**
 ```python
-for hidden_size in hidden_units:  # [256, 64]
+for hidden_size in hidden_units:  # [512, 128]
     nn.Linear(in_features, hidden_size)
     nn.ReLU()
     nn.Dropout(dropout_rate)
 ```
-**What it does:** Adds 2 hidden layers (1920 → 256 → 64) before final prediction.
+**What it does:** Adds 2 hidden layers (1920 → 512 → 128) before final prediction.
 
 **Why it helps:**
 - **More layers = more learning capacity** to understand PD vs Healthy patterns
@@ -18,7 +18,7 @@ for hidden_size in hidden_units:  # [256, 64]
 
 ## **7.2. Final Single Output**
 ```python
-nn.Linear(in_features, 1)  # 64 → 1
+nn.Linear(in_features, 1)  # 128 → 1
 ```
 **What it does:** Produces one number (logit) that represents confidence of PD.
 
@@ -39,6 +39,6 @@ DenseNet features (1920) → [DIRECT] → Prediction (1)
 
 **After (improved model):**
 ```
-DenseNet features (1920) → 256 → Dropout → 64 → Dropout → Prediction (1)
+DenseNet features (1920) → 512 → Dropout → 128 → Dropout → Prediction (1)
 ```
 -> Gradual refinement, learns PD patterns better, less overfitting

@@ -2,7 +2,7 @@ from torchvision.models import densenet201
 from torch import nn, inference_mode
 
 def create_improved_densenet(dropout_rate=0.5, 
-                            hidden_units=[256, 64]):
+                            hidden_units=[512, 128]):
     """
     Creates an improved DenseNet201 model for BINARY classification (single output).
     
@@ -14,7 +14,7 @@ def create_improved_densenet(dropout_rate=0.5,
     
     Args:
         dropout_rate: Dropout probability (default: 0.5)
-        hidden_units: List of hidden layer sizes (default: [256, 64])
+        hidden_units: List of hidden layer sizes (default: [512, 128])
     
     Returns:
         Modified DenseNet201 model with binary output

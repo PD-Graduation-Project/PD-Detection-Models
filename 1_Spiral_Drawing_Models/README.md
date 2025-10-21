@@ -52,7 +52,7 @@
 ---
 
 # Phase THREE
-- Updated the calssifier of the model, taking inspiration from [This paper](https://ieeexplore.ieee.org/document/10307641) (for more details see the `improved_classifier.md` file). This however increased the number of trainable parameters from `1,921` to `508,289`.
+- Updated the calssifier of the model, taking inspiration from [This paper](https://ieeexplore.ieee.org/document/10307641) (for more details see the `improved_classifier.md` file). This however increased the number of trainable parameters from `1,921` to `1,049,345`.
 - Added gradient clipping to training loop.
 - Updated max_lr from `3e-4` to `1e-3`.
 - Added precision,and F1-score calculations.
