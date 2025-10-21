@@ -10,7 +10,7 @@
 - Compared between all 5 models, accuracy and losses, when training them for:
     - 5 epochs
     - 10 epochs
-- Finetuned the best model , `DenseNet50`, and trained it for extra 50 epochs. (found in 'experiments/finetuning/finetune_test1.iypnb')
+- Finetuned the best model , `DenseNet50`, and trained it for extra 50 epochs. (found in `experiments/ finetuning/ finetune_test1.iypnb`)
 
 ## Best results from **PHASE ONE**
 - Validation Accuracy: **87.7%**
@@ -38,7 +38,7 @@
 ## Conclusion
 - Changing the *scheduler* made the accuracy increase way faster.
 - The new *loss function* needed many hyperparameters tuning, but now it is balanced.
-- After only 10 epochs the model gave comparable outputs to the one trained for over 50 epochs. (found in 'experiments/finetuning/finetune_test2.iypnb')
+- After only 10 epochs the model gave comparable outputs to the one trained for over 50 epochs. (found in `experiments/ finetuning/ finetune_test2.iypnb`)
 - `DenseNet50` is still superior in accuracy, recall, and model size. 
 - `VGG19_bn` is very promising, and has better recall, but the model is so much larger than `DenseNet50`. (may experiment with it more later)
 
