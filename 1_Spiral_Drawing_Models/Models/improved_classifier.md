@@ -1,25 +1,11 @@
-## **7.1. Global Average Pooling**
+## **7.1. Dense Layers with Dropout**
 ```python
-nn.AdaptiveAvgPool2d(1, 1)
-nn.Flatten()
-```
-**What it does:** Squashes the feature map from any size down to a single number per channel.
-
-**Why it helps:** 
-- Reduces overfitting (fewer parameters)
-- Makes model work with any input size
-- Keeps only the most important information from each feature map
-
----
-
-## **7.2. Dense Layers with Dropout**
-```python
-for hidden_size in hidden_units:  # [512, 128]
+for hidden_size in hidden_units:  # [256, 64]
     nn.Linear(in_features, hidden_size)
     nn.ReLU()
     nn.Dropout(dropout_rate)
 ```
-**What it does:** Adds 2 hidden layers (1920 → 512 → 128) before final prediction.
+**What it does:** Adds 2 hidden layers (1920 → 256 → 64) before final prediction.
 
 **Why it helps:**
 - **More layers = more learning capacity** to understand PD vs Healthy patterns
@@ -30,9 +16,9 @@ for hidden_size in hidden_units:  # [512, 128]
 
 ---
 
-## **7.3. Final Single Output**
+## **7.2. Final Single Output**
 ```python
-nn.Linear(in_features, 1)  # 128 → 1
+nn.Linear(in_features, 1)  # 64 → 1
 ```
 **What it does:** Produces one number (logit) that represents confidence of PD.
 
@@ -53,6 +39,6 @@ DenseNet features (1920) → [DIRECT] → Prediction (1)
 
 **After (improved model):**
 ```
-DenseNet features (1920) → Pool → 512 → Dropout → 128 → Dropout → Prediction (1)
+DenseNet features (1920) → 256 → Dropout → 64 → Dropout → Prediction (1)
 ```
 -> Gradual refinement, learns PD patterns better, less overfitting
