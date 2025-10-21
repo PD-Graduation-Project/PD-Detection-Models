@@ -42,6 +42,7 @@
 
 ## TO DO (for phase three maybe)
 - Keep testing new hyperparameters until we reach the best balance between *accuracy* and *recall*.
+- Unfreeze some layers in the middle of the model.
 - Compare `DenseNet50` with and without `CLAHE` in `val_dataloader`.
 - Compare `DenseNet50` with the trained image size of `(224, 224)` and with `(512, 512)`.
 - Just search for ways to **increase overall accuracy**.
