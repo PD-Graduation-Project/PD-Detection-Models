@@ -1,3 +1,10 @@
+> **Note:** Most notebook cell outputs have been cleared to keep the repository clean and easier to navigate. 
+> 
+> All code cells are preserved and fully executable. 
+> 
+> Key outputs, such as confusion matrices, are included in the README file, and training logs are available in the `results/` folder as text files.
+
+
 # Phase ONE [**DONE**]
 - All files created and working.
 - Compared between all 5 models, accuracy and losses, when training them for:
