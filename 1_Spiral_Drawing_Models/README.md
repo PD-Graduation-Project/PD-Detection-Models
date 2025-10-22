@@ -1,8 +1,10 @@
-> **Note:** Most notebook cell outputs have been cleared to keep the repository clean and easier to navigate. 
+> **Note 1:** Most notebook cell outputs have been cleared to keep the repository clean and easier to navigate. 
 > 
 > All code cells are preserved and fully executable. 
 > 
 > Key outputs, such as confusion matrices, are included in the README file, and training logs are available in the `results/` folder as text files.
+>
+> **NOTE 2:** Files and models that are no longer going to be used were moved to archived folders. If you are re-running the notebooks you may need to change the directories. (same for the whole `experiments` folder)
 
 
 # Phase ONE [**DONE**]
@@ -14,7 +16,7 @@
 
 ## Best results from **PHASE ONE**
 - Validation Accuracy: **87.7%**
-- ![alt text](imgs/image.png)
+- ![alt text](results/confusion_matrices/phase_1.png)
 
 ## Conclusion
 - Need to fix false negatives being more than false postives.
@@ -33,7 +35,7 @@
 - Validation Accuracy: **89.37%**
 - Validation Recall: **0.8407**
 - Number of trained epochs: **15** (initial model comparisons) + **31** (fine-tuning with early stopping; planned 50).
-- ![](imgs/PastedImage.png)
+- ![](results/confusion_matrices/phase_2.png)
 
 ## Conclusion
 - Changing the *scheduler* made the accuracy increase way faster.
@@ -56,13 +58,13 @@
 - Validation precision: **0.9609**
 - Validation F1-Score: **0.9689**
 - Number of trained epochs: **15** (initial model comparisons) + **43** (fine-tuning with early stopping; planned 50).
-![alt text](imgs/image-1.png)
+![alt text](results/confusion_matrices/phase_3.png)
 
 ## Conclusion
 - Massive improvement in accuracy and recall, along with a sharp drop in losses.
 - Comaprison in accuracy and losses between phase 2 and phase 3:
-    - ![](results/Phase%20THREE/finetuning/val_acc.png)
-    - ![](results/Phase%20THREE/finetuning/val_loss.png)
+    - ![](results/Phase_3/finetuning/val_acc.png)
+    - ![](results/Phase_3/finetuning/val_loss.png)
 
 ## TO DO (for phase four maybe)
 - Unfreeze some layers in the middle of the model or add more hidden layers.

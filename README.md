@@ -9,5 +9,5 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 - Validation Recall: **0.9787**
 - Validation precision: **0.9609**
 - Validation F1-Score: **0.9689**
-- ![](1_Spiral_Drawing_Models/imgs/image-1.png)
+- ![](1_Spiral_Drawing_Models/results/confusion_matrices/phase_3.png)
 
