@@ -4,7 +4,7 @@
 > 
 > Key outputs, such as confusion matrices, are included in the README file, and training logs are available in the `results/` folder as text files.
 >
-> **NOTE 2:** Files and models that are no longer going to be used were moved to archived folders. If you are re-running the notebooks you may need to change the directories. (same for the whole `experiments` folder)
+> **NOTE 2:** Files and models that are no longer going to be used were moved to archived folders. If you are re-running the notebooks you may need to change the directories. (same for the whole `experiments/` folder)
 
 
 # Phase ONE [**DONE**]
