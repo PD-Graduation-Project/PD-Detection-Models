@@ -2,6 +2,29 @@ import torch
 from torch import nn
 
 class TremorNetGRU(nn.Module):
+    """
+    CNN–GRU–Attention model for tremor classification using IMU signals and wrist info.
+
+    Combines:
+    - CNN: extracts local motion features (6→256 channels, ~T/8).
+    - BiGRU: captures temporal dependencies.
+    - Attention + mean/max pooling: highlight key time steps.
+    - Wrist embedding: adds left/right wrist context.
+    - Classifier: outputs logits for `num_classes`.
+
+    Args:
+        num_classes (int): number of output classes.
+        hidden_size (int): GRU hidden size per direction.
+        wrist_embed_dim (int): wrist embedding dimension.
+        dropout (float): dropout probability.
+
+    Input:
+        x (Tensor): [B, T, 6] IMU signals.
+        wrist (Tensor): [B] wrist side (0=Left, 1=Right).
+
+    Output:
+        Tensor: [B, num_classes] classification logits.
+    """
     def __init__(self,
                 num_classes: int = 3,
                 hidden_size: int = 128,
