@@ -27,10 +27,10 @@
   - `Other/`
 
 - **`TremorDataset` class:**
-  - Loads signals and labels from all groups
-  - Adds wrist information as a **7th channel** to signals
+  - Loads signals, wrist indicators, and labels from all groups
+  - Keeps wrist information as a **separate scalar value** (0=Left, 1=Right) instead of adding it as a 7th channel
   - Shuffles data for reproducibility
-  - Returns `(signal_tensor, label_tensor)` pairs
+  - Returns `(signal_tensor, wrist_tensor, label_tensor)` tuples
 
 - **`create_tremor_dataloaders()` function:**
   - Splits data into training/validation sets

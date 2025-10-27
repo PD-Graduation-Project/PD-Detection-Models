@@ -11,7 +11,11 @@ def create_tremor_dataloaders(
     Creates PyTorch DataLoaders for tremor movement classification.
 
     - Loads preprocessed .npz signals from the given movement folder.
-    - Each sample contains a motion signal (with wrist encoded as 7th feature) and a label (0=Healthy, 1=Parkinson, 2=Other).
+    - Each sample contains:
+        (signal_tensor, wrist_tensor, label_tensor)
+            - signal_tensor : shape (T, 6), IMU signal
+            - wrist_tensor  : scalar (0 = Left, 1 = Right)
+            - label_tensor  : scalar (0 = Healthy, 1 = Parkinson, 2 = Other)
     - Splits dataset into train/validation subsets (stratified by label).
     - Returns DataLoaders ready for model training.
 
