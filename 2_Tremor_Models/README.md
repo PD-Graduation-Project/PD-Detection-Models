@@ -114,6 +114,13 @@ These complement attention by providing different temporal summaries.
 - Default: 16-dimensional wrist embedding
 - Integrates wrist context (left vs right) into the final classification
 
+- **Think of it like this:**
+  - For **left** wrist data, the model uses one embedding vector.
+  - For **right** wrist data, it uses another.
+  - During **training**, it learns how the tremor signals from the two wrists differ statistically or dynamically.
+
+So effectively, those 32 parameters help the model link “wrist side” to movement patterns, improving classification consistency when left and right hands behave differently (which is common in PD).
+
 ---
 
 ## 6. Classifier
@@ -132,22 +139,35 @@ These complement attention by providing different temporal summaries.
 
 ## 7. Forward Pass
 
-**Data flow:**
+**Data Flow:**
+
 ```python
-x: [B, T, 6]        -> [B, 6, T]           # CNN expects channels-first
-cnn_out: [B, 256, T/8]
+# 1. Input Formatting
+x: [B, T, 6] -> [B, 6, T]                     # CNN expects channels-first format
+
+# 2. CNN Feature Extraction
+cnn_out: [B, 256, T/8]                        # local motion features after temporal downsampling
+
+# 3. GRU Temporal Modeling
 gru_in: [B, T/8, 256]
-gru_out: [B, T/8, 256]                     # bidirectional GRU output
+gru_out: [B, T/8, hidden_size*2]              # bidirectional GRU captures forward & backward dependencies
 
-attended:   [B, 256]                       # attention-weighted feature
-pooled_mean:[B, 256]
-pooled_max: [B, 256]
-time_features = concat([attended, pooled_mean, pooled_max]) -> [B, 768]
+# 4. Temporal Feature Summarization
+# The GRU outputs a sequence over time. Here we summarize it into fixed-size features:
+# - Attention: focuses on the most informative time steps
+# - Mean pooling: captures the average motion pattern
+# - Max pooling: captures the strongest motion response
+attended:    [B, hidden_size*2]               # attention-weighted representation
+pooled_mean: [B, hidden_size*2]               # global average pooling
+pooled_max:  [B, hidden_size*2]               # global max pooling
+time_features = concat([attended, pooled_mean, pooled_max]) -> [B, hidden_size*6]
 
-wrist_embed: [B, 16]
-combined = concat([time_features, wrist_embed]) -> [B, 784]
+# 5. Wrist Context Embedding
+wrist_embed: [B, 16]                          # learned wrist feature (left/right)
 
-output = classifier(combined) -> [B, num_classes]
+# 6. Fusion and Classification
+combined = concat([time_features, wrist_embed]) -> [B, hidden_size*6 + wrist_embed_dim]
+output = classifier(combined) -> [B, num_classes]            # final class logits
 ```
 
 **Output:**
