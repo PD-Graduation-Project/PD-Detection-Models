@@ -10,7 +10,7 @@
 
 - **Signal length:** 1024 or 2048 timepoints per file (movement-dependent)
 
-- **Signal structure:** 6 IMU channels per timepoint
+- **Signal structure:** 6 IMU channels per timepoint (e.g., 3-axis accelerometer + 3-axis gyroscope)
 
 ---
 
@@ -59,66 +59,140 @@
 
 ## 1. CNN Block
 
-- Input: 6 IMU channels -> 64 -> 128 feature maps
-- Temporal downsampling using stride and padding
+- Input: 6 IMU channels -> 64 -> 128 -> 256 feature maps
+- **Three** 1D convolutions with `stride = 2` (temporal downsampling by ~8×)
 - Batch normalization and ReLU activations after each convolution
 - Dropout applied for regularization
 
 **Output shape:**
-`[B, 128, T/4]` -> fed into GRU
+`[B, 256, T/8]` -> reshaped to `[B, T/8, 256]` for GRU input
 
 ---
 
 ## 2. GRU Block
 
-- `input_size = 128` (from CNN output)
-- 2 stacked bidirectional GRU layers (`hidden_size = 128`)
+- `input_size = 256` (from CNN output)
+- 2 stacked **bidirectional** GRU layers (`hidden_size = 128`)
 - Dropout applied between GRU layers
 
 **Output shape:**
-`[B, T/4, 2 * hidden_size]` (bidirectional output)
-
-Last timestep extracted with:
-
-```python
-last_out = gru_out[:, -1, :]
-```
+`[B, T/8, 2 * hidden_size]` = `[B, T/8, 256]` (bidirectional output)
 
 ---
 
-## 3. Wrist Embedding
+## 3. Attention Block
+
+The attention mechanism learns to **focus on the most diagnostically relevant time windows** rather than treating all time steps equally.
+
+**Mechanism:**
+  - Small attention network: `Linear(256→64) → Tanh → Linear(64→1)`
+  - Produces scalar attention **scores** per **time step**
+  - `Softmax` normalizes these scores across time
+  - Weighted sum yields an attention-focused temporal representation
+
+**Key advantage:** Automatically identifies *when* symptoms occur, ignoring irrelevant movement periods.
+
+**Output shape:**
+`[B, 256]` (attention-weighted temporal features vecor)
+
+---
+
+## 4. Global Pooling
+
+In addition to attention, two pooling operations capture overall patterns:
+
+- **Mean pooling:** `[B, 256]` (average across all time steps)
+- **Max pooling:** `[B, 256]` (maximum activation across time)
+
+These complement attention by providing different temporal summaries.
+
+---
+
+## 5. Wrist Embedding
 
 - `nn.Embedding(2, wrist_embed_dim)` maps wrist type to a learned feature vector
 - Default: 16-dimensional wrist embedding
-- Integrates wrist context into the final classification
+- Integrates wrist context (left vs right) into the final classification
 
 ---
 
-## 4. Classifier
+## 6. Classifier
 
-- Input: concatenation of GRU output and wrist embedding
-- Hidden layer with ReLU and dropout
+- Input: concatenation of attention features + mean pooling + max pooling + wrist embedding
+- Input dimension:
+    ```
+    3 × (2 × hidden_size) + wrist_embed_dim
+    = hidden_size * 6 + wrist_embed_dim
+    = 128 * 6 + 16 = 784
+    ```
+- Hidden layer (128 units) with ReLU and dropout
 - Final linear layer produces `num_classes` logits
 
 ---
 
-## 5. Forward Pass
+## 7. Forward Pass
 
 **Data flow:**
-
 ```python
-x: [Batch, Time, Channels] -> [B, C, T]  # for Conv1d
-features: [B, 128, T/4] -> [B, T/4, 128]  # for GRU
-```
+x: [B, T, 6]        -> [B, 6, T]           # CNN expects channels-first
+cnn_out: [B, 256, T/8]
+gru_in: [B, T/8, 256]
+gru_out: [B, T/8, 256]                     # bidirectional GRU output
 
-**Concatenation:**
+attended:   [B, 256]                       # attention-weighted feature
+pooled_mean:[B, 256]
+pooled_max: [B, 256]
+time_features = concat([attended, pooled_mean, pooled_max]) -> [B, 768]
 
-```python
-combined = cat([last_out, wrist_embed], dim=1)
+wrist_embed: [B, 16]
+combined = concat([time_features, wrist_embed]) -> [B, 784]
+
+output = classifier(combined) -> [B, num_classes]
 ```
 
 **Output:**
 `[B, num_classes]`: suitable for `CrossEntropyLoss`
 
 ---
+
+## 8. Full model architecture 
+```
+========================================================================================================================
+Layer (type (var_name))                  Input Shape          Output Shape         Param #              Trainable
+========================================================================================================================
+TremorNetGRU (TremorNetGRU)              [1, 1024, 6]         [1, 3]               --                   True
+├─Sequential (cnn)                       [1, 6, 1024]         [1, 256, 128]        --                   True
+│    └─Conv1d (0)                        [1, 6, 1024]         [1, 64, 512]         1,984                True
+│    └─BatchNorm1d (1)                   [1, 64, 512]         [1, 64, 512]         128                  True
+│    └─ReLU (2)                          [1, 64, 512]         [1, 64, 512]         --                   --
+│    └─Conv1d (3)                        [1, 64, 512]         [1, 128, 256]        24,704               True
+│    └─BatchNorm1d (4)                   [1, 128, 256]        [1, 128, 256]        256                  True
+│    └─ReLU (5)                          [1, 128, 256]        [1, 128, 256]        --                   --
+│    └─Conv1d (6)                        [1, 128, 256]        [1, 256, 128]        98,560               True
+│    └─BatchNorm1d (7)                   [1, 256, 128]        [1, 256, 128]        512                  True
+│    └─ReLU (8)                          [1, 256, 128]        [1, 256, 128]        --                   --
+│    └─Dropout (9)                       [1, 256, 128]        [1, 256, 128]        --                   --
+├─GRU (gru)                              [1, 128, 256]        [1, 128, 256]        592,896              True
+├─Sequential (attention)                 [1, 128, 256]        [1, 128, 1]          --                   True
+│    └─Linear (0)                        [1, 128, 256]        [1, 128, 64]         16,448               True
+│    └─Tanh (1)                          [1, 128, 64]         [1, 128, 64]         --                   --
+│    └─Linear (2)                        [1, 128, 64]         [1, 128, 1]          65                   True
+├─Embedding (wrist_embed)                [1]                  [1, 16]              32                   True
+├─Sequential (classifier)                [1, 784]             [1, 3]               --                   True
+│    └─Linear (0)                        [1, 784]             [1, 128]             100,480              True
+│    └─ReLU (1)                          [1, 128]             [1, 128]             --                   --
+│    └─Dropout (2)                       [1, 128]             [1, 128]             --                   --
+│    └─Linear (3)                        [1, 128]             [1, 3]               387                  True
+========================================================================================================================
+Total params: 836,452
+Trainable params: 836,452
+Non-trainable params: 0
+Total mult-adds (M): 95.96
+========================================================================================================================
+Input size (MB): 0.02
+Forward/backward pass size (MB): 1.90
+Params size (MB): 3.35
+Estimated Total Size (MB): 5.27
+========================================================================================================================
+```
 
