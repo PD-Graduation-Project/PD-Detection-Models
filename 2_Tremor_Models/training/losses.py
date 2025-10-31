@@ -34,21 +34,26 @@ class CombinedLoss(nn.Module):
     """
     def __init__(self,
                 # losses weights (final equation)
-                ce_weight=0.8,
-                focal_weight=1.0,
-                tversky_weight=1.2,
+                ce_weight=1.0,           
+                focal_weight=0.8,        
+                tversky_weight=1.0,      
                 
                 # classes params
                 class_weights=torch.tensor([1.85, 0.53, 1.28]),
                 num_classes=3, 
                 
                 # focal params
-                focal_alpha=0.6,
-                focal_gamma=1.5,
+                focal_alpha=0.8,
+                focal_gamma=2.0,
                 
                 # tversky params
-                tversky_alpha=0.7,
-                tversky_beta=0.3):
+                tversky_alpha=0.6,
+                tversky_beta=0.4,
+                
+                # NEW: Adaptive parameters
+                adaptive_weighting=True,   # Enable dynamic loss weighting
+                label_smoothing=0.1,      # ENHANCED: increased smoothing
+                ):
         super().__init__()
         
         # 1. init all params
@@ -60,7 +65,7 @@ class CombinedLoss(nn.Module):
         self.tversky_weight = tversky_weight
         
         # 1.2. Optional per-class weights (for imbalance)
-        self.class_weights = class_weights
+        self.register_buffer('class_weights', class_weights)
         self.num_classes = num_classes
         
         # 1.3. Focal loss params
@@ -71,6 +76,16 @@ class CombinedLoss(nn.Module):
         self.tversky_alpha = tversky_alpha
         self.tversky_beta = tversky_beta
         
+        # 1.5. NEW: Adaptive parameters
+        self.adaptive_weighting = adaptive_weighting
+        self.label_smoothing = label_smoothing
+        
+        # 1.6. NEW: Loss tracking for adaptive weighting (will be moved to device automatically)
+        self.ce_running = None
+        self.focal_running = None
+        self.tversky_running = None
+        self.update_count = 0
+        
     # 2. Forward function
     # -----------------------
     def forward(self, pred, label):
@@ -78,18 +93,39 @@ class CombinedLoss(nn.Module):
         pred: [B, num_classes] (logits)
         label: [B] (class indices)
         """
+        # NEW: Initialize running averages on correct device if not done
+        if self.ce_running is None:
+            device = pred.device
+            self.ce_running = torch.zeros(1, device=device)
+            self.focal_running = torch.zeros(1, device=device)
+            self.tversky_running = torch.zeros(1, device=device)
+            
+        # NEW: Apply label smoothing to all components
+        if self.label_smoothing > 0:
+            label_one_hot = F.one_hot(label, self.num_classes).float()
+            label_one_hot = label_one_hot * (1 - self.label_smoothing) + self.label_smoothing / self.num_classes
+        else:
+            label_one_hot = F.one_hot(label, self.num_classes).float()
+            
         # 1. CrossEntropy Loss (multi-class)
+        # ------------------------------------
         ce = F.cross_entropy(pred, label, weight=self.class_weights,
-                            label_smoothing= 0.05)
+                            label_smoothing= self.label_smoothing)
 
         # 2. Focal Loss (multi-class)
-        probs = F.softmax(pred, dim=1)                     # [B, C]
-        label_one_hot = F.one_hot(label, self.num_classes).float()  # [B, C]
+        # -------------------------------
+        probs = F.softmax(pred, dim=1) # [B, C]
+        # NEW: Class-balanced focal alpha
+        if isinstance(self.focal_alpha, (list, torch.Tensor)):
+            alpha_t = self.focal_alpha[label]  # Per-sample alpha
+        else:
+            alpha_t = self.focal_alpha
         pt = torch.sum(label_one_hot * probs, dim=1) + 1e-8 # prob of true class
-        focal = -self.focal_alpha * ((1 - pt) ** self.focal_gamma) * torch.log(pt)
+        focal = -alpha_t * ((1 - pt) ** self.focal_gamma) * torch.log(pt)
         focal = focal.mean()
 
         # 3. Tversky Loss (multi-class)
+        # -------------------------------
         probs_flat = probs.view(-1, self.num_classes)
         labels_flat = label_one_hot.view(-1, self.num_classes)
         
@@ -97,8 +133,41 @@ class CombinedLoss(nn.Module):
         FP = ((1 - labels_flat) * probs_flat).sum(dim=0)
         FN = (labels_flat * (1 - probs_flat)).sum(dim=0)
         
+        # NEW: Add smoothness to prevent division by zero and improve gradient flow
         tversky_index = (TP + 1.0) / (TP + self.tversky_alpha * FN + self.tversky_beta * FP + 1.0)
         tversky = 1 - tversky_index.mean()
+        
+        
+        # NEW: 4. Adaptive loss weighting based on current magnitudes
+        # -------------------------------------------------------------
+        if self.adaptive_weighting and self.training:
+            # Update running averages
+            self.ce_running = 0.9 * self.ce_running + 0.1 * ce.detach()
+            self.focal_running = 0.9 * self.focal_running + 0.1 * focal.detach()
+            self.tversky_running = 0.9 * self.tversky_running + 0.1 * tversky.detach()
+            self.update_count += 1
+            
+            # Avoid division by zero in early steps
+            if self.update_count > 10:
+                ce_scale = self.ce_running.mean()
+                focal_scale = self.focal_running.mean()
+                tversky_scale = self.tversky_running.mean()
+                
+                # Normalize weights by their relative scales
+                total_scale = ce_scale + focal_scale + tversky_scale + 1e-8
+                ce_weight = self.ce_weight * (total_scale / (ce_scale + 1e-8))
+                focal_weight = self.focal_weight * (total_scale / (focal_scale + 1e-8))
+                tversky_weight = self.tversky_weight * (total_scale / (tversky_scale + 1e-8))
+                
+                # Normalize to maintain overall scale
+                weight_sum = ce_weight + focal_weight + tversky_weight + 1e-8
+                ce_weight = ce_weight / weight_sum * 3.0  # Maintain total weight ~3.0
+                focal_weight = focal_weight / weight_sum * 3.0
+                tversky_weight = tversky_weight / weight_sum * 3.0
+            else:
+                ce_weight, focal_weight, tversky_weight = self.ce_weight, self.focal_weight, self.tversky_weight
+        else:
+            ce_weight, focal_weight, tversky_weight = self.ce_weight, self.focal_weight, self.tversky_weight
         
         # Combine all
         total_loss = (self.ce_weight * ce +
