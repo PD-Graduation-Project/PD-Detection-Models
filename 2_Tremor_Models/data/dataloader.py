@@ -68,7 +68,7 @@ def create_tremor_dataloaders(
     """
     
     # 0. Import here to avoid circular imports
-    from dataset import TremorDataset
+    from .dataset import TremorDataset
     
     # 1. Init unified dataset (loads all movements)
     full_dataset = TremorDataset(
