@@ -273,3 +273,40 @@ These mean:
 - Healthy (minority) -> higher penalty (1.85)
 - Parkinson’s (majority) -> lower penalty (0.53)
 - Other disorders -> intermediate (1.28)
+
+---
+
+# Mode V1
+
+### 1. **Much Larger Model** (~10-15x more parameters)
+   - CNN: `6→128→256→512→512` channels (vs original `6→64→128→256`)
+   - GRU: 3 layers with 256 hidden units (vs 2 layers with 128)
+   - Deeper classifier with 4 layers
+
+### 2. **Movement Embedding** (New!)
+   - 128-dimensional embedding for each of the 11 movements
+   - Allows the model to learn movement-specific patterns
+   - Similar to how wrist embedding works
+
+### 3. **Enhanced Wrist Embedding**
+   - Increased from 16 to 64 dimensions (4x larger)
+   - Now has 128 trainable parameters instead of 32
+
+### 4. **Handles Variable Length Inputs**
+   - Works with both 1024 and 2048 timesteps
+   - CNN downsamples by ~8x, so both become manageable sequences for GRU
+
+### 5. **Better Regularization**
+   - BatchNorm in classifier layers
+   - Graduated dropout rates
+   - More depth for better feature learning
+
+### Expected Parameter Count:
+- **Original model**: ~500K-600K parameters
+- **Enhanced model**: ~6-8M parameters
+
+This unified model should:
+- Learn shared patterns across all movements
+- Capture movement-specific characteristics via embeddings
+- Have much more capacity to learn complex tremor patterns
+- Perform better with longer training (50+ epochs recommended)

@@ -6,109 +6,150 @@ import random
 
 class TremorDataset(Dataset):
     """
-    PyTorch Dataset for loading tremor movement signals from preprocessed .npz files.
+    PyTorch Dataset for loading tremor movement signals from ALL movements.
 
-    Each dataset corresponds to a single movement (e.g., "CrossArms"), and the expected
-    folder layout is:
-
+    Expected folder layout:
+    
     data_path/
-        ├── Healthy/
-        │     ├── 001_L.npz
-        │     ├── 002_R.npz
-        │     └── ...
-        ├── Parkinson/
-        │     ├── 003_L.npz
-        │     └── ...
-        └── Other/
-              └── ...
+        ├── Movement1/  (e.g., "CrossArms")
+        │   ├── Healthy/
+        │   │     ├── 001_L.npz
+        │   │     ├── 002_R.npz
+        │   │     └── ...
+        │   ├── Parkinson/
+        │   │     ├── 003_L.npz
+        │   │     └── ...
+        │   └── Other/
+        │         └── ...
+        ├── Movement2/  (e.g., "FingerNose")
+        │   ├── Healthy/
+        │   ├── Parkinson/
+        │   └── Other/
+        └── ...
 
     Each .npz must contain:
-        - signal : np.ndarray, shape (T, 6)  # IMU channels
+        - signal : np.ndarray, shape (T, 6)  # IMU channels (T can be 1024 or 2048)
         - label  : int (0 = Healthy, 1 = Parkinson, 2 = Other)
         - wrist  : int (0 = Left, 1 = Right) 
-        - subject_id : int or str
-        
-    Notes
-    -----
-    The wrist information is **not concatenated** to the signal as an extra channel.
-    Instead, it is stored and returned as a separate scalar tensor (0 or 1) to avoid
-    redundant repetition across all timesteps.
+        - subject_id : int or str (optional)
 
     Parameters
     ----------
     data_path : str or Path
-        Path to the root directory for one movement (contains Healthy/ Parkinson/ Other).
+        Path to the root directory containing all movement folders.
+        
+    movement_names : list of str, optional
+        List of movement folder names to include. If None, automatically detects
+        all subdirectories in data_path.
         
     random_seed : int, optional (default=42)
         Seed used to shuffle the dataset for reproducibility.
 
     Returns
     -------
-    tuple(torch.Tensor, torch.Tensor, torch.Tensor)
-        (signal_tensor, wrist_tensor, label_tensor) per sample.
-        - signal_tensor : shape (T, 6), dtype=torch.float32
-        - wrist_tensor  : scalar (0 = Left, 1 = Right), dtype=torch.long
-        - label_tensor  : scalar (0 = Healthy, 1 = Parkinson, 2 = Other), dtype=torch.long
+    tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
+        (signal_tensor, wrist_tensor, movement_tensor, label_tensor) per sample.
+        - signal_tensor   : shape (T, 6), dtype=torch.float32
+        - wrist_tensor    : scalar (0 = Left, 1 = Right), dtype=torch.long
+        - movement_tensor : scalar (movement index 0-10), dtype=torch.long
+        - label_tensor    : scalar (0 = Healthy, 1 = Parkinson, 2 = Other), dtype=torch.long
     """
     def __init__(self,
                 data_path: str,
-                random_seed:int = 42):
+                movement_names: list = None,
+                random_seed: int = 42):
         super().__init__()
         
-        # 0. init dirs with respect to root data dir
-        healthy_dir = Path(data_path) / "Healthy"
-        parkinson_dir = Path(data_path) / "Parkinson"
-        other_dir = Path(data_path) / "Other"
+        self.data_path = Path(data_path)
         
-        # 1. init empty lists of data
-        healthy = []
-        parkinson = []
-        other = []
+        # 1. Movements inits
+        # -------------------
+        # 1.1. Automatically detect movement folders if not provided
+        if movement_names is None:
+            movement_names = sorted([
+                d.name for d in self.data_path.iterdir() 
+                if d.is_dir() and not d.name.startswith('.')
+            ])
         
-        # 2. create data tensors
-        # ------------------------
+        # 1.2. Create movement name to index mapping
+        self.movement_names = movement_names
+        self.num_movements = len(movement_names)
+        self.movement_to_idx = {name: idx for idx, name in enumerate(movement_names)}
         
-        # 2.0 function to load and process individual .npz files
-        def process_npz(file):
-            # load the .npz file
-            npz = np.load(file)
-            # extract the IMU signal
-            signal = npz["signal"].astype(np.float32)
-            # extract wrist indicator (0 = Left, 1 = Right)
-            wrist = int(npz["wrist"])
+        print(f"Found {self.num_movements} movements: {movement_names}")
+        
+        # 2. Init lists for all data
+        all_samples = []
+        
+        # 3. Load data from each movement folder
+        # ----------------------------------------
+        for movement_idx, movement_name in enumerate(movement_names):
+            movement_path = self.data_path / movement_name
+            
+            # 3.1. check for dir availability
+            if not movement_path.exists():
+                print(f"Warning: Movement folder '{movement_name}' not found, skipping...")
+                continue
+            
+            # 3.2. init Healthy, Parkinson, Other subfolders dir
+            healthy_dir = movement_path / "Healthy"
+            parkinson_dir = movement_path / "Parkinson"
+            other_dir = movement_path / "Other"
+            
+            # 4. Helper function to process .npz files
+            # -------------------------------------------
+            def process_npz(file, label):
+                """Load signal and wrist from .npz file"""
+                # 4.1. load the .npz file
+                npz = np.load(file)
+                
+                # 4.2. extract the IMU signal
+                signal = npz["signal"].astype(np.float32)
+                # 4.3. extract wrist indicator (0 = Left, 1 = Right)
+                wrist = int(npz["wrist"])
+                
+                # 4.4. # finally return everything separately
+                return signal, wrist, movement_idx, label
 
-            # finally return both separately
-            return signal, wrist
-        
-        # 2.1 Healthy
-        for h in healthy_dir.glob("*.npz"):
-            signal, wrist = process_npz(h)
-            healthy.append((signal, wrist))
-        
-        # 2.2. Parkinson
-        for pd in parkinson_dir.glob("*.npz"):
-            signal, wrist = process_npz(pd)
-            parkinson.append((signal, wrist))
+            # 5. add all data
+            # -----------------
+            # 5.1. Load Healthy samples (label=0)
+            if healthy_dir.exists():
+                for file in healthy_dir.glob("*.npz"):
+                    result = process_npz(file, label=0)
+                    if result is not None:
+                        all_samples.append(result)
             
-        # 2.3. Other
-        for o in other_dir.glob("*.npz"):
-            signal, wrist = process_npz(o)
-            other.append((signal, wrist))
+            # 5.2. Load Parkinson samples (label=1)
+            if parkinson_dir.exists():
+                for file in parkinson_dir.glob("*.npz"):
+                    result = process_npz(file, label=1)
+                    if result is not None:
+                        all_samples.append(result)
             
+            # 5.3. Load Other samples (label=2)
+            if other_dir.exists():
+                for file in other_dir.glob("*.npz"):
+                    result = process_npz(file, label=2)
+                    if result is not None:
+                        all_samples.append(result)
             
-        # 3. combine all signals and wrists, and create label list
-        signals, wrist = zip(*[x for x in healthy + parkinson + other])
-        labels = [0]*len(healthy) + [1]*len(parkinson) + [2]*len(other)
+            print(f"  Loaded {movement_name}: {len([s for s in all_samples if s[2] == movement_idx])} samples")
         
-        # 4. combine signals, wrists, and labels into a single list
-        combined = list( zip(signals, wrist, labels) )
-        
-        # 5, shuffle them
+        # 6. Shuffle all samples
         random.seed(random_seed)
-        random.shuffle(combined)
+        random.shuffle(all_samples)
         
-        # 6. split them again
-        self.signals, self.wrists, self.labels = zip(*combined)
+        # 7. Split into separate lists
+        self.signals = [s[0] for s in all_samples]
+        self.wrists = [s[1] for s in all_samples]
+        self.movements = [s[2] for s in all_samples]
+        self.labels = [s[3] for s in all_samples]
+        
+        print(f"\nTotal samples loaded: {len(self.signals)}")
+        print(f"  Healthy: {self.labels.count(0)}")
+        print(f"  Parkinson: {self.labels.count(1)}")
+        print(f"  Other: {self.labels.count(2)}")
         
     def __len__(self):
         return len(self.signals)
@@ -117,10 +158,10 @@ class TremorDataset(Dataset):
         """
         Returns
         -------
-        tuple(torch.Tensor, torch.Tensor, torch.Tensor)
-            (signal_tensor, wrist_tensor, label_tensor)
+        tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
+            (signal_tensor, wrist_tensor, movement_tensor, label_tensor)
         """
-        x = torch.tensor(
+        signal = torch.tensor(
             self.signals[index],
             dtype=torch.float32
         )
@@ -128,9 +169,32 @@ class TremorDataset(Dataset):
             self.wrists[index],
             dtype=torch.long
         )
-        y = torch.tensor(
+        movement = torch.tensor(
+            self.movements[index],
+            dtype=torch.long
+        )
+        label = torch.tensor(
             self.labels[index],
             dtype=torch.long
         )
         
-        return x, wrist, y
+        return signal, wrist, movement, label
+    
+    def get_movement_name(self, movement_idx):
+        """Get movement name from index"""
+        return self.movement_names[movement_idx]
+    
+    def get_class_distribution(self):
+        """Get distribution of classes across dataset"""
+        return {
+            'Healthy': self.labels.count(0),
+            'Parkinson': self.labels.count(1),
+            'Other': self.labels.count(2)
+        }
+    
+    def get_movement_distribution(self):
+        """Get distribution of samples per movement"""
+        movement_counts = {}
+        for idx, name in enumerate(self.movement_names):
+            movement_counts[name] = self.movements.count(idx)
+        return movement_counts
