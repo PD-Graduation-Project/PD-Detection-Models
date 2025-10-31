@@ -42,7 +42,8 @@ def create_tremor_dataloaders(
         data_path: str,
         batch_size: int = 32,
         train_val_split: float = 0.8,
-        random_seed: int = 42):
+        random_seed: int = 42,
+        print_details: bool = False):
     """
     Creates PyTorch DataLoaders for tremor movement classification across all movements.
     
@@ -62,6 +63,7 @@ def create_tremor_dataloaders(
         train_val_split (float): Fraction of data to use for training (default: 0.8).
         random_seed (int): Random seed for reproducibility (default: 42).
         num_workers (int): Number of workers for DataLoader (default: 4).
+        print_details(bool): Prints details of the dataloader (default: False).
 
     Returns:
         (DataLoader, DataLoader): train_loader, val_loader
@@ -73,7 +75,8 @@ def create_tremor_dataloaders(
     # 1. Init unified dataset (loads all movements)
     full_dataset = TremorDataset(
         data_path=data_path,
-        random_seed=random_seed
+        random_seed=random_seed,
+        print_details = print_details
     )
 
     # 2.1. Create stratification key: combine label and movement
@@ -119,15 +122,16 @@ def create_tremor_dataloaders(
     )
 
     # 6. Print dataset info
-    print(f"\n{'='*60}")
-    print(f"Dataset Summary")
-    print(f"{'='*60}")
-    print(f"Total samples: {dataset_size}")
-    print(f"Train: {len(train_subset)} | Val: {len(val_subset)}")
-    print(f"Movements: {full_dataset.num_movements}")
-    print(f"\nClass Distribution:")
-    for cls, count in full_dataset.get_class_distribution().items():
-        print(f"  {cls:12s}: {count:4d} ({count/dataset_size*100:.1f}%)")
-    print(f"{'='*60}\n")
+    if print_details:
+        print(f"\n{'='*60}")
+        print(f"Dataset Summary")
+        print(f"{'='*60}")
+        print(f"Total samples: {dataset_size}")
+        print(f"Train: {len(train_subset)} | Val: {len(val_subset)}")
+        print(f"Movements: {full_dataset.num_movements}")
+        print(f"\nClass Distribution:")
+        for cls, count in full_dataset.get_class_distribution().items():
+            print(f"  {cls:12s}: {count:4d} ({count/dataset_size*100:.1f}%)")
+        print(f"{'='*60}\n")
     
     return train_dataloader, val_dataloader

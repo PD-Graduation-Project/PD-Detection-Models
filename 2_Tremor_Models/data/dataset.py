@@ -57,7 +57,8 @@ class TremorDataset(Dataset):
     def __init__(self,
                 data_path: str,
                 movement_names: list = None,
-                random_seed: int = 42):
+                random_seed: int = 42,
+                print_details: bool = False):
         super().__init__()
         
         self.data_path = Path(data_path)
@@ -76,7 +77,8 @@ class TremorDataset(Dataset):
         self.num_movements = len(movement_names)
         self.movement_to_idx = {name: idx for idx, name in enumerate(movement_names)}
         
-        print(f"Found {self.num_movements} movements: {movement_names}")
+        if print_details:
+            print(f"Found {self.num_movements} movements: {movement_names}")
         
         # 2. Init lists for all data
         all_samples = []
@@ -134,7 +136,8 @@ class TremorDataset(Dataset):
                     if result is not None:
                         all_samples.append(result)
             
-            print(f"  Loaded {movement_name}: {len([s for s in all_samples if s[2] == movement_idx])} samples")
+            if print_details:
+                print(f"  Loaded {movement_name}: {len([s for s in all_samples if s[2] == movement_idx])} samples")
         
         # 6. Shuffle all samples
         random.seed(random_seed)
@@ -146,10 +149,11 @@ class TremorDataset(Dataset):
         self.movements = [s[2] for s in all_samples]
         self.labels = [s[3] for s in all_samples]
         
-        print(f"\nTotal samples loaded: {len(self.signals)}")
-        print(f"  Healthy: {self.labels.count(0)}")
-        print(f"  Parkinson: {self.labels.count(1)}")
-        print(f"  Other: {self.labels.count(2)}")
+        if print_details:
+            print(f"\nTotal samples loaded: {len(self.signals)}")
+            print(f"  Healthy: {self.labels.count(0)}")
+            print(f"  Parkinson: {self.labels.count(1)}")
+            print(f"  Other: {self.labels.count(2)}")
         
     def __len__(self):
         return len(self.signals)
