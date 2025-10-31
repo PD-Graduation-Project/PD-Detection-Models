@@ -12,7 +12,6 @@ def train_one_epoch(model:torch.nn.Module,
                     optim:torch.optim,
                     scheduler,
                     
-
                     scaler,
                     device):
     """

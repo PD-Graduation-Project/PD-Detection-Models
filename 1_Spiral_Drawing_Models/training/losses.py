@@ -40,15 +40,19 @@ class CombinedLoss(nn.Module):
         ↓ Lower = that loss component has LESS influence
     """
     def __init__(self,
+                # losses weights (final equation)
                 bce_weight=1.0,
                 focal_weight=0.5,
                 tversky_weight=0.5,
                 
+                # positive class (PD) weight
                 pos_weight=1.5,
                 
+                # focal params
                 focal_alpha=0.6,
                 focal_gamma=1.5,
                 
+                # tversky params
                 tversky_alpha=0.60,
                 tversky_beta=0.40):
         super().__init__()
@@ -64,11 +68,11 @@ class CombinedLoss(nn.Module):
         # 1.2. `pos_weight` applies a multiplier only to the positive class (making the model care more about it)
         self.pos_weight_tensor = torch.tensor([pos_weight])
         
-        # 1.3. focal loss params
+        # 1.3. Focal loss params
         self.focal_alpha = focal_alpha
         self.focal_gamma = focal_gamma
         
-        # 1.4. tversky loss params
+        # 1.4. Tversky loss params
         self.tversky_alpha = tversky_alpha
         self.tversky_beta = tversky_beta
         

@@ -85,7 +85,7 @@
 The attention mechanism learns to **focus on the most diagnostically relevant time windows** rather than treating all time steps equally.
 
 **Mechanism:**
-  - Small attention network: `Linear(256→64) → Tanh → Linear(64→1)`
+  - Small attention network: `Linear(256->64) -> Tanh -> Linear(64->1)`
   - Produces scalar attention **scores** per **time step**
   - `Softmax` normalizes these scores across time
   - Weighted sum yields an attention-focused temporal representation
@@ -216,3 +216,60 @@ Estimated Total Size (MB): 5.27
 ========================================================================================================================
 ```
 
+---
+
+# Loss function preparations
+
+
+### Dataset distribution
+
+| Class                    | Samples |
+| :----------------------- | ------: |
+| Healthy                  |      79 |
+| Parkinson’s Disease (PD) |     276 |
+| Other disorders          |     114 |
+
+Total = 79 + 276 + 114 = **469**
+
+---
+
+### Step 1: Compute class frequencies
+
+$$
+p_i = \frac{n_i}{N}
+$$
+$$
+p = [0.168, 0.588, 0.243]
+$$
+
+---
+
+### Step 2: Inverse-frequency weights
+
+$$
+w_i = \frac{1}{p_i}
+$$
+-> `[5.95, 1.70, 4.11]`
+
+---
+
+### Step 3: Normalize (so they sum to ≈ number of classes)
+
+$$
+w_i = \frac{w_i}{\sum w_i} \times 3
+$$
+-> `[1.85, 0.53, 1.28]`
+
+---
+
+### Final Class Weights
+
+```python
+class_weights = torch.tensor([1.85, 0.53, 1.28])
+```
+
+These mean:
+
+- Healthy (minority) -> higher penalty (1.85)
+- Parkinson’s (majority) -> lower penalty (0.53)
+- Other disorders -> intermediate (1.28)

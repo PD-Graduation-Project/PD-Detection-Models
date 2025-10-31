@@ -90,7 +90,7 @@ def train(model:torch.nn.Module,
             checkpoint = torch.load(load_pretrained, map_location=device)
             # load model
             model.load_state_dict(checkpoint['model_state_dict'])
-            #load optimizer and scheduler
+            #load optimizer
             optim.load_state_dict(checkpoint['optim_state_dict'])
             
             print(f"Loaded pretrained model:")
