@@ -165,18 +165,32 @@ class TremorDataset(Dataset):
         tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
             (signal_tensor, wrist_tensor, movement_tensor, label_tensor)
         """
+        # 1. Singal 
+        # ----------
         signal = torch.tensor(
             self.signals[index],
             dtype=torch.float32
         )
+        # 1.1. Normalize per channel [NEW]
+        signal = (signal - signal.mean(axis=0)) / (signal.std(axis=0) + 1e-8)
+        signal = signal.detach().clone().requires_grad_(True).float()
+        
+        # 2. wrist
+        # ---------
         wrist = torch.tensor(
             self.wrists[index],
             dtype=torch.long
         )
+        
+        # 3. movement
+        # -------------
         movement = torch.tensor(
             self.movements[index],
             dtype=torch.long
         )
+        
+        # 4. label
+        # --------- 
         label = torch.tensor(
             self.labels[index],
             dtype=torch.long

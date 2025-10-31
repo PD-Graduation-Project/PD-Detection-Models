@@ -37,7 +37,7 @@ def train(model: torch.nn.Module,
     Notes:
         - Uses `CombinedLoss` (CrossEntropy + Focal + Tversky) for robust multi-class optimization.
         - Optimizer: AdamW with weight decay.
-        - Scheduler: OneCycleLR for smoother and faster convergence.
+        - Scheduler: ReduceLROnPlateau.
         - Metrics: Accuracy, Recall, Precision, and F1 (macro-averaged).
         - Logs all metrics and LR to TensorBoard.
         - Saves checkpoints after each epoch with model and optimizer states.
@@ -64,14 +64,11 @@ def train(model: torch.nn.Module,
     )
 
     # 1.3. scheduler 
-    scheduler = torch.optim.lr_scheduler.OneCycleLR(
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer=optim,
-        max_lr=max_lr,
-        epochs=epochs,
-        steps_per_epoch=len(train_dataloader),
-        pct_start=0.3,            # warm up for 30% of training (default)
-        div_factor=25,            # Start LR = max_lr/25 (more conservative start) (default)
-        final_div_factor=1e4      # End LR = max_lr/10000 (fine-tune at end) (default)
+        mode='min',          # monitor val_loss
+        factor=0.5,          # reduce LR by 50%
+        patience=2,          # wait 2 epochs before reducing
     )
 
     # 1.4. scaler (to prevent underflow during mixed precision)
@@ -115,7 +112,6 @@ def train(model: torch.nn.Module,
             loss_fn,
             multiclass_metrics,
             optim,
-            scheduler,
             scaler,
             device
         )
@@ -128,6 +124,7 @@ def train(model: torch.nn.Module,
             multiclass_metrics,
             device
         )
+        scheduler.step(val_loss)
 
 
         if Tboard:

@@ -9,14 +9,13 @@ import torch
 def collate_variable_length(batch):
     """
     Custom collate function to handle variable-length sequences (1024 or 2048).
-    
     Pads sequences to the maximum length in the batch.
     
     Args:
         batch: List of tuples (signal, wrist, movement, label)
     
     Returns:
-        Tuple of (signals_padded, wrists, movements, labels)
+        Tuple of (signals_padded, wrists, movements, labels, lengths)
     """
     
     # 1. unpack data in batch - each item is (signal, wrist, movement, label)
@@ -24,8 +23,11 @@ def collate_variable_length(batch):
     wrists = torch.stack([item[1] for item in batch])
     movements = torch.stack([item[2] for item in batch])
     labels = torch.stack([item[3] for item in batch])
+    
+    # 2. store original (pre-padding) lengths
+    lengths = torch.tensor([s.size(0) for s in signals], dtype=torch.long)
 
-    # 2. pad signals to max length in batch (if some samples are 1024 and there is a 2048 sample in the batch)
+    # 3. pad signals to max length in batch (if some samples are 1024 and there is a 2048 sample in the batch)
     # pad_sequence expects (batch, seq_len, features) format
     signals_padded = pad_sequence(
         signals,
@@ -33,7 +35,8 @@ def collate_variable_length(batch):
         padding_value=0.0
     )
     
-    return signals_padded, wrists, movements, labels
+    # 4. return padded batch + old lengths
+    return signals_padded, wrists, movements, labels, lengths
 
 
 # dataloader creator function

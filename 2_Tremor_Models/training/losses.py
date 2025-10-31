@@ -34,9 +34,9 @@ class CombinedLoss(nn.Module):
     """
     def __init__(self,
                 # losses weights (final equation)
-                ce_weight=1.0,
-                focal_weight=0.5,
-                tversky_weight=0.5,
+                ce_weight=0.8,
+                focal_weight=1.0,
+                tversky_weight=1.2,
                 
                 # classes params
                 class_weights=torch.tensor([1.85, 0.53, 1.28]),
@@ -44,7 +44,7 @@ class CombinedLoss(nn.Module):
                 
                 # focal params
                 focal_alpha=0.6,
-                focal_gamma=2.0,
+                focal_gamma=1.5,
                 
                 # tversky params
                 tversky_alpha=0.7,
@@ -79,7 +79,8 @@ class CombinedLoss(nn.Module):
         label: [B] (class indices)
         """
         # 1. CrossEntropy Loss (multi-class)
-        ce = F.cross_entropy(pred, label, weight=self.class_weights)
+        ce = F.cross_entropy(pred, label, weight=self.class_weights,
+                            label_smoothing= 0.05)
 
         # 2. Focal Loss (multi-class)
         probs = F.softmax(pred, dim=1)                     # [B, C]

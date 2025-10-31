@@ -10,7 +10,6 @@ def train_one_epoch(model: torch.nn.Module,
                     loss_fn: torch.nn.Module,
                     metric_fn, 
                     optim: torch.optim,
-                    scheduler,
                     
                     scaler,
                     device):
@@ -38,13 +37,13 @@ def train_one_epoch(model: torch.nn.Module,
     
     for batch in pbar:
         # 2. unpack and move data to device
-        signals, wrists, movements, labels = [b.to(device) for b in batch]  # (B, T, 6), (B,), (B,), (B,)
+        signals, wrists, movements, labels, lengths  = [b.to(device) for b in batch]  # (B, T, 6), (B,), (B,), (B,)
         
         # 3. enable auto mixed precision (AMP) for efficiency
         with torch.amp.autocast(device_type=device):
             
             # 4. forward pass (model takes signal, wrist, and movement)
-            logits = model(signals, wrists, movements)
+            logits = model(signals, wrists, movements, lengths)
                         
             # 5. calculate the losses and metrics
             loss = loss_fn(logits, labels)
@@ -62,7 +61,6 @@ def train_one_epoch(model: torch.nn.Module,
         
         # 9. step the optimizer, scheduler, and update scaler
         scaler.step(optim)
-        scheduler.step()
         scaler.update()
 
         # 10. compute total loss and metrics
@@ -127,12 +125,12 @@ def validate(model: torch.nn.Module,
         
         for batch in pbar:
             # 3. unpack and move data to device
-            signals, wrists, movements, labels = [b.to(device) for b in batch]
+            signals, wrists, movements, labels, lengths = [b.to(device) for b in batch]
             
             # 4. enable auto mixed precision (AMP)
             with torch.amp.autocast(device_type=device):
                 # 5. forward pass
-                logits = model(signals, wrists, movements)
+                logits = model(signals, wrists, movements, lengths)
                                 
                 # 6. calculate losses and metrics
                 loss = loss_fn(logits, labels)

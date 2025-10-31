@@ -1,17 +1,20 @@
 import torch
 from torch import nn
 
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+
 class TremorNetGRU_V1(nn.Module):
     """
     Enhanced CNN–GRU–Attention model for tremor classification across multiple movements.
 
     Key improvements:
-    - Larger CNN backbone (6→512 channels)
-    - Deeper GRU layers with more hidden units
-    - Movement type embedding (11 movements)
-    - Enhanced wrist embedding (larger dimension)
-    - Handles variable length inputs (1024 or 2048 timesteps)
-    - More parameters for better capacity
+        - **Improved CNN backbone** with modular conv blocks for better feature extraction
+        - **Multi-head attention** for more powerful temporal modeling  
+        - Deeper GRU layers with more hidden units
+        - Movement type embedding (11 movements)
+        - Enhanced wrist embedding (larger dimension)
+        - Handles variable length inputs (1024 or 2048 timesteps)
+        - More parameters for better capacity
 
     Args:
         num_classes (int): number of output classes (3: PD, Healthy, Other).
@@ -20,6 +23,7 @@ class TremorNetGRU_V1(nn.Module):
         wrist_embed_dim (int): wrist embedding dimension.
         movement_embed_dim (int): movement type embedding dimension.
         dropout (float): dropout probability.
+        num_attention_heads (int): number of attention heads for multi-head attention.
 
     Input:
         x (Tensor): [B, T, 6] IMU signals (T can be 1024 or 2048).
@@ -35,7 +39,8 @@ class TremorNetGRU_V1(nn.Module):
                 hidden_size: int = 256,  # Doubled from 128
                 wrist_embed_dim: int = 64,  # Increased from 16
                 movement_embed_dim: int = 128,  # New: movement embedding
-                dropout: float = 0.4,
+                dropout: float = 0.2,
+                num_attention_heads: int = 4,  # NEW: multi-head attention
                 ):
         super().__init__()
         
@@ -43,39 +48,19 @@ class TremorNetGRU_V1(nn.Module):
         # ------------------------------------------------
         # Input: [B, C=6, T] -> after 3 conv stride-2 layers -> approx T/8
         self.cnn = nn.Sequential(
-            # 1.1. Conv layer 1: 6 -> 128 channels (doubled)
-            nn.Conv1d(
-                in_channels=6,
-                out_channels=128,
-                kernel_size=7, stride=2, padding=3),  # Larger kernel
-            nn.BatchNorm1d(128),
-            nn.ReLU(),
-            nn.Dropout(dropout * 0.5),  # Light dropout early
-            
-            # 1.2. Conv layer 2: 128 -> 256 channels (doubled)
-            nn.Conv1d(
-                in_channels=128,
-                out_channels=256,
-                kernel_size=5, stride=2, padding=2),
-            nn.BatchNorm1d(256),
-            nn.ReLU(),
+            # 1.1. Initial conv layer with larger receptive field: 6 -> 128 channels
+            self._make_conv_block(6, 128, 7, 2, 3),  # [B, 128, T/2]
             nn.Dropout(dropout * 0.5),
             
-            # 1.3. Conv layer 3: 256 -> 512 channels (doubled)
-            nn.Conv1d(
-                in_channels=256,
-                out_channels=512,
-                kernel_size=3, stride=2, padding=1),
-            nn.BatchNorm1d(512),
-            nn.ReLU(),
+            # 1.2. Second conv layer with downsampling: 128 -> 256 channels
+            self._make_conv_block(128, 256, 5, 2, 2),  # [B, 256, T/4]
+            nn.Dropout(dropout * 0.5),
             
-            # 1.4. Additional conv layer for more depth (512 -> 512)
-            nn.Conv1d(
-                in_channels=512,
-                out_channels=512,
-                kernel_size=3, stride=1, padding=1),  # stride=1 maintains T/8
-            nn.BatchNorm1d(512),
-            nn.ReLU(),
+            # 1.3. Third conv layer with downsampling: 256 -> 512 channels
+            self._make_conv_block(256, 512, 3, 2, 1),  # [B, 512, T/8]
+            
+            # 1.4. Additional conv layer for more depth (no downsampling): (512 -> 512)
+            self._make_conv_block(512, 512, 3, 1, 1),  # [B, 512, T/8]
             
             nn.Dropout(dropout)
         )
@@ -91,13 +76,21 @@ class TremorNetGRU_V1(nn.Module):
             dropout=dropout
         )
         
-        # 3. Enhanced Attention mechanism
-        # --------------------------------
-        self.attention = nn.Sequential(
-            nn.Linear(hidden_size * 2, 128),  # Larger intermediate layer
+        # 3. ENHANCED: Multi-Head Attention mechanism
+        # --------------------------------------------
+        # NEW: Multi-head attention for better temporal modeling
+        self.multihead_attn = nn.MultiheadAttention(
+            embed_dim= hidden_size * 2, # Bidirectional GRU output
+            num_heads= num_attention_heads,
+            batch_first= True,
+            dropout= dropout*0.5
+        )
+        
+        # 3.1. Attention projection for weitghted combination
+        self.attention_proj = nn.Sequential(
+            nn.Linear(hidden_size * 2, hidden_size * 2),
             nn.Tanh(),
             nn.Dropout(dropout * 0.5),
-            nn.Linear(128, 1)
         )
         
         # 4. Wrist embedding (MUCH LARGER)
@@ -142,12 +135,42 @@ class TremorNetGRU_V1(nn.Module):
             nn.Linear(128, num_classes)
         )
         
-    def forward(self, x, wrist, movement):
+    # Helper CNN funciton
+    # ---------------------
+    def _make_conv_block(self, in_c, out_c, kernel, stride, padding):
+        """
+        Modular conv block creation for consistent CNN architecture
+        
+        Creates a convolution block with:
+            - Conv1d layer with specified parameters
+            - Batch normalization for stable training
+            - ReLU activation for non-linearity
+            - Dropout for regularization
+        
+        Args:
+            in_c (int): Input channels
+            out_c (int): Output channels  
+            kernel (int): Kernel size
+            stride (int): Stride length
+            padding (int): Padding size
+            
+        Returns:
+            nn.Sequential: Complete conv block
+        """
+        return nn.Sequential(
+            nn.Conv1d(in_c, out_c, kernel, stride, padding),
+            nn.BatchNorm1d(out_c),
+            nn.ReLU(),
+            nn.Dropout(0.1)
+        )
+        
+    def forward(self, x, wrist, movement, lengths=None):
         """
         Args:
             x: [B, T, C=6] (T can be 1024 or 2048)
             wrist: [B] or [B,1] integer indices (0 or 1)
             movement: [B] or [B,1] integer indices (0-10 for 11 movements)
+            lengths: [B] original sequence lengths before padding (optional)
         
         Returns:
             logits: [B, num_classes]
@@ -156,16 +179,64 @@ class TremorNetGRU_V1(nn.Module):
         x = x.permute(0, 2, 1)
         
         # 2. CNN: extract local motion features
+        # --------------------------------------
         features = self.cnn(x)  # [B, 512, T'], where T' ≈ T/8
         features = features.permute(0, 2, 1)  # [B, T', 512]
         
-        # 3. GRU: capture temporal dependencies
-        gru_out, _ = self.gru(features)  # [B, T', hidden_size*2]
         
-        # 4. Attention-weighted pooling
-        attn_logits = self.attention(gru_out).squeeze(-1)  # [B, T']
+        # 3. GRU: capture temporal dependencies
+        # --------------------------------------
+        if lengths is not None:
+            # 3.1. Convert lengths to match reduced temporal dimension (after CNN stride)
+            downsample_factor = 8  # because of 3 stride-2 conv layers
+            reduced_lengths = torch.clamp((lengths.float() / downsample_factor).long(), min=1)
+            
+            # 3.2. Pack padded sequence
+            packed = nn.utils.rnn.pack_padded_sequence(
+                features, reduced_lengths.cpu(), batch_first=True, enforce_sorted=False
+            )
+            gru_out_packed, _ = self.gru(packed)
+            
+            # 3.3. Pad back to tensor form
+            gru_out, _ = nn.utils.rnn.pad_packed_sequence(
+                gru_out_packed, batch_first=True
+            )  # [B, T', hidden_size*2]
+        else:
+            gru_out, _ = self.gru(features)  # [B, T', hidden_size*2]
+            reduced_lengths = torch.full(
+                (gru_out.size(0),), gru_out.size(1),
+                dtype=torch.long, device=gru_out.device
+            )
+        
+        # 4. ENHANCED: Multi-Head Attention with masking
+        # ------------------------------------------------
+        
+        # 4.1 Create attention mask for padded positions
+        mask = torch.arange(gru_out.size(1), device=gru_out.device)[None, :] < reduced_lengths[:, None]
+        
+        # 4.2. Apply multi-head attention (self-attention on GRU outputs)
+        attended_out, attention_weights = self.multihead_attn(
+            query=gru_out,
+            key=gru_out, 
+            value=gru_out,
+            key_padding_mask=~mask  # True for positions to mask 
+        )
+
+        # 4.3. Project attended output
+        attended_out = self.attention_proj(attended_out)  # [B, T', hidden_size*2]
+        
+        # 4.4. Apply attention pooling with masking
+        # Create attention weights from the multi-head output
+        attn_logits = torch.mean(attention_weights, dim=1) if attention_weights.dim() > 2 else attention_weights
+        attn_logits = attn_logits.squeeze(1)  # [B, T']
+        
+        # 4.5. Mask padded positions before softmax
+        attn_logits[~mask] = float('-inf')
         attn_weights = torch.softmax(attn_logits, dim=1).unsqueeze(-1)  # [B, T', 1]
-        attended = (gru_out * attn_weights).sum(dim=1)  # [B, hidden_size*2]
+        
+        # 4.6. Compute weighted sum
+        attended = (attended_out * attn_weights).sum(dim=1)  # [B, hidden_size*2]
+        
         
         # 5. Global pooling
         pooled_mean = gru_out.mean(dim=1)  # [B, hidden_size*2]
