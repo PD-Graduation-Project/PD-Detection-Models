@@ -18,7 +18,7 @@
 
 - Each `.npz` file contains:
 
-  - `signal`: array of shape `(N, 6)` — IMU sensor readings
+  - `signal`: array of shape `(N, 6)` -> IMU sensor readings
   - `label`: `0 = Healthy`, `1 = Parkinson's`, `2 = Other`
   - `wrist`: `0 = Left`, `1 = Right`
   - `subject_id`: unique identifier
