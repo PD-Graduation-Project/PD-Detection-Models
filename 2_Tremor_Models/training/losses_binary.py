@@ -6,36 +6,36 @@ import torch.nn.functional as F
 # -------------------------------
 class CombinedLoss(nn.Module):
     """
-    Combined BinaryCrossEntropy + Focal + Tversky Loss optimized for detecting minority (Healthy) class 
-    in a highly imbalanced dataset (Healthy=0, 22%; PD=1, 78%).
+    Combined BinaryCrossEntropy + Focal + Tversky Loss optimized for **Parkinson (1) recall**
+    after applying balanced sampling in the dataloader.
 
     Final Loss = w1*BCE + w2*Focal + w3*Tversky
 
     PARAMETER EFFECTS:
     ------------------
-    - pos_weight: weight for minority (Healthy) class -> increases penalty for missing Healthy.
-    - focal_alpha: balance between classes in Focal loss (↑ focuses more on Healthy)
-    - focal_gamma: focuses more on hard-to-classify examples
-    - tversky_alpha: weight for false negatives (↑ emphasizes Healthy recall)
-    - tversky_beta: weight for false positives (↑ emphasizes precision)
+    - pos_weight: boosts penalty for missing Parkinson samples (since it's harder).
+    - focal_alpha: >0.5 emphasizes Parkinson; <0.5 emphasizes Healthy
+    - focal_gamma: focuses more on hard examples (higher = stronger focusing)
+    - tversky_alpha: controls FN penalty (↑ => higher recall focus)
+    - tversky_beta: controls FP penalty (↑ => higher precision)
     """
     
     def __init__(self,
                 # loss weights
                 bce_weight=1.0,
-                focal_weight=1.2,
+                focal_weight=1.0,
                 tversky_weight=1.0,
                 
-                # weight for Healthy=0 (MINORITY)
-                healthy_weight=3.5,       # num_PD / num_Healthy
+                # Parkinson class weight (harder)
+                parkinson_weight=2,  
                 
-                # focal params
-                focal_alpha=0.15, # This focuses on majority (PD=1)
+                # focal params (focus more on PD recall)
+                focal_alpha=0.85, # This focuses on majority (PD=1)
                 focal_gamma=2.0,
                 
-                # tversky params
-                tversky_alpha=0.8, # This focuses on minority (FN reduction)
-                tversky_beta=0.2):
+                # tversky params (focus on FN reduction for PD)
+                tversky_alpha=0.85,
+                tversky_beta=0.15):
         super().__init__()
         
         # 1. init all params
@@ -46,8 +46,8 @@ class CombinedLoss(nn.Module):
         self.focal_weight = focal_weight
         self.tversky_weight = tversky_weight
         
-        # 1.2. healthy_weight tensor (minority)
-        self.register_buffer("healthy_weight", torch.tensor(healthy_weight))
+        # 1.2. Parkinson class weighting
+        self.register_buffer("parkinson_weight", torch.tensor(parkinson_weight))
         
         # 1.3. Focal loss params
         self.focal_alpha = focal_alpha
@@ -70,21 +70,21 @@ class CombinedLoss(nn.Module):
         device = pred.device
         
         # 1. BCE with minority weighting
-        weights = torch.where(label==0, # if healthy 
-                            self.healthy_weight.to(device), # then apply weight
-                            torch.ones_like(label, dtype=pred.dtype, device=device), # else make it one (the normal)
-                            )
+        weights = torch.where(
+                        label == 1,  # Parkinson
+                        self.parkinson_weight.to(device),
+                        torch.ones_like(label, dtype=pred.dtype, device=device)
+                    )
         bce = F.binary_cross_entropy_with_logits(probs, label.float(), weight=weights)
         
-        # 2. Focal Loss
-        # alpha: 0.25 for PD (1), 0.75 for Healthy (0)
+        # 2. Focal Loss (focus more on PD)
         pt = torch.where(label == 1, probs, 1 - probs)
         focal_weight = (1 - pt) ** self.focal_gamma
         alpha_weight = torch.where(label == 1, self.focal_alpha, 1 - self.focal_alpha)
         bce_raw = F.binary_cross_entropy_with_logits(pred, label.float(), reduction='none')
         focal = (alpha_weight * focal_weight * bce_raw).mean()
         
-        # 3. Tversky Loss
+        # 3. Tversky Loss (FN-heavy, recall-oriented)
         # 3.1. True Positive, False Negative, False Positive
         TP = (probs * label).sum()               # correctly predicted PD
         FN = ((1 - probs) * label).sum()         # PD missed

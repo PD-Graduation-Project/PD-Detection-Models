@@ -1,5 +1,6 @@
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader, Subset, WeightedRandomSampler
 from sklearn.model_selection import train_test_split
+import numpy as np
 
 # dataloader creator function
 # -----------------------------
@@ -70,17 +71,33 @@ def create_tremor_dataloaders(
     # 4. Create subsets
     train_subset = Subset(full_dataset, train_indices)
     val_subset = Subset(full_dataset, val_indices)
+    
+    # 5. WeightedRandomSampler for class imbalance
+    # ------------------------------------------------
+    # 5.1.Extract labels for the training subset
+    train_labels = np.array([full_dataset.labels[i] for i in train_indices])
+    class_counts = np.bincount(train_labels)
+    class_weights = 1.0 / np.maximum(class_counts, 1)  # avoid divide by zero
+    sample_weights = class_weights[train_labels]
 
-    # 5. Create DataLoaders
+    # 5.2. create sampler
+    sampler = WeightedRandomSampler(
+        weights=sample_weights,
+        num_samples=len(sample_weights),
+        replacement=True
+    )
+
+    # 6. Create DataLoaders
     train_dataloader = DataLoader(
         train_subset,
         batch_size=batch_size,
-        shuffle=True,
+        # shuffle=True, # sampler option is mutually exclusive with shuffle
         pin_memory=True,
         drop_last=True,
+        sampler= sampler # [NEW] using sampler for classes imbalance
     )
 
-    val_dataloader = DataLoader(
+    val_dataloader = DataLoader( # no sampler always plain
         val_subset,
         batch_size=batch_size,
         shuffle=False,

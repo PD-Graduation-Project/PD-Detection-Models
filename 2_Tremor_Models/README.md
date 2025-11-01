@@ -54,3 +54,9 @@ To ensure clean and standardized input for the model, several preprocessing step
   - **Wrist encoding**: Wrist side was encoded as a separate scalar input to the model (0 = Left, 1 = Right).
 
 ---
+
+# TODO:
+- find a better way to handle the class imbalance
+    - maybe by removing some PD data and try to make it closer to 50% (now it's 77% !!)
+    - try GANs on healthy data?
+- try models for each movement, and remove movements that are very hard to detect
