@@ -18,7 +18,7 @@ def train(model: torch.nn.Module,
         Tboard: bool = True,
 
         epochs: int = 5,
-        max_lr: float = 1e-3,):
+        max_lr: float = 1e-4,):
     """
     Train a multi-class classification model with TensorBoard logging and checkpoint saving.
 
@@ -92,7 +92,7 @@ def train(model: torch.nn.Module,
             
             print(f"Loaded pretrained model:")
             print(f"- val_loss={checkpoint['val_loss']:.4f}")
-            print(f"- val_acc={checkpoint['val_acc']:.4f}")
+            print(f"- val_accuracy={checkpoint['val_accuracy']:.4f}")
             print(f"- val_recall={checkpoint['val_recall']:.4f}")
             print(f"- val_precision={checkpoint['val_precision']:.4f}")
             print(f"- val_f1={checkpoint['val_f1']:.4f}")

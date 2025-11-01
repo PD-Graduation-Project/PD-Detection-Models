@@ -23,19 +23,19 @@ class CombinedLoss(nn.Module):
     def __init__(self,
                 # loss weights
                 bce_weight=1.0,
-                focal_weight=0.8,
+                focal_weight=1.2,
                 tversky_weight=1.0,
                 
                 # weight for Healthy=0 (MINORITY)
                 healthy_weight=3.5,       # num_PD / num_Healthy
                 
                 # focal params
-                focal_alpha=0.25, # This focuses on majority (PD=1)
+                focal_alpha=0.15, # This focuses on majority (PD=1)
                 focal_gamma=2.0,
                 
                 # tversky params
-                tversky_alpha=0.7, # This focuses on minority (FN reduction)
-                tversky_beta=0.3):
+                tversky_alpha=0.8, # This focuses on minority (FN reduction)
+                tversky_beta=0.2):
         super().__init__()
         
         # 1. init all params
@@ -74,14 +74,14 @@ class CombinedLoss(nn.Module):
                             self.healthy_weight.to(device), # then apply weight
                             torch.ones_like(label, dtype=pred.dtype, device=device), # else make it one (the normal)
                             )
-        bce = F.binary_cross_entropy(probs, label.float(), weight=weights)
+        bce = F.binary_cross_entropy_with_logits(probs, label.float(), weight=weights)
         
         # 2. Focal Loss
         # alpha: 0.25 for PD (1), 0.75 for Healthy (0)
         pt = torch.where(label == 1, probs, 1 - probs)
         focal_weight = (1 - pt) ** self.focal_gamma
         alpha_weight = torch.where(label == 1, self.focal_alpha, 1 - self.focal_alpha)
-        bce_raw = F.binary_cross_entropy_with_logits(pred, label, reduction='none')
+        bce_raw = F.binary_cross_entropy_with_logits(pred, label.float(), reduction='none')
         focal = (alpha_weight * focal_weight * bce_raw).mean()
         
         # 3. Tversky Loss
