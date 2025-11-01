@@ -18,7 +18,7 @@ def train(model: torch.nn.Module,
         Tboard: bool = True,
 
         epochs: int = 5,
-        max_lr: float = 1e-4,):
+        max_lr: float = 1e-3,):
     """
     Train a multi-class classification model with TensorBoard logging and checkpoint saving.
 
