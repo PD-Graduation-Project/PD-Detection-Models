@@ -1,5 +1,5 @@
 import torch
-from .losses import CombinedLoss, binary_metrics
+from .losses_binary import CombinedLoss, binary_metrics
 from .training_loop import train_one_epoch, validate
 
 from torch.utils.tensorboard import SummaryWriter
@@ -52,9 +52,9 @@ def train(model: torch.nn.Module,
 
     # 1. init loss, optimizer, scheduler, and scaler
     # ------------------------------------------------
-    # 1.1. custom weighted loss function for 3-class setup
-    class_weights = torch.tensor([1.85, 0.53, 1.28], device=device) # computed in readme file
-    loss_fn = CombinedLoss(class_weights=class_weights)
+    # 1.1. custom weighted loss function for 3-class setup (only used in older models)
+    # class_weights = torch.tensor([1.85, 0.53, 1.28], device=device) # computed in readme file
+    loss_fn = CombinedLoss()
 
     # 1.2. optimizer (with weight decay)
     optim = torch.optim.AdamW(

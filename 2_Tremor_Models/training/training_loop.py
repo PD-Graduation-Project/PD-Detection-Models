@@ -37,7 +37,7 @@ def train_one_epoch(model: torch.nn.Module,
     
     for batch in pbar:
         # 2. unpack and move data to device
-        signals, wrists, movements, labels, lengths = [b.to(device) for b in batch]  # (B, T, 6), (B,), (B,)
+        signals, wrists, movements, labels = [b.to(device) for b in batch]  # (B, T, 6), (B,), (B,)
         
         # 3. enable auto mixed precision (AMP) for efficiency
         with torch.amp.autocast(device_type=device):
@@ -125,7 +125,7 @@ def validate(model: torch.nn.Module,
         
         for batch in pbar:
             # 3. unpack and move data to device
-            signals, wrists, movements, labels, lengths = [b.to(device) for b in batch]
+            signals, wrists, movements, labels = [b.to(device) for b in batch]
             
             # 4. enable auto mixed precision (AMP)
             with torch.amp.autocast(device_type=device):
