@@ -2,12 +2,63 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from tqdm import tqdm
+from scipy.signal import butter, filtfilt, resample
 
+
+# Preprocessing utilities
+# ------------------------
+
+def butter_lowpass_filter(data, cutoff=10, fs=50, order=4):
+    """Apply a low-pass Butterworth filter to each column of IMU data."""
+    b, a = butter(order, cutoff / (0.5 * fs), btype='low')
+    return filtfilt(b, a, data, axis=0)
+
+def normalize_signal(data):
+    """Z-score normalize each channel independently."""
+    mean = np.mean(data, axis=0)
+    std = np.std(data, axis=0)
+    std[std == 0] = 1.0  # avoid division by zero
+    return (data - mean) / std
+
+def preprocess_signal(data, target_len=1024):
+    """
+    Apply preprocessing pipeline:
+    1. Remove NaNs
+    2. Clip outliers
+    3. Low-pass filter
+    4. Resample to fixed length
+    5. Normalize
+    """
+    # 1. Replace NaNs with 0
+    data = np.nan_to_num(data, nan=0.0)
+
+    # 2. Clip outliers
+    data = np.clip(data, -50, 50)
+
+    # 3. Filter noise
+    try:
+        data = butter_lowpass_filter(data)
+    except ValueError:
+        pass  # skip short signals that can't be filtered
+
+    # 4. Resample (upsample (data < 1024) or downsample (data > 1024) to target length)
+    if data.shape[0] != target_len:
+        data = resample(data, target_len, axis=0)
+
+    # 5. Normalize per channel
+    data = normalize_signal(data)
+
+    return data
+
+
+# Main dataset creation function
+# ----------------------------------
 def create_preprocessed_dataset(
     root_dir: Path = Path("../../project_datasets/tremor/pads-parkinsons-disease-smartwatch-dataset-1.0.0"),
     time_series_subdir: str = "movement/timeseries",
     file_list_subdir: str = "preprocessed/file_list.csv",
-    output_dir: Path = Path("../../project_datasets/tremor/") 
+    output_dir: Path = Path("../../project_datasets/tremor/") ,
+    target_len: int = 1024, # as used in the official .bin files
     ):
     """
     Preprocesses the *Parkinson's Disease Smartwatch Dataset (PADS)* to create 
@@ -54,7 +105,6 @@ def create_preprocessed_dataset(
 
     # 1. Load patient labels (healthy, PD, others)
     # ----------------------------------------------
-
     # 1.1. read csv file and get patients' ids and labels
     labels_df = pd.read_csv(FILE_LIST)
     labels_df = labels_df[['id', 'label']]
@@ -117,7 +167,10 @@ def create_preprocessed_dataset(
         if label is None:
             continue # skip if not in file_list.csv
         
-        # 4.5. save info in the output dir
+        # 4.5. [NEW] Apply preprocessing
+        data = preprocess_signal(data, target_len=target_len)
+        
+        # 4.6. save info in the output dir
         label_name = {
             0: "Healthy",
             1: "Parkinson",
@@ -128,7 +181,7 @@ def create_preprocessed_dataset(
         out_dir = OUTPUT_DIR / movement_name / label_name
         out_dir.mkdir(parents=True, exist_ok=True)
         
-        # 4.6. save preprocessed .npz file
+        # 4.7. save preprocessed .npz file
         np.savez_compressed(
             out_dir / f"{subject_id}_{'L' if wrist==0 else 'R'}.npz",
             signal = data,
@@ -137,6 +190,7 @@ def create_preprocessed_dataset(
             subject_id = subject_id
         )
         
+        print(f"\nFinished preprocessing. Saved dataset to: {OUTPUT_DIR.resolve()}")
         
     # 5. To load any of them:
     # --------------------------

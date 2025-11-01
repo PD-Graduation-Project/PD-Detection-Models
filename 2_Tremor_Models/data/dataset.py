@@ -44,6 +44,12 @@ class TremorDataset(Dataset):
         
     random_seed : int, optional (default=42)
         Seed used to shuffle the dataset for reproducibility.
+        
+    include_other : bool, default=True
+        Whether to include the "Other" class (label=2)
+        
+    print_details : bool, default=False
+        Print dataset info
 
     Returns
     -------
@@ -58,10 +64,12 @@ class TremorDataset(Dataset):
                 data_path: str,
                 movement_names: list = None,
                 random_seed: int = 42,
+                include_other: bool = True,
                 print_details: bool = False):
         super().__init__()
         
         self.data_path = Path(data_path)
+        self.include_other = include_other
         
         # 1. Movements inits
         # -------------------
@@ -94,9 +102,12 @@ class TremorDataset(Dataset):
                 continue
             
             # 3.2. init Healthy, Parkinson, Other subfolders dir
-            healthy_dir = movement_path / "Healthy"
-            parkinson_dir = movement_path / "Parkinson"
-            other_dir = movement_path / "Other"
+            dirs = {
+                # label: directory
+                0: movement_path / "Healthy",
+                1: movement_path / "Parkinson",
+                2: movement_path / "Other",
+            }
             
             # 4. Helper function to process .npz files
             # -------------------------------------------
@@ -115,26 +126,17 @@ class TremorDataset(Dataset):
 
             # 5. add all data
             # -----------------
-            # 5.1. Load Healthy samples (label=0)
-            if healthy_dir.exists():
-                for file in healthy_dir.glob("*.npz"):
-                    result = process_npz(file, label=0)
-                    if result is not None:
-                        all_samples.append(result)
-            
-            # 5.2. Load Parkinson samples (label=1)
-            if parkinson_dir.exists():
-                for file in parkinson_dir.glob("*.npz"):
-                    result = process_npz(file, label=1)
-                    if result is not None:
-                        all_samples.append(result)
-            
-            # 5.3. Load Other samples (label=2)
-            if other_dir.exists():
-                for file in other_dir.glob("*.npz"):
-                    result = process_npz(file, label=2)
-                    if result is not None:
-                        all_samples.append(result)
+            for label, dir_path in dirs.items():
+                # 5.1. skip the 'other' label if 'include_other' is False
+                if label == 2 and not include_other:
+                    continue
+                
+                # 5.2. gte all the '.npz' data in each directory
+                if dir_path.exists():
+                    for file in dir_path.glob("*.npz"):
+                        result = process_npz(file, label)
+                        if result is not None:
+                            all_samples.append(result)
             
             if print_details:
                 print(f"  Loaded {movement_name}: {len([s for s in all_samples if s[2] == movement_idx])} samples")
@@ -153,7 +155,8 @@ class TremorDataset(Dataset):
             print(f"\nTotal samples loaded: {len(self.signals)}")
             print(f"  Healthy: {self.labels.count(0)}")
             print(f"  Parkinson: {self.labels.count(1)}")
-            print(f"  Other: {self.labels.count(2)}")
+            if include_other:
+                print(f"  Other: {self.labels.count(2)}")
         
     def __len__(self):
         return len(self.signals)
@@ -171,9 +174,6 @@ class TremorDataset(Dataset):
             self.signals[index],
             dtype=torch.float32
         )
-        # 1.1. Normalize per channel [NEW]
-        signal = (signal - signal.mean(axis=0)) / (signal.std(axis=0) + 1e-8)
-        signal = signal.detach().clone().requires_grad_(True).float()
         
         # 2. wrist
         # ---------

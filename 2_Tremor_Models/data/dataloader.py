@@ -1,44 +1,6 @@
 from torch.utils.data import DataLoader, Subset
 from sklearn.model_selection import train_test_split
 
-from torch.nn.utils.rnn import pad_sequence
-import torch
-
-# custom collate function
-# -------------------------
-def collate_variable_length(batch):
-    """
-    Custom collate function to handle variable-length sequences (1024 or 2048).
-    Pads sequences to the maximum length in the batch.
-    
-    Args:
-        batch: List of tuples (signal, wrist, movement, label)
-    
-    Returns:
-        Tuple of (signals_padded, wrists, movements, labels, lengths)
-    """
-    
-    # 1. unpack data in batch - each item is (signal, wrist, movement, label)
-    signals = [item[0] for item in batch]
-    wrists = torch.stack([item[1] for item in batch])
-    movements = torch.stack([item[2] for item in batch])
-    labels = torch.stack([item[3] for item in batch])
-    
-    # 2. store original (pre-padding) lengths
-    lengths = torch.tensor([s.size(0) for s in signals], dtype=torch.long)
-
-    # 3. pad signals to max length in batch (if some samples are 1024 and there is a 2048 sample in the batch)
-    # pad_sequence expects (batch, seq_len, features) format
-    signals_padded = pad_sequence(
-        signals,
-        batch_first=True,
-        padding_value=0.0
-    )
-    
-    # 4. return padded batch + old lengths
-    return signals_padded, wrists, movements, labels, lengths
-
-
 # dataloader creator function
 # -----------------------------
 def create_tremor_dataloaders(
@@ -46,6 +8,7 @@ def create_tremor_dataloaders(
         batch_size: int = 32,
         train_val_split: float = 0.8,
         random_seed: int = 42,
+        include_other: bool = True,
         print_details: bool = False):
     """
     Creates PyTorch DataLoaders for tremor movement classification across all movements.
@@ -66,6 +29,7 @@ def create_tremor_dataloaders(
         train_val_split (float): Fraction of data to use for training (default: 0.8).
         random_seed (int): Random seed for reproducibility (default: 42).
         num_workers (int): Number of workers for DataLoader (default: 4).
+        include_other (bool): Whether to include the "Other" class (label=2) (default=True).
         print_details(bool): Prints details of the dataloader (default: False).
 
     Returns:
@@ -79,7 +43,8 @@ def create_tremor_dataloaders(
     full_dataset = TremorDataset(
         data_path=data_path,
         random_seed=random_seed,
-        print_details = print_details
+        include_other= include_other,
+        print_details = print_details,
     )
 
     # 2.1. Create stratification key: combine label and movement
@@ -113,7 +78,6 @@ def create_tremor_dataloaders(
         shuffle=True,
         pin_memory=True,
         drop_last=True,
-        collate_fn=collate_variable_length # NEW
     )
 
     val_dataloader = DataLoader(
@@ -121,7 +85,6 @@ def create_tremor_dataloaders(
         batch_size=batch_size,
         shuffle=False,
         pin_memory=True,
-        collate_fn=collate_variable_length # NEW
     )
 
     # 6. Print dataset info
