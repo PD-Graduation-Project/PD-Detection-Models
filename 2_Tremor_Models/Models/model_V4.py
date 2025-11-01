@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import torch.nn.functional as F
 
 class TremorNetGRU_V4(nn.Module):
     """
@@ -89,19 +90,20 @@ class TremorNetGRU_V4(nn.Module):
             nn.Dropout(dropout * 0.5),                  # regularization
         )
         
-        # 4. Wrist embedding (MUCH LARGER)
+        # 4. Wrist and Movement embedding
         # ---------------------------------
         self.wrist_embed = nn.Embedding(
             num_embeddings=2,  # 0 = Left, 1 = Right
             embedding_dim=wrist_embed_dim 
         )
-        
-        # 5. Movement type embedding (NEW)
-        # --------------------------------
         self.movement_embed = nn.Embedding(
             num_embeddings=num_movements,  # 11 movements
             embedding_dim=movement_embed_dim 
         )
+        
+        # 5. Normalization layer (helps small batch stability)
+        # -----------------------------------------------------
+        self.layer_norm = nn.LayerNorm(hidden_size * 2)
         
         # 6. Classifier 
         # ---------------
