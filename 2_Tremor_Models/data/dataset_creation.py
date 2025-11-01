@@ -8,19 +8,19 @@ from scipy.signal import butter, filtfilt, resample
 # Preprocessing utilities
 # ------------------------
 
-def butter_lowpass_filter(data, cutoff=10, fs=50, order=4):
+def _butter_lowpass_filter(data, cutoff=10, fs=50, order=4):
     """Apply a low-pass Butterworth filter to each column of IMU data."""
     b, a = butter(order, cutoff / (0.5 * fs), btype='low')
     return filtfilt(b, a, data, axis=0)
 
-def normalize_signal(data):
+def _normalize_signal(data):
     """Z-score normalize each channel independently."""
     mean = np.mean(data, axis=0)
     std = np.std(data, axis=0)
     std[std == 0] = 1.0  # avoid division by zero
     return (data - mean) / std
 
-def preprocess_signal(data, target_len=1024):
+def _preprocess_signal(data, target_len=1024):
     """
     Apply preprocessing pipeline:
     1. Remove NaNs
@@ -37,7 +37,7 @@ def preprocess_signal(data, target_len=1024):
 
     # 3. Filter noise
     try:
-        data = butter_lowpass_filter(data)
+        data = _butter_lowpass_filter(data)
     except ValueError:
         pass  # skip short signals that can't be filtered
 
@@ -46,7 +46,7 @@ def preprocess_signal(data, target_len=1024):
         data = resample(data, target_len, axis=0)
 
     # 5. Normalize per channel
-    data = normalize_signal(data)
+    data = _normalize_signal(data)
 
     return data
 
@@ -54,10 +54,10 @@ def preprocess_signal(data, target_len=1024):
 # Main dataset creation function
 # ----------------------------------
 def create_preprocessed_dataset(
-    root_dir: Path = Path("../../project_datasets/tremor/pads-parkinsons-disease-smartwatch-dataset-1.0.0"),
+    root_dir: Path = Path("../project_datasets/tremor/pads-parkinsons-disease-smartwatch-dataset-1.0.0"),
     time_series_subdir: str = "movement/timeseries",
     file_list_subdir: str = "preprocessed/file_list.csv",
-    output_dir: Path = Path("../../project_datasets/tremor/") ,
+    output_dir: Path = Path("../project_datasets/tremor/") ,
     target_len: int = 1024, # as used in the official .bin files
     ):
     """
@@ -168,7 +168,7 @@ def create_preprocessed_dataset(
             continue # skip if not in file_list.csv
         
         # 4.5. [NEW] Apply preprocessing
-        data = preprocess_signal(data, target_len=target_len)
+        data = _preprocess_signal(data, target_len=target_len)
         
         # 4.6. save info in the output dir
         label_name = {
@@ -190,7 +190,7 @@ def create_preprocessed_dataset(
             subject_id = subject_id
         )
         
-        print(f"\nFinished preprocessing. Saved dataset to: {OUTPUT_DIR.resolve()}")
+    print(f"\nFinished preprocessing. Saved dataset to: {OUTPUT_DIR.resolve()}")
         
     # 5. To load any of them:
     # --------------------------
