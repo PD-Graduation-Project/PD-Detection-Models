@@ -1,5 +1,5 @@
 import torch
-from .losses import CombinedLoss, multiclass_metrics
+from .losses import CombinedLoss, binary_metrics
 from .training_loop import train_one_epoch, validate
 
 from torch.utils.tensorboard import SummaryWriter
@@ -110,7 +110,7 @@ def train(model: torch.nn.Module,
             model,
             train_dataloader,
             loss_fn,
-            multiclass_metrics,
+            binary_metrics,
             optim,
             scaler,
             device
@@ -121,7 +121,7 @@ def train(model: torch.nn.Module,
             model,
             val_dataloader,
             loss_fn,
-            multiclass_metrics,
+            binary_metrics,
             device
         )
         scheduler.step(val_loss)
@@ -132,7 +132,7 @@ def train(model: torch.nn.Module,
             writer.add_scalar("Loss/train", train_loss, epoch)
             writer.add_scalar("Loss/val", val_loss, epoch)
 
-            for m in ["accuracy", "recall_macro", "precision_macro", "f1_macro"]:
+            for m in ["accuracy", "recall", "precision", "f1"]:
                 writer.add_scalar(f"{m}/train", train_metrics[m], epoch)
                 writer.add_scalar(f"{m}/val", val_metrics[m], epoch)
 
@@ -157,15 +157,15 @@ def train(model: torch.nn.Module,
         
         print(f"Train Loss = {train_loss:.3f} | "
             f"Acc: {train_metrics['accuracy']:.3f} | "
-            f"Recall: {train_metrics['recall_macro']:.3f} | "
-            f"Precision: {train_metrics['precision_macro']:.3f} | "
-            f"F1: {train_metrics['f1_macro']:.3f}")
+            f"Recall: {train_metrics['recall']:.3f} | "
+            f"Precision: {train_metrics['precision']:.3f} | "
+            f"F1: {train_metrics['f1']:.3f}")
         
         print(f"Val Loss = {val_loss:.3f} | "
             f"Acc: {val_metrics['accuracy']:.3f} | "
-            f"Recall: {val_metrics['recall_macro']:.3f} | "
-            f"Precision: {val_metrics['precision_macro']:.3f} | "
-            f"F1: {val_metrics['f1_macro']:.3f}")
+            f"Recall: {val_metrics['recall']:.3f} | "
+            f"Precision: {val_metrics['precision']:.3f} | "
+            f"F1: {val_metrics['f1']:.3f}")
         
         print("=" * 35, "\n")
 

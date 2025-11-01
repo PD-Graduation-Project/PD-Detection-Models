@@ -47,7 +47,7 @@ def train_one_epoch(model: torch.nn.Module,
                         
             # 5. calculate the losses and metrics
             loss = loss_fn(logits, labels)
-            metrics = metric_fn(logits, labels, num_classes=3)
+            metrics = metric_fn(logits, labels)
             
         # 6. zero grad
         optim.zero_grad()
@@ -66,17 +66,17 @@ def train_one_epoch(model: torch.nn.Module,
         # 10. compute total loss and metrics
         total_losses += loss.item()
         total_acc += metrics['accuracy']
-        total_recall += metrics['recall_macro']
-        total_precision += metrics['precision_macro']
-        total_f1 += metrics['f1_macro']
+        total_recall += metrics['recall']
+        total_precision += metrics['precision']
+        total_f1 += metrics['f1']
         
         # 11. update progress bar
         pbar.set_postfix({
             'Loss': f'{loss.item():.4f}',
             'Acc': f'{metrics["accuracy"]:.4f}',
-            'Rec': f'{metrics["recall_macro"]:.4f}',
-            'Prec': f'{metrics["precision_macro"]:.4f}',
-            'F1': f'{metrics["f1_macro"]:.4f}'
+            'Rec': f'{metrics["recall"]:.4f}',
+            'Prec': f'{metrics["precision"]:.4f}',
+            'F1': f'{metrics["f1"]:.4f}'
         })
         
     # 12. return average losses and metrics as dictionary
@@ -84,9 +84,9 @@ def train_one_epoch(model: torch.nn.Module,
 
     metrics_dict = {
         "accuracy": total_acc / len(train_dataloader),
-        "recall_macro": total_recall / len(train_dataloader),
-        "precision_macro": total_precision / len(train_dataloader),
-        "f1_macro": total_f1 / len(train_dataloader),
+        "recall": total_recall / len(train_dataloader),
+        "precision": total_precision / len(train_dataloader),
+        "f1": total_f1 / len(train_dataloader),
     }
 
     return avg_loss, metrics_dict
@@ -134,22 +134,22 @@ def validate(model: torch.nn.Module,
                                 
                 # 6. calculate losses and metrics
                 loss = loss_fn(logits, labels)
-                metrics = metric_fn(logits, labels, num_classes=3)
+                metrics = metric_fn(logits, labels)
                 
             # 7. compute total loss and metrics
             total_losses += loss.item()
             total_acc += metrics['accuracy']
-            total_recall += metrics['recall_macro']
-            total_precision += metrics['precision_macro']
-            total_f1 += metrics['f1_macro']
+            total_recall += metrics['recall']
+            total_precision += metrics['precision']
+            total_f1 += metrics['f1']
             
             # 8. update progress bar
             pbar.set_postfix({
                 'Loss': f'{loss.item():.4f}',
                 'Acc': f'{metrics["accuracy"]:.4f}',
-                'Rec': f'{metrics["recall_macro"]:.4f}',
-                'Prec': f'{metrics["precision_macro"]:.4f}',
-                'F1': f'{metrics["f1_macro"]:.4f}'
+                'Rec': f'{metrics["recall"]:.4f}',
+                'Prec': f'{metrics["precision"]:.4f}',
+                'F1': f'{metrics["f1"]:.4f}'
             })
             
         # 9. return average loss and metrics as dictionary
@@ -157,9 +157,9 @@ def validate(model: torch.nn.Module,
 
         metrics_dict = {
             "accuracy": total_acc / len(val_dataloader),
-            "recall_macro": total_recall / len(val_dataloader),
-            "precision_macro": total_precision / len(val_dataloader),
-            "f1_macro": total_f1 / len(val_dataloader),
+            "recall": total_recall / len(val_dataloader),
+            "precision": total_precision / len(val_dataloader),
+            "f1": total_f1 / len(val_dataloader),
         }
 
         return avg_loss, metrics_dict
