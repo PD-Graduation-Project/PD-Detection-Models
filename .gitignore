@@ -14,5 +14,5 @@ __pycache__/
 
 # TensorBoard runs
 # -----------------
-runs/
-other_runs/
+# runs/
+# other_runs/
