@@ -192,10 +192,3 @@ def create_preprocessed_dataset(
         
     print(f"\nFinished preprocessing. Saved dataset to: {OUTPUT_DIR.resolve()}")
         
-    # 5. To load any of them:
-    # --------------------------
-
-    # npz = np.load("preprocessed_datasets/CrossArms/Healthy/001_L.npz")
-    # X = npz["signal"]
-    # y = npz["label"]
-    # wrist = npz["wrist"]
