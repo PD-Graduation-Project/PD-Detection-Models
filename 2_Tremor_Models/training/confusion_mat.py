@@ -2,7 +2,12 @@ import torch
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
-def plot_confusion_matrix(model, dataloader, device, class_names=None, threshold=0.5):
+def plot_confusion_matrix(model, 
+                        dataloader, 
+                        device, 
+                        class_names=None, 
+                        threshold=0.5,
+                        per_movement = False):
     """
     Computes and plots the confusion matrix for a binary classification model.
     
@@ -28,9 +33,10 @@ def plot_confusion_matrix(model, dataloader, device, class_names=None, threshold
             signals, wrists, movements, labels = [b.to(device) for b in batch]
 
             # forward pass
-            logits = model(signals, wrists, movements)
-            if isinstance(logits, tuple):
-                logits = logits[0]
+            if per_movement:
+                logits = model(signals, wrists, movements)
+            else:
+                logits = model(signals, wrists)
             
             # convert to probabilities if binary classification
             if logits.shape[1] == 1:
