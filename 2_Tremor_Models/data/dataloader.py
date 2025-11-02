@@ -11,7 +11,7 @@ def create_tremor_dataloaders(
         random_seed: int = 42,
         include_other: bool = True,
         print_details: bool = False,
-        per_movemnet: bool = False):
+        per_movement: bool = False):
     """
     Creates PyTorch DataLoaders for tremor movement classification across all movements.
     
@@ -33,7 +33,7 @@ def create_tremor_dataloaders(
         num_workers (int): Number of workers for DataLoader (default: 4).
         include_other (bool): Whether to include the "Other" class (label=2) (default=True).
         print_details (bool): Prints details of the dataloader (default: False).
-        per_movemnet (bool): returns each movement as a seperate dataloader (default: False).
+        per_movement (bool): returns each movement as a seperate dataloader (default: False).
 
     Returns:
         (DataLoader, DataLoader): train_loader, val_loader
@@ -52,7 +52,7 @@ def create_tremor_dataloaders(
     
     # Option A: return all the movements in the same dataloader:
     # --------------------------------------------------------------
-    if not per_movemnet:
+    if not per_movement:
         
         # 2.1. Create stratification key: combine label and movement
         # This ensures each split has good representation of all movements AND classes

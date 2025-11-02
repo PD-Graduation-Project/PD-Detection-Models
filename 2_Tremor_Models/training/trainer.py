@@ -18,7 +18,8 @@ def train(model: torch.nn.Module,
         Tboard: bool = True,
 
         epochs: int = 5,
-        max_lr: float = 1e-3,):
+        max_lr: float = 1e-3,
+        per_movement: bool = False):
     """
     Train a multi-class classification model with TensorBoard logging and checkpoint saving.
 
@@ -33,6 +34,7 @@ def train(model: torch.nn.Module,
         Tboard (bool, optional): Whether to use SummaryWriter for TensorBoard logging. Defaults to True.
         epochs (int, optional): Number of training epochs. Defaults to 5.
         max_lr (float, optional): Maximum learning rate. Defaults to 1e-3.
+        per_movement (bool): Whether the model has a movement embedding block or not.
 
     Notes:
         - Uses `CombinedLoss` (CrossEntropy + Focal + Tversky) for robust multi-class optimization.
@@ -113,7 +115,8 @@ def train(model: torch.nn.Module,
             binary_metrics,
             optim,
             scaler,
-            device
+            device,
+            per_movement
         )
 
         # 6. validate
@@ -122,7 +125,8 @@ def train(model: torch.nn.Module,
             val_dataloader,
             loss_fn,
             binary_metrics,
-            device
+            device,
+            per_movement
         )
         scheduler.step(val_loss)
 
