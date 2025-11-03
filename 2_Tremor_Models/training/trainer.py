@@ -1,6 +1,7 @@
 import torch
 from .losses_binary import CombinedLoss, binary_metrics, compute_per_class_metrics
 from .training_loop import train_one_epoch, validate
+from .tensorboard_logger import log_metrics_to_tensorboard
 
 from torch.utils.tensorboard import SummaryWriter
 import os
@@ -101,7 +102,11 @@ def train(model: torch.nn.Module,
     if Tboard:
         writer = SummaryWriter(log_dir=os.path.join("runs", run_name))
 
-    # 3. load pretrained model if available
+    # 3. Best model tracking
+    # ------------------------
+    best_balanced_acc = 0.0
+
+    # 4. load pretrained model if available
     # -------------------------------------
     if load_pretrained:
         if os.path.exists(load_pretrained):
@@ -121,13 +126,13 @@ def train(model: torch.nn.Module,
         else:
             print(f"[WARNING] load_pretrained path was provided but does not exist: {load_pretrained}")
 
-    # 4. full training loop
+    # 5. full training loop
     # ----------------------
     for epoch in range(epochs):
         print(f"Training model: {model_name} epoch {epoch + 1} / {epochs}")
         print("-" * 35)
 
-        # 5. train
+        # 6. train
         train_loss, train_overall, train_per_class = train_one_epoch(
             model= model,
             train_dataloader= train_dataloader,
@@ -140,7 +145,7 @@ def train(model: torch.nn.Module,
             per_movement= per_movement
         )
 
-        # 6. validate
+        # 7. validate
         val_loss, val_overall, val_per_class = validate(
             model= model,
             val_dataloader= val_dataloader,
@@ -151,92 +156,47 @@ def train(model: torch.nn.Module,
             per_movement= per_movement
         )
         
-        # 6.1. step scheduler
+        # 7.1. step scheduler
         scheduler.step(val_loss)
         current_lr = optim.param_groups[0]['lr']
         
 
-        # 7. log metrics to TensorBoard
+        # 8. log metrics to TensorBoard
         # ------------------------------------
         if Tboard:
-            # 7.1. Loss
-            writer.add_scalar("Loss/train", train_loss, epoch)
-            writer.add_scalar("Loss/val", val_loss, epoch)
-            
-            # 7.2. overall metrics
-            for metric_name in ["accuracy", "recall", "precision", "f1"]:
-                writer.add_scalar(f"Overall/{metric_name}/train", train_overall[metric_name], epoch)
-                writer.add_scalar(f"Overall/{metric_name}/val", val_overall[metric_name], epoch)
-                
-            # 7.3. Per-class metrics
-            for class_name in ["healthy", "parkinson"]:
-                for metric in ["recall", "precision", "f1"]:
-                    writer.add_scalar(
-                        f"PerClass/{class_name}_{metric}/train",
-                        train_per_class[class_name][metric],
-                        epoch
-                    )
-                    writer.add_scalar(
-                        f"PerClass/{class_name}_{metric}/val",
-                        val_per_class[class_name][metric],
-                        epoch
-                    )
-                    
-            # 7.4. Balanced metrics
-            writer.add_scalar("Balanced/accuracy/train", train_per_class['balanced_accuracy'], epoch)
-            writer.add_scalar("Balanced/accuracy/val", val_per_class['balanced_accuracy'], epoch)
-            writer.add_scalar("Balanced/macro_f1/train", train_per_class['macro_f1'], epoch)
-            writer.add_scalar("Balanced/macro_f1/val", val_per_class['macro_f1'], epoch)
-            
-            # 7.5. Prediction distribution (detect bias)
-            writer.add_scalar(
-                "PredDist/train_healthy_ratio",
-                train_per_class['prediction_dist']['pred_healthy_ratio'],
-                epoch
+            log_metrics_to_tensorboard(
+                writer=writer,
+                epoch=epoch,
+                train_loss=train_loss,
+                val_loss=val_loss,
+                train_overall=train_overall,
+                val_overall=val_overall,
+                train_per_class=train_per_class,
+                val_per_class=val_per_class,
+                current_lr=current_lr
             )
-            writer.add_scalar(
-                "PredDist/train_pd_ratio",
-                train_per_class['prediction_dist']['pred_pd_ratio'],
-                epoch
-            )
-            writer.add_scalar(
-                "PredDist/val_healthy_ratio",
-                val_per_class['prediction_dist']['pred_healthy_ratio'],
-                epoch
-            )
-            writer.add_scalar(
-                "PredDist/val_pd_ratio",
-                val_per_class['prediction_dist']['pred_pd_ratio'],
-                epoch
-            )
-            
-            # 7.6. Confusion matrix as scalars
-            for key, value in val_per_class['confusion_matrix'].items():
-                writer.add_scalar(f"ConfusionMatrix/{key}", value, epoch)
-            
-            # 7.7. Learning rate
-            writer.add_scalar("LearningRate", current_lr, epoch)
-            writer.flush()
 
-        # 8. Save checkpoint (every epoch)
-        # ----------------------------------
-        os.makedirs(checkpoint_dir, exist_ok=True)
-        checkpoint_path = os.path.join(checkpoint_dir, f"{model_name}_epoch_{epoch + 1}.pth")
-        
-        torch.save({
-            'model_state_dict': model.state_dict(),
-            'optim_state_dict': optim.state_dict(),
-            'train_loss': train_loss,
-            'val_loss': val_loss,
-            'val_overall': val_overall,
-            'val_per_class': val_per_class,
-            'balanced_accuracy': val_per_class['balanced_accuracy'],
-            'macro_f1': val_per_class['macro_f1']
-        }, checkpoint_path)
+        # 9. Save the best model only
+        # ------------------------------
+        current_balanced_acc = val_per_class['balanced_accuracy']
+        if current_balanced_acc > best_balanced_acc:
+            best_balanced_acc = current_balanced_acc
+            best_model_path = os.path.join(checkpoint_dir, f"{model_name}_BEST.pth")
+            
+            torch.save({
+                'model_state_dict': model.state_dict(),
+                'optim_state_dict': optim.state_dict(),
+                'train_loss': train_loss,
+                'val_loss': val_loss,
+                'val_overall': val_overall,
+                'val_per_class': val_per_class,
+                'balanced_accuracy': val_per_class['balanced_accuracy'],
+                'macro_f1': val_per_class['macro_f1']
+            }, best_model_path)
+            
+            print(f"[BEST] New best balanced_accuracy: {best_balanced_acc:.3f} (saved)\n")
 
-        print(f"Model: {model_name} saved.\n")
-
-        # 9. print epoch summary
+        # 10. print epoch summary
         # -----------------------
         print(f"Epoch {epoch + 1} / {epochs} summary")
         print("-" * 35)
@@ -256,6 +216,6 @@ def train(model: torch.nn.Module,
         
         print("=" * 35, "\n")
 
-    # 10. close writer
+    # 11. close writer
     if Tboard:
         writer.close()
