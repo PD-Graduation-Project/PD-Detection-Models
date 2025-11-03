@@ -104,7 +104,6 @@ class TremorNetGRU_V5_5(nn.Module):
             nn.Conv1d(in_c, out_c, kernel, stride, padding),
             nn.BatchNorm1d(out_c),
             nn.ReLU(),
-            nn.Dropout(0.1)
         )
 
     def _encode_wrist(self, x, handed_embed):

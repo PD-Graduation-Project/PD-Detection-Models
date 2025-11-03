@@ -18,7 +18,7 @@ def train(model: torch.nn.Module,
         Tboard: bool = True,
 
         epochs: int = 5,
-        max_lr: float = 1e-3,
+        max_lr: float = 3e-4, # CHANGED: Lower LR for deeper, more complex model
         per_movement: bool = False):
     """
     Train a multi-class classification model with TensorBoard logging and checkpoint saving.
@@ -70,7 +70,8 @@ def train(model: torch.nn.Module,
         optimizer=optim,
         mode='min',          # monitor val_loss
         factor=0.5,          # reduce LR by 50%
-        patience=2,          # wait 2 epochs before reducing
+        patience=3,          # wait 2 epochs before reducing
+        min_lr=1e-6,         # CHANGED: Set minimum LR to prevent too small values
     )
 
     # 1.4. scaler (to prevent underflow during mixed precision)

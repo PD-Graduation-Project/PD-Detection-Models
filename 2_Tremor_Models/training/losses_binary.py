@@ -22,20 +22,23 @@ class CombinedLoss(nn.Module):
     
     def __init__(self,
                 # loss weights
-                bce_weight=1.0,
-                focal_weight=1.0,
-                tversky_weight=1.0,
+                bce_weight=0.6,
+                focal_weight=1.2,
+                tversky_weight=0.8,
                 
                 # Parkinson class weight (harder)
-                parkinson_weight=2,  
+                parkinson_weight=1.7,  
                 
                 # focal params (focus more on PD recall)
                 focal_alpha=0.85, # This focuses on majority (PD=1)
-                focal_gamma=2.0,
+                focal_gamma=2,
                 
                 # tversky params (focus on FN reduction for PD)
                 tversky_alpha=0.85,
-                tversky_beta=0.15):
+                tversky_beta=0.15,
+                
+                # Label smoothing for regularization
+                label_smoothing=0.1):
         super().__init__()
         
         # 1. init all params
@@ -64,31 +67,37 @@ class CombinedLoss(nn.Module):
         """
         # 0. ensure correct shape
         pred = pred.view(-1, 1)
-        label = label.view(-1, 1)
+        label = label.view(-1, 1).float()
+        
+        # 0.0. Apply label smoothing if enabled
+        if self.label_smoothing > 0:
+            label = label * (1 - self.label_smoothing) + 0.5 * self.label_smoothing
         
         probs = torch.sigmoid(pred)
         device = pred.device
         
         # 1. BCE with minority weighting
         weights = torch.where(
-                        label == 1,  # Parkinson
+                        label >= 0.5,  # Parkinson (considering smoothed labels)
                         self.parkinson_weight.to(device),
                         torch.ones_like(label, dtype=pred.dtype, device=device)
                     )
-        bce = F.binary_cross_entropy_with_logits(probs, label.float(), weight=weights)
+        bce = F.binary_cross_entropy_with_logits(probs, label, weight=weights)
         
         # 2. Focal Loss (focus more on PD)
-        pt = torch.where(label == 1, probs, 1 - probs)
+        pt = torch.where(label >= 0.5, probs, 1 - probs)
         focal_weight = (1 - pt) ** self.focal_gamma
-        alpha_weight = torch.where(label == 1, self.focal_alpha, 1 - self.focal_alpha)
-        bce_raw = F.binary_cross_entropy_with_logits(pred, label.float(), reduction='none')
+        alpha_weight = torch.where(label >= 0.5, self.focal_alpha, 1 - self.focal_alpha)
+        bce_raw = F.binary_cross_entropy_with_logits(pred, label, reduction='none')
         focal = (alpha_weight * focal_weight * bce_raw).mean()
         
         # 3. Tversky Loss (FN-heavy, recall-oriented)
         # 3.1. True Positive, False Negative, False Positive
-        TP = (probs * label).sum()               # correctly predicted PD
-        FN = ((1 - probs) * label).sum()         # PD missed
-        FP = (probs * (1 - label)).sum()         # predicted PD but actually Healthy
+        label_binary = (label >= 0.5).float() if self.label_smoothing > 0 else label
+        
+        TP = (probs * label_binary).sum()               # correctly predicted PD
+        FN = ((1 - probs) * label_binary).sum()         # PD missed
+        FP = (probs * (1 - label_binary)).sum()         # predicted PD but actually Healthy
         
         # 3.2. Tversky index and loss (add epsilon to avoid division by zero)
         tversky_index = (TP + 1.0) / (TP + self.tversky_alpha * FN + self.tversky_beta * FP + 1.0)
