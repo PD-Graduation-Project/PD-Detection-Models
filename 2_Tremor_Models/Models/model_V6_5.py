@@ -50,8 +50,9 @@ class TremorNetGRU_V6_5(nn.Module):
 
         # 2. Enhanced GRU with layer normalization
         # ------------------------------------------
+        gru_input_size = 256 + handedness_embed_dim
         self.gru = nn.GRU(
-            input_size=256 + handedness_embed_dim,
+            input_size=gru_input_size, # (cnn_channels + handedness)
             hidden_size=hidden_size,
             num_layers=2,
             batch_first=True,
@@ -60,25 +61,25 @@ class TremorNetGRU_V6_5(nn.Module):
         )
         
         # 2.1. GRU layer normalization
-        self.gru_ln = nn.LayerNorm(256 + handedness_embed_dim)
+        self.gru_ln = nn.LayerNorm(hidden_size * 2) # GRU output dim
 
-        # 3. Enhanced Multi-Head Self-Attention
-        # --------------------------------------
+        # 3. Enhanced Multi-Head Self-Attention over GRU output 
+        # -------------------------------------------------------
         self.multihead_attn = nn.MultiheadAttention(
-            embed_dim=256 + handedness_embed_dim,
+            embed_dim=hidden_size * 2, # (embed_dim == hidden_size*2)
             num_heads=num_attention_heads,
             batch_first=True,
             dropout=dropout * 0.5
         )
 
-        # 3.1. Learnable positional encoding
+        # 3.1. Learnable positional encoding (must match fused_features dimension (cnn 256 + handedness))
         # Learns the best way to remember time order instead of using fixed math formulas.
-        self.pos_encoding = nn.Parameter(torch.randn(1, 1000, 256 + handedness_embed_dim))
+        self.pos_encoding = nn.Parameter(torch.randn(1, 1000, gru_input_size))
         
         # 3.2. Enhanced attention projection with residual connection
         self.attention_proj = nn.Sequential(
-            nn.Linear(256 + handedness_embed_dim, 256 + handedness_embed_dim),
-            nn.LayerNorm(256 + handedness_embed_dim),
+            nn.Linear(hidden_size * 2, hidden_size * 2),
+            nn.LayerNorm(hidden_size * 2),
             nn.GELU(),
             nn.Dropout(dropout * 0.5),
         )
@@ -102,10 +103,24 @@ class TremorNetGRU_V6_5(nn.Module):
             nn.Linear(handedness_embed_dim * 2, handedness_embed_dim),
             nn.LayerNorm(handedness_embed_dim)
         )
+        
+        # Pooled feature dimensionality:
+        # we concatenate 5 pooled vectors each with dim (hidden_size*2)
+        self.pooled_dim = (hidden_size * 2) * 5  # e.g., 5 * 256 = 1280
+
+        # Cross-wrist attention must accept pooled vectors (embed_dim = pooled_dim)
+        # Make sure num_heads divides pooled_dim; default uses num_attention_heads//2
+        cross_heads = max(1, num_attention_heads // 2)
+        self.cross_attention = nn.MultiheadAttention(
+            embed_dim=self.pooled_dim,
+            num_heads=cross_heads,
+            batch_first=True,
+            dropout=dropout * 0.5
+        )
 
         # 5. Enhanced Classifier with residual connections
         # -------------------------------------------------
-        classifier_input_dim = (hidden_size * 6) * 2 + handedness_embed_dim
+        classifier_input_dim = self.pooled_dim * 3 + handedness_embed_dim
         
         self.classifier = nn.Sequential(
             # First block with residual connection
@@ -180,37 +195,37 @@ class TremorNetGRU_V6_5(nn.Module):
         # 1. Enhanced CNN feature extraction
         x = x.permute(0, 2, 1)  # [B, 6, T]
         
-        # Multi-scale feature extraction with residual connections
+        # 1.1. Multi-scale feature extraction with residual connections
         features1 = self.conv1(x)
         features2 = self.conv2(features1)
         features3 = self.conv3(features2)
         
-        # Dilated convolution for larger receptive field
+        # 1.2. Dilated convolution for larger receptive field
         dilated_features = F.gelu(self.conv_bn(self.dilated_conv(features3)))
-        features = features3 + dilated_features  # Residual connection
+        features = features3 + dilated_features  # Residual connection [B, 256, T']
         
-        # Apply channel attention
+        # 1.3. Apply channel attention
         features = self._apply_channel_attention(features)
-        
         features = features.permute(0, 2, 1)  # [B, T', 256]
 
         # 2. Enhanced handedness fusion
+        # expand and concat -> [B, T', 256 + handedness]
         handed_expanded = handed_embed.unsqueeze(1).expand(-1, features.size(1), -1)
-        fused_features = torch.cat([features, handed_expanded], dim=-1)
+        fused_features = torch.cat([features, handed_expanded], dim=-1) # [B, T', 256 + handedness]
 
         # 3. Enhanced temporal modeling with positional encoding
         seq_len = fused_features.size(1)
         pos_enc = self.pos_encoding[:, :seq_len, :].expand(B, -1, -1)
-        fused_features = fused_features + pos_enc
+        fused_features = fused_features + pos_enc # [B, T', 256+handedness]
 
         # 4. GRU processing
-        gru_out, _ = self.gru(fused_features)
-        gru_out = self.gru_ln(gru_out)
+        gru_out, _ = self.gru(fused_features) # [B, T', 256]
+        gru_out = self.gru_ln(gru_out) # [B, T', hidden_size*2]
 
         # 5. Enhanced self-attention with residual connection
         attn_out, attn_weights = self.multihead_attn(gru_out, gru_out, gru_out)
         gru_out = gru_out + attn_out  # Residual connection
-        gru_out = self.attention_proj(gru_out)
+        gru_out = self.attention_proj(gru_out) # [B, T', hidden_size*2]
 
         # 6. Multi-pooling strategy with learnable weights
         # 6.1. Attention pooling
@@ -230,7 +245,8 @@ class TremorNetGRU_V6_5(nn.Module):
         
         # 7. Concatenate all pooling strategies
         pooled_features = torch.cat([weighted_pool, attended_pool, mean_pool, max_pool, std_pool], dim=1)
-
+        # pooled_features shape: [B, (hidden_size*2) * 5] == [B, self.pooled_dim]
+        
         return pooled_features
 
     def forward(self, x, handedness):
@@ -240,24 +256,26 @@ class TremorNetGRU_V6_5(nn.Module):
         B = x.shape[0]
 
         # 1. Enhanced handedness embedding
-        handed_embed = self.handedness_embed(handedness.long())
-        handed_embed = self.handedness_proj(handed_embed)
+        handed_embed = self.handedness_embed(handedness.long())  # [B, handed_dim]
+        handed_embed = self.handedness_proj(handed_embed)        # [B, handed_dim]
         handed_embed = F.normalize(handed_embed, dim=-1)
 
         # 2. Encode both wrists
-        left_feats = self._encode_wrist(x[:, 0], handed_embed)  # [B, hidden_size*6]
+        left_feats = self._encode_wrist(x[:, 0], handed_embed)   # [B, hidden_size*6]
         right_feats = self._encode_wrist(x[:, 1], handed_embed)  # [B, hidden_size*6]
 
         # 3. Cross-wrist attention for interaction modeling
         left_expanded = left_feats.unsqueeze(1)  # [B, 1, hidden_size*6]
         right_expanded = right_feats.unsqueeze(1)  # [B, 1, hidden_size*6]
         
-        cross_features = torch.cat([left_expanded, right_expanded], dim=1)
+        cross_features = torch.cat([left_expanded, right_expanded], dim=1) # [B, 2, pooled_dim]
+        
+        # cross_attention embed_dim == pooled_dim
         attended_cross, _ = self.cross_attention(cross_features, cross_features, cross_features)
-        cross_pool = attended_cross.mean(dim=1)  # [B, hidden_size*6]
+        cross_pool = attended_cross.mean(dim=1)  # [B, pooled_dim]
 
-        # 4. Enhanced feature fusion
-        combined = torch.cat([left_feats, right_feats, cross_pool, handed_embed], dim=1)
+        # 4. Combined features: left + right + cross + handedness
+        combined = torch.cat([left_feats, right_feats, cross_pool, handed_embed], dim=1) # [B, pooled_dim*3 + handed_dim]
 
         # 5. Enhanced classifier with residual connections
         # First block with residual

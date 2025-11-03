@@ -43,6 +43,7 @@ class CombinedLoss(nn.Module):
         
         # 1. init all params
         # -------------------
+        self.label_smoothing = label_smoothing
         
         # 1.1. Final combined loss weights
         self.bce_weight = bce_weight
