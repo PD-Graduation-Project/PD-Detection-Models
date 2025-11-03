@@ -18,25 +18,38 @@ def create_tremor_dataloaders(
     - Loads preprocessed .npz signals from all movement folders.
     - Each sample contains:
         (signal_tensor, wrist_tensor, movement_tensor, label_tensor)
-            - signal_tensor   : shape (T, 6), IMU signal
-            - wrist_tensor    : scalar (0 = Left, 1 = Right)
+            - signal_tensor   : shape (2, T, 6), IMU signal (left-signals, right-signals)
+            - wrist_tensor    : scalar (0 = Left-handed, 1 = Right-handed)
             - movement_tensor : scalar (0-10), movement type
             - label_tensor    : scalar (0 = Healthy, 1 = Parkinson, 2 = Other)
     - Splits dataset into train/validation subsets (stratified by label AND movement).
     - Returns DataLoaders ready for model training.
+    
+    Supports two modes:
+        A. Unified dataloaders across all movements.
+        B. Per-movement dataloaders (train/val for each).
 
     Args:
-        data_path (str): Path to root folder containing all movement subfolders.
-        batch_size (int): Batch size for training (default: 32).
-        train_val_split (float): Fraction of data to use for training (default: 0.8).
-        random_seed (int): Random seed for reproducibility (default: 42).
-        num_workers (int): Number of workers for DataLoader (default: 4).
-        include_other (bool): Whether to include the "Other" class (label=2) (default=True).
-        print_details (bool): Prints details of the dataloader (default: False).
-        per_movement (bool): returns each movement as a seperate dataloader (default: False).
+        data_path : str
+            Root directory containing all movement folders.
+        batch_size : int, default=32
+            Batch size for both train and validation dataloaders.
+        train_val_split : float, default=0.8
+            Fraction of data used for training.
+        random_seed : int, default=42
+            Random seed for reproducibility.
+        include_other : bool, default=True
+            Whether to include samples from the "Other" class (label=2).
+        print_details : bool, default=False
+            Whether to print dataset loading details.
+        per_movement : bool, default=False
+            If True, returns a dataloader dict for each movement.
 
     Returns:
-        (DataLoader, DataLoader): train_loader, val_loader
+        - If per_movement=False:
+            (train_dataloader, val_dataloader)
+        - If per_movement=True:
+            movement_dataloaders : dict of {movement_name: {"train": DataLoader, "val": DataLoader}}
     """
     
     # 0. Import here to avoid circular imports
@@ -50,6 +63,7 @@ def create_tremor_dataloaders(
         print_details = print_details,
     )
     
+    # --------------------------------------------------------------
     # Option A: return all the movements in the same dataloader:
     # --------------------------------------------------------------
     if not per_movement:
@@ -125,6 +139,7 @@ def create_tremor_dataloaders(
             
         return train_dataloader, val_dataloader    
     
+    # ----------------------------------------------------------
     # Option B: return each movement as a seperate dataloader:
     # ----------------------------------------------------------
     else:

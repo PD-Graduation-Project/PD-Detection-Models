@@ -13,11 +13,11 @@ class TremorDataset(Dataset):
     data_path/
         ├── Movement1/  (e.g., "CrossArms")
         │   ├── Healthy/
-        │   │     ├── 001_L.npz
-        │   │     ├── 002_R.npz
+        │   │     ├── 001.npz
+        │   │     ├── 002.npz
         │   │     └── ...
         │   ├── Parkinson/
-        │   │     ├── 003_L.npz
+        │   │     ├── 003.npz
         │   │     └── ...
         │   └── Other/
         │         └── ...
@@ -28,9 +28,10 @@ class TremorDataset(Dataset):
         └── ...
 
     Each .npz must contain:
-        - signal : np.ndarray, shape (T, 6)  # IMU channels (T can be 1024 or 2048)
+        - signal : tuple of 2 np.ndarrays
+                    ((1024, 6), (1024, 6)) -> (Left, Right)
         - label  : int (0 = Healthy, 1 = Parkinson, 2 = Other)
-        - wrist  : int (0 = Left, 1 = Right) 
+        - wrist  : int (0 = Left-handed, 1 = Right-handed) 
         - subject_id : int or str (optional)
 
     Parameters
@@ -54,11 +55,11 @@ class TremorDataset(Dataset):
     Returns
     -------
     tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
-        (signal_tensor, wrist_tensor, movement_tensor, label_tensor) per sample.
-        - signal_tensor   : shape (T, 6), dtype=torch.float32
-        - wrist_tensor    : scalar (0 = Left, 1 = Right), dtype=torch.long
-        - movement_tensor : scalar (movement index 0-10), dtype=torch.long
-        - label_tensor    : scalar (0 = Healthy, 1 = Parkinson, 2 = Other), dtype=torch.long
+        (signal_tensor, handedness_tensor, movement_tensor, label_tensor) per sample.
+        - signal_tensor     : shape (2, T, 6), dtype=torch.float32  # (Left, Right)
+        - handedness_tensor : scalar (0 = Left-handed, 1 = Right-handed), dtype=torch.long
+        - movement_tensor   : scalar (movement index 0-10), dtype=torch.long
+        - label_tensor      : scalar (0 = Healthy, 1 = Parkinson, 2 = Other), dtype=torch.long
     """
     def __init__(self,
                 data_path: str,
@@ -103,7 +104,6 @@ class TremorDataset(Dataset):
             
             # 3.2. init Healthy, Parkinson, Other subfolders dir
             dirs = {
-                # label: directory
                 0: movement_path / "Healthy",
                 1: movement_path / "Parkinson",
                 2: movement_path / "Other",
@@ -112,17 +112,20 @@ class TremorDataset(Dataset):
             # 4. Helper function to process .npz files
             # -------------------------------------------
             def process_npz(file, label):
-                """Load signal and wrist from .npz file"""
-                # 4.1. load the .npz file
-                npz = np.load(file)
+                """Load (Left, Right) signals and handedness from .npz file"""
+                npz = np.load(file, allow_pickle=True)
                 
-                # 4.2. extract the IMU signal
-                signal = npz["signal"].astype(np.float32)
-                # 4.3. extract wrist indicator (0 = Left, 1 = Right)
-                wrist = int(npz["wrist"])
+                # 4.1. extract tuple of both wrist signals
+                left_signal, right_signal = npz["signal"]
                 
-                # 4.4. # finally return everything separately
-                return signal, wrist, movement_idx, label
+                # 4.2. stack them into (2, T, 6)
+                signal = np.stack([left_signal, right_signal], axis=0).astype(np.float32)
+                
+                # 4.3. extract handedness (0 = Left-handed, 1 = Right-handed)
+                handedness = int(npz["wrist"])
+                
+                # 4.4. finally return everything separately
+                return signal, handedness, movement_idx, label
 
             # 5. add all data
             # -----------------
@@ -131,7 +134,7 @@ class TremorDataset(Dataset):
                 if label == 2 and not include_other:
                     continue
                 
-                # 5.2. gte all the '.npz' data in each directory
+                # 5.2. get all '.npz' data in each directory
                 if dir_path.exists():
                     for file in dir_path.glob("*.npz"):
                         result = process_npz(file, label)
@@ -147,7 +150,7 @@ class TremorDataset(Dataset):
         
         # 7. Split into separate lists
         self.signals = [s[0] for s in all_samples]
-        self.wrists = [s[1] for s in all_samples]
+        self.handedness = [s[1] for s in all_samples]
         self.movements = [s[2] for s in all_samples]
         self.labels = [s[3] for s in all_samples]
         
@@ -166,19 +169,19 @@ class TremorDataset(Dataset):
         Returns
         -------
         tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
-            (signal_tensor, wrist_tensor, movement_tensor, label_tensor)
+            (signal_tensor, handedness_tensor, movement_tensor, label_tensor)
         """
-        # 1. Singal 
+        # 1. Signal 
         # ----------
         signal = torch.tensor(
             self.signals[index],
             dtype=torch.float32
-        )
+        )  # shape: (2, T, 6)
         
-        # 2. wrist
-        # ---------
-        wrist = torch.tensor(
-            self.wrists[index],
+        # 2. wrist (handedness)
+        # ----------------------
+        handedness = torch.tensor(
+            self.handedness[index],
             dtype=torch.long
         )
         
@@ -196,7 +199,7 @@ class TremorDataset(Dataset):
             dtype=torch.long
         )
         
-        return signal, wrist, movement, label
+        return signal, handedness, movement, label
     
     def get_movement_name(self, movement_idx):
         """Get movement name from index"""
