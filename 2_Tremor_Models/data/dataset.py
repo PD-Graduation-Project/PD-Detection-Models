@@ -2,7 +2,6 @@ import torch
 from torch.utils.data import Dataset
 from pathlib import Path
 import numpy as np
-import random
 
 class TremorDataset(Dataset):
     """
@@ -29,10 +28,10 @@ class TremorDataset(Dataset):
 
     Each .npz must contain:
         - signal : tuple of 2 np.ndarrays
-                    ((1024, 6), (1024, 6)) -> (Left, Right)
+                    ((1024, 6), (1024, 6)) -> (Left, Right) - ALWAYS in this order
         - label  : int (0 = Healthy, 1 = Parkinson, 2 = Other)
         - wrist  : int (0 = Left-handed, 1 = Right-handed) 
-        - subject_id : int or str (optional)
+        - subject_id : int or str
 
     Parameters
     ----------
@@ -43,8 +42,9 @@ class TremorDataset(Dataset):
         List of movement folder names to include. If None, automatically detects
         all subdirectories in data_path.
         
-    random_seed : int, optional (default=42)
-        Seed used to shuffle the dataset for reproducibility.
+    subject_ids : list of int, optional
+        If provided, only load samples from these specific subject IDs.
+        Useful for train/val/test splitting by subject to avoid data leakage.
         
     include_other : bool, default=True
         Whether to include the "Other" class (label=2)
@@ -64,13 +64,14 @@ class TremorDataset(Dataset):
     def __init__(self,
                 data_path: str,
                 movement_names: list = None,
-                random_seed: int = 42,
+                subject_ids: list = None,
                 include_other: bool = True,
                 print_details: bool = False):
         super().__init__()
         
         self.data_path = Path(data_path)
         self.include_other = include_other
+        self.subject_ids = set(subject_ids) if subject_ids is not None else None
         
         # 1. Movements inits
         # -------------------
@@ -88,6 +89,8 @@ class TremorDataset(Dataset):
         
         if print_details:
             print(f"Found {self.num_movements} movements: {movement_names}")
+            if self.subject_ids:
+                print(f"Filtering for {len(self.subject_ids)} specific subjects")
         
         # 2. Init lists for all data
         all_samples = []
@@ -115,7 +118,12 @@ class TremorDataset(Dataset):
                 """Load (Left, Right) signals and handedness from .npz file"""
                 npz = np.load(file, allow_pickle=True)
                 
-                # 4.1. extract tuple of both wrist signals
+                # 4.0. Check subject_id filter
+                subject_id = int(npz["subject_id"])
+                if self.subject_ids is not None and subject_id not in self.subject_ids:
+                    return None
+                
+                # 4.1. extract tuple of both wrist signals (ALWAYS left, right order)
                 left_signal, right_signal = npz["signal"]
                 
                 # 4.2. stack them into (2, T, 6)
@@ -125,7 +133,7 @@ class TremorDataset(Dataset):
                 handedness = int(npz["wrist"])
                 
                 # 4.4. finally return everything separately
-                return signal, handedness, movement_idx, label
+                return signal, handedness, movement_idx, label, subject_id
 
             # 5. add all data
             # -----------------
@@ -144,15 +152,12 @@ class TremorDataset(Dataset):
             if print_details:
                 print(f"  Loaded {movement_name}: {len([s for s in all_samples if s[2] == movement_idx])} samples")
         
-        # 6. Shuffle all samples
-        random.seed(random_seed)
-        random.shuffle(all_samples)
-        
-        # 7. Split into separate lists
+        # 6. Store samples (NO shuffling here - do it at DataLoader level or after splitting)
         self.signals = [s[0] for s in all_samples]
         self.handedness = [s[1] for s in all_samples]
         self.movements = [s[2] for s in all_samples]
         self.labels = [s[3] for s in all_samples]
+        self.subject_ids_list = [s[4] for s in all_samples]
         
         if print_details:
             print(f"\nTotal samples loaded: {len(self.signals)}")
@@ -160,6 +165,7 @@ class TremorDataset(Dataset):
             print(f"  Parkinson: {self.labels.count(1)}")
             if include_other:
                 print(f"  Other: {self.labels.count(2)}")
+            print(f"  Unique subjects: {len(set(self.subject_ids_list))}")
         
     def __len__(self):
         return len(self.signals)
@@ -219,3 +225,7 @@ class TremorDataset(Dataset):
         for idx, name in enumerate(self.movement_names):
             movement_counts[name] = self.movements.count(idx)
         return movement_counts
+    
+    def get_unique_subjects(self):
+        """Get list of unique subject IDs in this dataset"""
+        return sorted(set(self.subject_ids_list))

@@ -12,7 +12,7 @@ class TremorNetGRU_V5_5(nn.Module):
         - x[:, 0, :, :] -> always left wrist signal
         - x[:, 1, :, :] -> always right wrist signal
 
-    - handedness: shape [B, 1]
+    - handedness: shape [B,]
         0 -> patient is left-handed
         1 -> patient is right-handed
     - Each wrist is processed by the same CNN–GRU–Attention stack.
@@ -134,7 +134,7 @@ class TremorNetGRU_V5_5(nn.Module):
         """
         Args:
             x: [B, 2, T, 6]  -> left-hand (0), right-hand (1)
-            handedness: [B, 1]
+            handedness: [B,]
         Returns:
             logits: [B, 1]
         """
@@ -144,7 +144,8 @@ class TremorNetGRU_V5_5(nn.Module):
         right_feats = self._encode_wrist(x[:, 1])
         
         # 2. Embed and normalize handedness (learned influence)
-        handed_embed = F.normalize(self.handedness_embed(handedness.squeeze(1).long()), dim=-1)
+        handedness = handedness.view(-1).long()  # ensures shape (B,)
+        handed_embed = F.normalize(self.handedness_embed(handedness), dim=-1)
 
         # 3. Concatenate features and handedness, then classify
         combined = torch.cat([left_feats, right_feats, handed_embed], dim=1)

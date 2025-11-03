@@ -36,8 +36,30 @@
 
   - Loads signals, wrist indicators, and labels from all groups
   - Keeps wrist as a **separate scalar tensor** (`0 = Left`, `1 = Right`)
-  - Shuffles data for reproducibility
   - Returns tuples of `(signal_tensor, wrist_tensor, label_tensor)`
+  - Added `subject_ids` filter.
+  ``` python
+  # Example:
+  # Say you have subjects: 1, 2, 3, 4, 5 in your data
+  # And you split them: train=[1, 2, 3], val=[4, 5]
+
+  # When you do:
+  train_dataset = TremorDataset(
+      data_path=data_path,
+      subject_ids=[1, 2, 3],  # <-- can be list, set, or any iterable
+      ...
+  )
+  # This dataset will ONLY load samples from subjects 1, 2, and 3
+  # It will skip/ignore all .npz files from subjects 4 and 5
+
+  val_dataset = TremorDataset(
+      data_path=data_path,
+      subject_ids=[4, 5],  # <-- different subjects
+      ...
+  )
+  # This dataset will ONLY load samples from subjects 4 and 5
+  # It will skip/ignore all .npz files from subjects 1, 2, and 3
+  ```
 
 ### **`create_tremor_dataloaders()` function:**
 

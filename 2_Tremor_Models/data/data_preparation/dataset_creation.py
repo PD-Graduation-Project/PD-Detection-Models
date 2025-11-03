@@ -68,7 +68,7 @@ def create_preprocessed_dataset(
     Each dataset will contain all subjects' paired recordings for that specific movement,
     stored as compressed `.npz` files. Each file includes:
         - signal: tuple of two np.ndarray ((1024, 6), (1024, 6))
-                    where (left_signal, right_signal)
+                    where (left_signal, right_signal) - ALWAYS in this order
         - label: integer (0=Healthy, 1=Parkinson, 2=Other)
         - wrist: integer (0=Left-handed, 1=Right-handed)
         - subject_id: integer (3-digit subject identifier)
@@ -157,9 +157,9 @@ def create_preprocessed_dataset(
         if 0 not in wrist_files or 1 not in wrist_files:
             continue
         
-        # 5.2. Load both signals
-        left_data = np.loadtxt(wrist_files[0], delimiter=',', dtype=np.float32)
-        right_data = np.loadtxt(wrist_files[1], delimiter=',', dtype=np.float32)
+        # 5.2. Load BOTH signals - explicitly by wrist position (0=Left, 1=Right)
+        left_data = np.loadtxt(wrist_files[0], delimiter=',', dtype=np.float32)   # wrist=0 is LEFT
+        right_data = np.loadtxt(wrist_files[1], delimiter=',', dtype=np.float32)  # wrist=1 is RIGHT
 
         # 5.3. remove time column if present
         if left_data.shape[1] == 7: left_data = left_data[:, 1:]
@@ -186,14 +186,13 @@ def create_preprocessed_dataset(
         out_dir = OUTPUT_DIR / movement_name / label_name
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        # 5.7. save tupled signals
+        # 5.7. save tupled signals - ALWAYS (left, right) order
         np.savez_compressed(
             out_dir / f"{subject_id}.npz",
-            signal=(left_data, right_data), # signal: left-signals, right-signals
+            signal=(left_data, right_data),  # ALWAYS: (left wrist, right wrist)
             label=label,
             wrist=handedness,     # handedness: 0=Left-handed, 1=Right-handed
             subject_id=subject_id
         )
 
     print(f"\nFinished preprocessing. Saved dataset to: {OUTPUT_DIR.resolve()}")
-        
