@@ -38,16 +38,16 @@ def train_one_epoch(model: torch.nn.Module,
     
     for batch in pbar:
         # 2. unpack and move data to device
-        signals, wrists, movements, labels = [b.to(device) for b in batch]  # (B, T, 6), (B,), (B,), (B,)
+        signals, handedness, movements, labels = [b.to(device) for b in batch]  # (B, 2, T, 6), (B,), (B,), (B,)
         
         # 3. enable auto mixed precision (AMP) for efficiency
         with torch.amp.autocast(device_type=device):
             
-            # 4. forward pass (model takes signal, wrist, and movement)
+            # 4. forward pass (model takes signals, handedness, and movement)
             if not per_movement:
-                logits = model(signals, wrists, movements)
+                logits = model(signals, handedness, movements)
             else:
-                logits = model(signals, wrists)
+                logits = model(signals, handedness)
                         
             # 5. calculate the losses and metrics
             loss = loss_fn(logits, labels)
@@ -130,16 +130,16 @@ def validate(model: torch.nn.Module,
         
         for batch in pbar:
             # 3. unpack and move data to device
-            signals, wrists, movements, labels = [b.to(device) for b in batch]
+            signals, handedness, movements, labels = [b.to(device) for b in batch]
 
                 
             # 4. enable auto mixed precision (AMP)
             with torch.amp.autocast(device_type=device):
                 # 5. forward pass
                 if not per_movement:
-                    logits = model(signals, wrists, movements)
+                    logits = model(signals, handedness, movements)
                 else:
-                    logits = model(signals, wrists)
+                    logits = model(signals, handedness)
                                 
                 # 6. calculate losses and metrics
                 loss = loss_fn(logits, labels)
