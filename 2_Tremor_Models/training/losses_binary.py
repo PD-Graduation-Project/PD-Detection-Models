@@ -223,3 +223,92 @@ def binary_metrics(preds, labels, threshold=0.5):
         "precision": precision.item(),
         "f1": f1.item()
     }
+
+
+# Per-class metrics computation
+# -------------------------------
+def compute_per_class_metrics(preds, labels, threshold=0.5):
+    """
+    Compute per-class metrics for binary classification.
+    
+    Args:
+        preds: [N, 1] or [N] - raw logits
+        labels: [N, 1] or [N] - binary labels {0=Healthy, 1=Parkinson}
+        threshold: classification threshold
+        
+    Returns:
+        dict with per-class metrics and confusion matrix
+    """
+    # Convert to binary predictions
+    probs = torch.sigmoid(preds).view(-1)
+    labels = labels.view(-1)
+    preds_bin = (probs >= threshold).float()
+    
+    # Confusion matrix components
+    tp = ((preds_bin == 1) & (labels == 1)).float().sum()
+    tn = ((preds_bin == 0) & (labels == 0)).float().sum()
+    fp = ((preds_bin == 1) & (labels == 0)).float().sum()
+    fn = ((preds_bin == 0) & (labels == 1)).float().sum()
+    
+    # Per-class metrics
+    # -----------------
+    
+    # Healthy class (label=0, predicted as 0)
+    healthy_recall = tn / (tn + fp + 1e-8)      # True Negative Rate (Specificity)
+    healthy_precision = tn / (tn + fn + 1e-8)   # Negative Predictive Value
+    healthy_f1 = 2 * (healthy_precision * healthy_recall) / (healthy_precision + healthy_recall + 1e-8)
+    
+    # Parkinson class (label=1, predicted as 1)
+    pd_recall = tp / (tp + fn + 1e-8)           # Sensitivity / True Positive Rate
+    pd_precision = tp / (tp + fp + 1e-8)        # Positive Predictive Value
+    pd_f1 = 2 * (pd_precision * pd_recall) / (pd_precision + pd_recall + 1e-8)
+    
+    # Balanced metrics
+    balanced_accuracy = (healthy_recall + pd_recall) / 2
+    macro_f1 = (healthy_f1 + pd_f1) / 2
+    
+    # Prediction distribution (to detect if model predicts all one class)
+    total = len(labels)
+    pred_healthy_count = (preds_bin == 0).sum().item()
+    pred_pd_count = (preds_bin == 1).sum().item()
+    
+    actual_healthy_count = (labels == 0).sum().item()
+    actual_pd_count = (labels == 1).sum().item()
+    
+    return {
+        # Confusion matrix
+        'confusion_matrix': {
+            'TP': tp.item(),
+            'TN': tn.item(),
+            'FP': fp.item(),
+            'FN': fn.item()
+        },
+        
+        # Healthy class (label=0)
+        'healthy': {
+            'recall': healthy_recall.item(),        # How many Healthy we found
+            'precision': healthy_precision.item(),  # How accurate our Healthy predictions are
+            'f1': healthy_f1.item()
+        },
+        
+        # Parkinson class (label=1)
+        'parkinson': {
+            'recall': pd_recall.item(),             # How many PD we found
+            'precision': pd_precision.item(),       # How accurate our PD predictions are
+            'f1': pd_f1.item()
+        },
+        
+        # Balanced metrics
+        'balanced_accuracy': balanced_accuracy.item(),
+        'macro_f1': macro_f1.item(),
+        
+        # Prediction distribution (detect if model is biased)
+        'prediction_dist': {
+            'predicted_healthy': pred_healthy_count,
+            'predicted_pd': pred_pd_count,
+            'actual_healthy': actual_healthy_count,
+            'actual_pd': actual_pd_count,
+            'pred_healthy_ratio': pred_healthy_count / total,
+            'pred_pd_ratio': pred_pd_count / total
+        }
+    }

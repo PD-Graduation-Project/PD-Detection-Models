@@ -9,27 +9,28 @@ def train_one_epoch(model: torch.nn.Module,
                     
                     loss_fn: torch.nn.Module,
                     metric_fn, 
+                    compute_per_class_metrics,
                     optim: torch.optim,
                     
                     scaler,
                     device,
                     per_movement):
     """
-    Runs one epoch of multi-class training using mixed precision and metrics tracking.
-
-    Uses macro-averaged accuracy, recall, precision, and F1-score.
+    Runs one epoch of binary training with per-class metrics tracking.
+    
+    Returns both overall metrics and per-class breakdown for Healthy and PD.
     """
     # 0. put model in train mode 
     model.train()
     
     # 1. init total losses and metrics
     total_losses = 0
-    total_acc = 0
-    total_recall = 0
-    total_precision = 0
-    total_f1 = 0
     
-    # 1. loop through train_dataloader
+    # 1.1. Store all predictions and labels for per-class metrics
+    all_preds = []
+    all_labels = []
+    
+    # 2. loop through train_dataloader
     pbar = tqdm(
         iterable=train_dataloader,
         total=len(train_dataloader),
@@ -37,63 +38,58 @@ def train_one_epoch(model: torch.nn.Module,
     )
     
     for batch in pbar:
-        # 2. unpack and move data to device
+        # 3. unpack and move data to device
         signals, handedness, movements, labels = [b.to(device) for b in batch]  # (B, 2, T, 6), (B,), (B,), (B,)
         
-        # 3. enable auto mixed precision (AMP) for efficiency
+        # 4. enable auto mixed precision (AMP) for efficiency
         with torch.amp.autocast(device_type=device):
             
-            # 4. forward pass (model takes signals, handedness, and movement)
+            # 5. forward pass (model takes signals, handedness, and movement)
             if not per_movement:
                 logits = model(signals, handedness, movements)
             else:
                 logits = model(signals, handedness)
                         
-            # 5. calculate the losses and metrics
+            # 6. calculate the loss
             loss = loss_fn(logits, labels)
-            metrics = metric_fn(logits, labels)
             
-        # 6. zero grad
+        # 7. zero grad
         optim.zero_grad()
         
-        # 7. scale loss and back propagate
+        # 8. scale loss and back propagate
         scaler.scale(loss).backward()
         
-        # 8. gradient clipping to prevent exploding gradients
+        # 9. gradient clipping to prevent exploding gradients
         scaler.unscale_(optim)
         clip_grad_norm_(model.parameters(), max_norm=1.0)
         
-        # 9. step the optimizer, scheduler, and update scaler
+        # 10. step the optimizer, scheduler, and update scaler
         scaler.step(optim)
         scaler.update()
 
-        # 10. compute total loss and metrics
+        # 11. store predictions and labels for metrics
+        all_preds.append(logits.detach())
+        all_labels.append(labels.detach())
+        
+        # 12. compute total loss
         total_losses += loss.item()
-        total_acc += metrics['accuracy']
-        total_recall += metrics['recall']
-        total_precision += metrics['precision']
-        total_f1 += metrics['f1']
         
-        # 11. update progress bar
-        pbar.set_postfix({
-            'Loss': f'{loss.item():.4f}',
-            'Acc': f'{metrics["accuracy"]:.4f}',
-            'Rec': f'{metrics["recall"]:.4f}',
-            'Prec': f'{metrics["precision"]:.4f}',
-            'F1': f'{metrics["f1"]:.4f}'
-        })
+        # 13. update progress bar with batch loss
+        pbar.set_postfix({'Loss': f'{loss.item():.4f}'})
         
-    # 12. return average losses and metrics as dictionary
+    # 14. Compute overall metrics on entire epoch
+    all_preds = torch.cat(all_preds, dim=0)
+    all_labels = torch.cat(all_labels, dim=0)
+    
+    overall_metrics = metric_fn(all_preds, all_labels)
+    
+    # 15. Compute per-class metrics
+    per_class_metrics = compute_per_class_metrics(all_preds, all_labels)
+    
+    # 16. return average loss, overall metrics, and per-class metrics
     avg_loss = total_losses / len(train_dataloader)
 
-    metrics_dict = {
-        "accuracy": total_acc / len(train_dataloader),
-        "recall": total_recall / len(train_dataloader),
-        "precision": total_precision / len(train_dataloader),
-        "f1": total_f1 / len(train_dataloader),
-    }
-
-    return avg_loss, metrics_dict
+    return avg_loss, overall_metrics, per_class_metrics
             
 
 # Validation function loop
@@ -102,36 +98,35 @@ def validate(model: torch.nn.Module,
             val_dataloader: torch.utils.data.DataLoader,
             loss_fn: torch.nn.Module,
             metric_fn,
+            compute_per_class_metrics,
             device,
             per_movement):
     """
-    Runs multi-class validation using mixed precision and macro-averaged metrics.
-
-    Macro averaging ensures each class contributes equally to recall, precision, and F1,
-    providing a more balanced evaluation for imbalanced datasets.
+    Runs binary validation with per-class metrics tracking.
+    
+    Returns both overall metrics and per-class breakdown for Healthy and PD.
     """
     # 0. put model in eval mode 
     model.eval()
     
-    # 1. init total losses and metrics
+    # 1. init total losses
     total_losses = 0
-    total_acc = 0
-    total_recall = 0
-    total_precision = 0
-    total_f1 = 0
+    
+    # Store all predictions and labels for per-class metrics
+    all_preds = []
+    all_labels = []
     
     # 2. loop through val_dataloader (in inference_mode)
     with torch.inference_mode():
         pbar = tqdm(
             iterable=val_dataloader,
             total=len(val_dataloader),
-            desc="Testing..."
+            desc="Validating..."
         )
         
         for batch in pbar:
             # 3. unpack and move data to device
             signals, handedness, movements, labels = [b.to(device) for b in batch]
-
                 
             # 4. enable auto mixed precision (AMP)
             with torch.amp.autocast(device_type=device):
@@ -141,35 +136,30 @@ def validate(model: torch.nn.Module,
                 else:
                     logits = model(signals, handedness)
                                 
-                # 6. calculate losses and metrics
+                # 6. calculate loss
                 loss = loss_fn(logits, labels)
-                metrics = metric_fn(logits, labels)
                 
-            # 7. compute total loss and metrics
+            # 7. store predictions and labels
+            all_preds.append(logits.detach())
+            all_labels.append(labels.detach())
+            
+            # 8. compute total loss
             total_losses += loss.item()
-            total_acc += metrics['accuracy']
-            total_recall += metrics['recall']
-            total_precision += metrics['precision']
-            total_f1 += metrics['f1']
             
-            # 8. update progress bar
-            pbar.set_postfix({
-                'Loss': f'{loss.item():.4f}',
-                'Acc': f'{metrics["accuracy"]:.4f}',
-                'Rec': f'{metrics["recall"]:.4f}',
-                'Prec': f'{metrics["precision"]:.4f}',
-                'F1': f'{metrics["f1"]:.4f}'
-            })
+            # 9. update progress bar
+            pbar.set_postfix({'Loss': f'{loss.item():.4f}'})
             
-        # 9. return average loss and metrics as dictionary
-        avg_loss = total_losses / len(val_dataloader)
+    # 10. Compute overall metrics on entire epoch
+    all_preds = torch.cat(all_preds, dim=0)
+    all_labels = torch.cat(all_labels, dim=0)
+    
+    overall_metrics = metric_fn(all_preds, all_labels)
+    
+    # 11. Compute per-class metrics
+    per_class_metrics = compute_per_class_metrics(all_preds, all_labels)
+    
+    # 12. return average loss, overall metrics, and per-class metrics
+    avg_loss = total_losses / len(val_dataloader)
 
-        metrics_dict = {
-            "accuracy": total_acc / len(val_dataloader),
-            "recall": total_recall / len(val_dataloader),
-            "precision": total_precision / len(val_dataloader),
-            "f1": total_f1 / len(val_dataloader),
-        }
-
-        return avg_loss, metrics_dict
+    return avg_loss, overall_metrics, per_class_metrics
 
