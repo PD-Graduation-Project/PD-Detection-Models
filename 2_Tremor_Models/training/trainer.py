@@ -19,7 +19,7 @@ def train(model: torch.nn.Module,
         Tboard: bool = True,
 
         epochs: int = 5,
-        max_lr: float = 1e-4,  # Lower LR for stability
+        max_lr: float = 5e-5,  # Lower LR for stability
         per_movement: bool = False):
     """
     Train a binary classification model with comprehensive per-class metrics tracking.
@@ -64,25 +64,25 @@ def train(model: torch.nn.Module,
     #  1.1. Combined loss function for binary classification with class imbalance
     # Adjusted for WeightedRandomSampler (batches are already balanced)
     loss_fn = CombinedLoss(
-        bce_weight=0.5,
-        focal_weight=1.0,
+        bce_weight=1.0,
+        focal_weight=0.5,
         tversky_weight=0.5,
         
-        healthy_weight=1.5,      # Mild boost (sampler already balances)
-        parkinson_weight=1.0,
+        healthy_weight=1.0,      # Mild boost (sampler already balances)
+        parkinson_weight=1.5,
         
-        focal_alpha=0.23,        # Focus on minority (Healthy)
+        focal_alpha=0.25,        
         focal_gamma=2.0,
         
-        tversky_alpha=0.5,       # Balanced F1
-        tversky_beta=0.5
+        tversky_alpha=0.3,      
+        tversky_beta=0.7,
     )
 
     # 1.2. optimizer (with weight decay)
     optim = torch.optim.AdamW(
         model.parameters(),
         lr=max_lr,
-        weight_decay=1e-5,
+        weight_decay=1e-4,
     )
 
     # 1.3. scheduler  (reduces LR when validation loss plateaus)

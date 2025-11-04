@@ -61,7 +61,7 @@ def train_one_epoch(model: torch.nn.Module,
         
         # 9. gradient clipping to prevent exploding gradients
         scaler.unscale_(optim)
-        clip_grad_norm_(model.parameters(), max_norm=1.0)
+        clip_grad_norm_(model.parameters(), max_norm=0.5)
         
         # 10. step the optimizer, scheduler, and update scaler
         scaler.step(optim)
@@ -148,6 +148,9 @@ def validate(model: torch.nn.Module,
             
             # 9. update progress bar
             pbar.set_postfix({'Loss': f'{loss.item():.4f}'})
+            # probs = torch.sigmoid(logits)
+            # print(f"Val sigmoid mean={probs.mean():.3f}, std={probs.std():.3f}, >0.5={(probs>0.5).float().mean():.3f}")
+
             
     # 10. Compute overall metrics on entire epoch
     all_preds = torch.cat(all_preds, dim=0)

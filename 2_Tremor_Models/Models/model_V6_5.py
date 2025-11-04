@@ -102,18 +102,18 @@ class TremorNetGRU_V6_5(nn.Module):
         classifier_input_dim = self.pooled_dim * 3 + handedness_embed_dim
         
         # 6.1. First residual block
-        self.fc1 = nn.Linear(classifier_input_dim, 512)
-        self.ln1 = nn.LayerNorm(512)
-        self.residual1 = nn.Linear(classifier_input_dim, 512)
+        self.fc1 = nn.Linear(classifier_input_dim, 256)
+        self.ln1 = nn.LayerNorm(256)
+        self.residual1 = nn.Linear(classifier_input_dim, 256)
         
         # 6.2. Second residual block
-        self.fc2 = nn.Linear(512, 256)
-        self.ln2 = nn.LayerNorm(256)
-        self.residual2 = nn.Linear(512, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.ln2 = nn.LayerNorm(128)
+        self.residual2 = nn.Linear(256, 128)
         
         # 6.3. Output layers
-        self.fc3 = nn.Linear(256, 128)
-        self.fc4 = nn.Linear(128, 1)
+        self.fc3 = nn.Linear(128, 64)
+        self.fc4 = nn.Linear(64, 1)
         
         self.dropout_classifier = nn.Dropout(dropout)
 
@@ -191,7 +191,7 @@ class TremorNetGRU_V6_5(nn.Module):
         # 4. Multi-head self-attention with residual connection
         # ------------------------------------------------------
         attn_out, _ = self.multihead_attn(gru_out, gru_out, gru_out)
-        gru_out = gru_out + attn_out  # Residual connection
+        gru_out = gru_out + (attn_out * 0.8)  # Residual connection
         gru_out = self.attention_proj(gru_out)  # [B, T', hidden_size*2]
 
         # 5. Multiple pooling strategies

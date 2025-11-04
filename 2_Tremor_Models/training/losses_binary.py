@@ -83,6 +83,7 @@ class CombinedLoss(nn.Module):
                 bce_weight=0.5,
                 focal_weight=1.0,
                 tversky_weight=0.5,
+                label_smoothing = 0.03,
                 
                 # Class imbalance correction (for 77% PD, 23% Healthy)
                 healthy_weight=1.5,    # Weight minority class higher
@@ -99,6 +100,7 @@ class CombinedLoss(nn.Module):
         
         # 1. Store all parameters
         # ------------------------
+        self.label_smoothing = label_smoothing
         
         # 1.1. Final combined loss weights
         self.bce_weight = bce_weight
@@ -132,6 +134,10 @@ class CombinedLoss(nn.Module):
         
         device = pred.device
         
+        # label smoothing
+        smooth = self.label_smoothing
+        label_smooth = label * (1 - smooth) + 0.5 * smooth
+        
         # 1. Binary Cross-Entropy with class weighting
         # ----------------------------------------------
         # Apply higher weight to minority class (Healthy=0)
@@ -142,7 +148,7 @@ class CombinedLoss(nn.Module):
         )
         
         # FIXED: Use logits directly (no double sigmoid)
-        bce = F.binary_cross_entropy_with_logits(pred, label, weight=weights)
+        bce = F.binary_cross_entropy_with_logits(pred, label_smooth, weight=weights)
         
         # 2. Focal Loss (focus on hard examples and minority class)
         # -----------------------------------------------------------
