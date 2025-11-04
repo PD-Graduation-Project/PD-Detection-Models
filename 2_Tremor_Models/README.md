@@ -78,8 +78,5 @@ To ensure clean and standardized input for the model, several preprocessing step
 ---
 
 # TODO:
-- ADD HANDEDNESS!!!!!
-- find a better way to handle the class imbalance
-    - maybe by removing some PD data and try to make it closer to 50% (now it's 77% !!)
-    - try GANs on healthy data?
-- try models for each movement, and remove movements that are very hard to detect
+- MAKE ACCURACY BETTER
+- current problem: model collapsing (predecting all PD, then all healthy)
