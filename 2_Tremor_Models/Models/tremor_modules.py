@@ -1,8 +1,8 @@
 """
 Modular components for advanced tremor detection models.
 
-Contains 9 modular classes:
-
+Contains modular classes:
+--------------------------
     - `FrequencyAnalyzer`: Enhanced FFT with 3 analysis methods:
             - Power spectrum (tremor magnitude)
             - Phase coherence (wrist synchronization)
