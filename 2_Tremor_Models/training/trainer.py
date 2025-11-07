@@ -20,7 +20,9 @@ def train(model: torch.nn.Module,
 
         epochs: int = 5,
         max_lr: float = 1e-4, 
-        per_movement: bool = False):
+        per_movement: bool = False,
+        
+        debug_mode:bool = True,):
     """
     Train a binary classification model with comprehensive per-class metrics tracking.
     
@@ -203,16 +205,19 @@ def train(model: torch.nn.Module,
         
         print(f"  Loss: Train={train_loss:.4f}, Val={val_loss:.4f}")
         print(f"  Balanced Acc: Train={train_per_class['balanced_accuracy']:.3f}, Val={val_per_class['balanced_accuracy']:.3f}")
-        print(f"  Macro F1: Train={train_per_class['macro_f1']:.3f}, Val={val_per_class['macro_f1']:.3f}")
-        print(f"  Healthy F1: Train={train_per_class['healthy']['f1']:.3f}, Val={val_per_class['healthy']['f1']:.3f}")
-        print(f"  PD F1: Train={train_per_class['parkinson']['f1']:.3f}, Val={val_per_class['parkinson']['f1']:.3f}")
         
-        val_dist = val_per_class['prediction_dist']
-        print(f"  Val Predictions: {val_dist['predicted_healthy']}H/{val_dist['predicted_pd']}PD "
-                f"(Actual: {val_dist['actual_healthy']}H/{val_dist['actual_pd']}PD)")
-        
-        cm = val_per_class['confusion_matrix']
-        print(f"  Confusion Matrix: TP={cm['TP']:.0f}, TN={cm['TN']:.0f}, FP={cm['FP']:.0f}, FN={cm['FN']:.0f}")
+        # Extra details for debugging mode
+        if debug_mode:
+            print(f"  Macro F1: Train={train_per_class['macro_f1']:.3f}, Val={val_per_class['macro_f1']:.3f}")
+            print(f"  Healthy F1: Train={train_per_class['healthy']['f1']:.3f}, Val={val_per_class['healthy']['f1']:.3f}")
+            print(f"  PD F1: Train={train_per_class['parkinson']['f1']:.3f}, Val={val_per_class['parkinson']['f1']:.3f}")
+            
+            val_dist = val_per_class['prediction_dist']
+            print(f"  Val Predictions: {val_dist['predicted_healthy']}H/{val_dist['predicted_pd']}PD "
+                    f"(Actual: {val_dist['actual_healthy']}H/{val_dist['actual_pd']}PD)")
+            
+            cm = val_per_class['confusion_matrix']
+            print(f"  Confusion Matrix: TP={cm['TP']:.0f}, TN={cm['TN']:.0f}, FP={cm['FP']:.0f}, FN={cm['FN']:.0f}")
         
         print("=" * 35, "\n")
 
