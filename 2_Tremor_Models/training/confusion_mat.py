@@ -30,13 +30,12 @@ def plot_confusion_matrix(model,
     
     with torch.inference_mode():
         for batch in dataloader:
-            signals, wrists, movements, labels = [b.to(device) for b in batch]
+            signals, handedness, movements, labels = [b.to(device) for b in batch]
 
             # forward pass
-            if per_movement:
-                logits = model(signals, wrists, movements)
-            else:
-                logits = model(signals, wrists)
+            logits = model(signals, handedness) if per_movement else model(signals, 
+                                                                            handedness, 
+                                                                            movements)
             
             # convert to probabilities if binary classification
             if logits.shape[1] == 1:

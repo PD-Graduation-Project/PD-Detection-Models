@@ -121,10 +121,8 @@ def train(model: torch.nn.Module,
             
             print(f"Loaded pretrained model:")
             print(f"- val_loss={checkpoint['val_loss']:.4f}")
-            print(f"- val_accuracy={checkpoint['val_accuracy']:.4f}")
-            print(f"- val_recall={checkpoint['val_recall']:.4f}")
-            print(f"- val_precision={checkpoint['val_precision']:.4f}")
-            print(f"- val_f1={checkpoint['val_f1']:.4f}")
+            print(f"- balanced_accuracy={checkpoint['balanced_accuracy']:.4f}")
+            print(f"- macro_f1={checkpoint['macro_f1']:.4f}")
         else:
             print(f"[WARNING] load_pretrained path was provided but does not exist: {load_pretrained}")
 
