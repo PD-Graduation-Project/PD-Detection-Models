@@ -78,5 +78,4 @@ To ensure clean and standardized input for the model, several preprocessing step
 ---
 
 # TODO:
-- MAKE ACCURACY BETTER
-- current problem: model collapsing (predecting all PD, then all healthy)
+- Search more for the frequency domain approach
