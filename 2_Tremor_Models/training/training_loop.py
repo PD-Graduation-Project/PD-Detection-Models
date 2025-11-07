@@ -1,6 +1,8 @@
 from tqdm import tqdm 
 import torch
 from torch.nn.utils import clip_grad_norm_
+import numpy as np
+import random
 
 # Training function loop for each epoch
 # ---------------------------------------
@@ -44,11 +46,19 @@ def train_one_epoch(model: torch.nn.Module,
         # 4. enable auto mixed precision (AMP) for efficiency
         with torch.amp.autocast(device_type=device):
             
-            # 5. forward pass (model takes signals, handedness, and movement)
-            if not per_movement:
-                logits = model(signals, handedness, movements)
+            # 5. forward pass (model takes signals, handedness, and movement):
+            # Use mixup during training
+            if random.random() < 0.5:
+                lambda_mix = np.random.beta(0.2, 0.2)  # Mixup strength
+                logits = model(signals, handedness, mixup_lambda=lambda_mix) if per_movement else model(signals, 
+                                                                                                        handedness, 
+                                                                                                        movements, 
+                                                                                                        mixup_lambda=lambda_mix)
             else:
-                logits = model(signals, handedness)
+                logits = model(signals, handedness) if per_movement else model(signals, 
+                                                                            handedness, 
+                                                                            movements)
+
                         
             # 6. calculate the loss
             loss = loss_fn(logits, labels)
@@ -131,10 +141,9 @@ def validate(model: torch.nn.Module,
             # 4. enable auto mixed precision (AMP)
             with torch.amp.autocast(device_type=device):
                 # 5. forward pass
-                if not per_movement:
-                    logits = model(signals, handedness, movements)
-                else:
-                    logits = model(signals, handedness)
+                logits = model(signals, handedness) if per_movement else model(signals, 
+                                                                            handedness, 
+                                                                            movements)
                                 
                 # 6. calculate loss
                 loss = loss_fn(logits, labels)

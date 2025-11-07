@@ -19,7 +19,7 @@ def train(model: torch.nn.Module,
         Tboard: bool = True,
 
         epochs: int = 5,
-        max_lr: float = 5e-5,  # Lower LR for stability
+        max_lr: float = 1e-4, 
         per_movement: bool = False):
     """
     Train a binary classification model with comprehensive per-class metrics tracking.
@@ -68,7 +68,7 @@ def train(model: torch.nn.Module,
         focal_weight=0.5,
         tversky_weight=0.5,
         
-        healthy_weight=1.0,      # Mild boost (sampler already balances)
+        healthy_weight=1.0,     
         parkinson_weight=1.5,
         
         focal_alpha=0.25,        
