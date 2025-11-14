@@ -19,7 +19,7 @@ def train(model: torch.nn.Module,
         Tboard: bool = True,
 
         epochs: int = 5,
-        max_lr: float = 1e-4, 
+        max_lr: float = 3e-4, 
         per_movement: bool = False,
         
         debug_mode:bool = True,):
@@ -67,11 +67,11 @@ def train(model: torch.nn.Module,
     # Adjusted for WeightedRandomSampler (batches are already balanced)
     loss_fn = CombinedLoss(
         bce_weight=1.0,
-        focal_weight=0.5,
-        tversky_weight=0.5,
+        focal_weight=0.3,
+        tversky_weight=0.0,
         
         healthy_weight=1.0,     
-        parkinson_weight=1.5,
+        parkinson_weight=1.3,
         
         focal_alpha=0.25,        
         focal_gamma=2.0,
@@ -84,7 +84,7 @@ def train(model: torch.nn.Module,
     optim = torch.optim.AdamW(
         model.parameters(),
         lr=max_lr,
-        weight_decay=1e-4,
+        weight_decay=5e-5,
     )
 
     # 1.3. scheduler  (reduces LR when validation loss plateaus)
@@ -92,8 +92,9 @@ def train(model: torch.nn.Module,
         optimizer=optim,
         mode='min',          # monitor val_loss
         factor=0.5,          # reduce LR by 50%
-        patience=5,          # wait 2 epochs before reducing
-        min_lr=1e-7,         # CHANGED: Set minimum LR to prevent too small values
+        patience=2,          # wait 2 epochs before reducing
+        min_lr=1e-6,         # CHANGED: Set minimum LR to prevent too small values
+        threshold= 0.01,     # Add threshold for meaningful improvement
     )
 
     # 1.4. scaler (to prevent underflow during mixed precision)

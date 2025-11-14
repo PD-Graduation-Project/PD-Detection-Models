@@ -48,8 +48,8 @@ def train_one_epoch(model: torch.nn.Module,
             
             # 5. forward pass (model takes signals, handedness, and movement):
             # Use mixup during training
-            if random.random() < 0.5:
-                lambda_mix = np.random.beta(0.2, 0.2)  # Mixup strength
+            if random.random() < 0.15:
+                lambda_mix = np.random.beta(0.4, 0.4)  # Mixup strength
                 logits = model(signals, handedness, mixup_lambda=lambda_mix) if per_movement else model(signals, 
                                                                                                         handedness, 
                                                                                                         movements, 
@@ -71,7 +71,7 @@ def train_one_epoch(model: torch.nn.Module,
         
         # 9. gradient clipping to prevent exploding gradients
         scaler.unscale_(optim)
-        clip_grad_norm_(model.parameters(), max_norm=0.5)
+        clip_grad_norm_(model.parameters(), max_norm=1.0)
         
         # 10. step the optimizer, scheduler, and update scaler
         scaler.step(optim)

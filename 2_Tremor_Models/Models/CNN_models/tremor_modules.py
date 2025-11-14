@@ -87,3 +87,39 @@ class FrequencyAnalyzer(nn.Module):
         freq_features = self.fusion(torch.cat([power_feat, phase_feat, envelope_feat], dim=-1))
         
         return freq_features
+    
+class StatisticalFeatureExtractor(nn.Module):
+    """
+    Extracts statistical moments that capture tremor irregularity.
+    """
+    def __init__(self):
+        super().__init__()
+        
+    def forward(self, x):
+        """
+        Args:
+            x: [B, C, T] - signal tensor
+        Returns:
+            stats: [B, 8] - statistical features
+        """
+        eps = 1e-5
+        
+        # Basic statistics
+        mean = x.mean(dim=2)
+        std = x.std(dim=2)
+        std_safe = torch.clamp(std, min=eps)
+        
+        # Higher-order moments
+        x_centered = x - mean.unsqueeze(2)
+        skew = (x_centered ** 3).mean(dim=2) / (std_safe ** 3)
+        kurt = (x_centered ** 4).mean(dim=2) / (std_safe ** 4)
+        
+        # Aggregate across channels
+        features = torch.stack([
+            mean.mean(dim=1), std.mean(dim=1),
+            skew.mean(dim=1), kurt.mean(dim=1),
+            mean.std(dim=1), std.std(dim=1),
+            skew.std(dim=1), kurt.std(dim=1)
+        ], dim=1)
+        
+        return features
