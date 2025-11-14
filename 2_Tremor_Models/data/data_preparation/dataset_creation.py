@@ -72,6 +72,7 @@ def create_preprocessed_dataset(
         - label: integer (0=Healthy, 1=Parkinson, 2=Other)
         - wrist: integer (0=Left-handed, 1=Right-handed)
         - subject_id: integer (3-digit subject identifier)
+        - metadata: dict containing age, height, weight, gender from CSV
 
     Parameters
     ----------
@@ -104,16 +105,37 @@ def create_preprocessed_dataset(
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-    # 1. Load patient metadata (labels + handedness)
+    # 1. Load patient metadata (labels + handedness + clinical info)
     # ----------------------------------------------
     # 1.1. read csv file and get patients' ids and labels
     labels_df = pd.read_csv(FILE_LIST)
-    labels_df = labels_df[['id', 'label', 'handedness']]  # handedness: "left" or "right"
-
+    
     # 1.2. create a dict with id:label & id:handedness
     id_to_label = dict(zip(labels_df['id'], labels_df['label']))
     id_to_handedness = {row['id']: 0 if row['handedness'].lower() == 'left' else 1
                         for _, row in labels_df.iterrows()}
+    
+    # 1.3. create metadata dict for each subject (all available fields)
+    id_to_metadata = {}
+    for _, row in labels_df.iterrows():
+        # Encode categorical variables numerically
+        gender_map = {'male': 0, 'female': 1}
+        handedness_map = {'left': 0, 'right': 1}
+        effect_alcohol_map = {'Unknown': 0, 'No effect': 1, 'Reduced': 2, 'Increased': 3}
+        
+        id_to_metadata[row['id']] = {
+            'age_at_diagnosis': row['age_at_diagnosis'] if pd.notna(row['age_at_diagnosis']) else -1,
+            'age': row['age'] if pd.notna(row['age']) else -1,
+            'height': row['height'] if pd.notna(row['height']) else -1,
+            'weight': row['weight'] if pd.notna(row['weight']) else -1,
+            'gender': gender_map.get(row['gender'], -1),
+            'appearance_in_kinship': 
+                    1 if row['appearance_in_kinship'] == True else 0 if row['appearance_in_kinship'] == False else -1,
+            'appearance_in_first_grade_kinship':
+                    1 if row['appearance_in_first_grade_kinship'] == True else 0 if row['appearance_in_first_grade_kinship'] == False else -1,
+            'effect_of_alcohol_on_tremor': 
+                    effect_alcohol_map.get(row['effect_of_alcohol_on_tremor'], -1) if pd.notna(row['effect_of_alcohol_on_tremor']) else -1,
+        }
 
     # 2. Final all movement files
     # ----------------------------
@@ -165,11 +187,12 @@ def create_preprocessed_dataset(
         if left_data.shape[1] == 7: left_data = left_data[:, 1:]
         if right_data.shape[1] == 7: right_data = right_data[:, 1:]
 
-        # 5.4. get label and handedness
+        # 5.4. get label, handedness, and metadata
         label = id_to_label.get(subject_id)
         handedness = id_to_handedness.get(subject_id)
+        metadata = id_to_metadata.get(subject_id)
 
-        if label is None or handedness is None:
+        if label is None or handedness is None or metadata is None:
             continue  # skip if metadata missing
 
         # 5.5. preprocess both signals
@@ -186,13 +209,14 @@ def create_preprocessed_dataset(
         out_dir = OUTPUT_DIR / movement_name / label_name
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        # 5.7. save tupled signals - ALWAYS (left, right) order
+        # 5.7. save tupled signals + metadata - ALWAYS (left, right) order
         np.savez_compressed(
             out_dir / f"{subject_id}.npz",
             signal=(left_data, right_data),  # ALWAYS: (left wrist, right wrist)
             label=label,
             wrist=handedness,     # handedness: 0=Left-handed, 1=Right-handed
-            subject_id=subject_id
+            subject_id=subject_id,
+            metadata=metadata,    # age, height, weight, gender
         )
 
     print(f"\nFinished preprocessing. Saved dataset to: {OUTPUT_DIR.resolve()}")

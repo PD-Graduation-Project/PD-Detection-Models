@@ -32,6 +32,9 @@ class TremorDataset(Dataset):
         - label  : int (0 = Healthy, 1 = Parkinson, 2 = Other)
         - wrist  : int (0 = Left-handed, 1 = Right-handed) 
         - subject_id : int or str
+        - metadata : dict (age_at_diagnosis, age, height, weight, gender,
+                          appearance_in_kinship, appearance_in_first_grade_kinship,
+                          effect_of_alcohol_on_tremor)
 
     Parameters
     ----------
@@ -54,12 +57,16 @@ class TremorDataset(Dataset):
 
     Returns
     -------
-    tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
-        (signal_tensor, handedness_tensor, movement_tensor, label_tensor) per sample.
+    tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
+        (signal_tensor, handedness_tensor, movement_tensor, label_tensor, metadata_tensor) per sample.
         - signal_tensor     : shape (2, T, 6), dtype=torch.float32  # (Left, Right)
         - handedness_tensor : scalar (0 = Left-handed, 1 = Right-handed), dtype=torch.long
         - movement_tensor   : scalar (movement index 0-10), dtype=torch.long
         - label_tensor      : scalar (0 = Healthy, 1 = Parkinson, 2 = Other), dtype=torch.long
+        - metadata_tensor   : shape (8,), dtype=torch.float32  # [age_at_diagnosis, age, height, 
+                                                              #  weight, gender, appearance_in_kinship,
+                                                              #  appearance_in_first_grade_kinship,
+                                                              #  effect_of_alcohol_on_tremor]
     """
     def __init__(self,
                 data_path: str,
@@ -115,7 +122,7 @@ class TremorDataset(Dataset):
             # 4. Helper function to process .npz files
             # -------------------------------------------
             def process_npz(file, label):
-                """Load (Left, Right) signals and handedness from .npz file"""
+                """Load (Left, Right) signals, handedness, and metadata from .npz file"""
                 npz = np.load(file, allow_pickle=True)
                 
                 # 4.0. Check subject_id filter
@@ -132,8 +139,21 @@ class TremorDataset(Dataset):
                 # 4.3. extract handedness (0 = Left-handed, 1 = Right-handed)
                 handedness = int(npz["wrist"])
                 
-                # 4.4. finally return everything separately
-                return signal, handedness, movement_idx, label, subject_id
+                # 4.4. extract metadata (all fields from CSV)
+                metadata = npz["metadata"].item() if "metadata" in npz else {}
+                metadata_vec = np.array([
+                    metadata.get('age_at_diagnosis', -1),
+                    metadata.get('age', -1),
+                    metadata.get('height', -1),
+                    metadata.get('weight', -1),
+                    metadata.get('gender', -1),
+                    metadata.get('appearance_in_kinship', -1),
+                    metadata.get('appearance_in_first_grade_kinship', -1),
+                    metadata.get('effect_of_alcohol_on_tremor', -1),
+                ], dtype=np.float32)
+                
+                # 4.5. finally return everything separately
+                return signal, handedness, movement_idx, label, subject_id, metadata_vec
 
             # 5. add all data
             # -----------------
@@ -158,6 +178,7 @@ class TremorDataset(Dataset):
         self.movements = [s[2] for s in all_samples]
         self.labels = [s[3] for s in all_samples]
         self.subject_ids_list = [s[4] for s in all_samples]
+        self.metadata = [s[5] for s in all_samples]
         
         if print_details:
             print(f"\nTotal samples loaded: {len(self.signals)}")
@@ -174,8 +195,8 @@ class TremorDataset(Dataset):
         """
         Returns
         -------
-        tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
-            (signal_tensor, handedness_tensor, movement_tensor, label_tensor)
+        tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
+            (signal_tensor, handedness_tensor, movement_tensor, label_tensor, metadata_tensor)
         """
         # 1. Signal 
         # ----------
@@ -205,7 +226,16 @@ class TremorDataset(Dataset):
             dtype=torch.long
         )
         
-        return signal, handedness, movement, label
+        # 5. metadata
+        # ------------
+        metadata = torch.tensor(
+            self.metadata[index],
+            dtype=torch.float32
+        )  # shape: (8,) - [age_at_diagnosis, age, height, weight, gender,
+           #              appearance_in_kinship, appearance_in_first_grade_kinship,
+           #              effect_of_alcohol_on_tremor]
+        
+        return signal, handedness, movement, label, metadata
     
     def get_movement_name(self, movement_idx):
         """Get movement name from index"""
