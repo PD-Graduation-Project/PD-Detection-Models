@@ -22,6 +22,15 @@
   - `label`: `0 = Healthy`, `1 = Parkinson's`, `2 = Other`
   - `wrist`: `0 = Left`, `1 = Right`
   - `subject_id`: unique identifier
+  - `metadata`: dict containing:
+      1. `age_at_diagnosis` - Age when diagnosed (numeric)
+      1. `age` - Current age (numeric)
+      1. `height` - Height in cm (numeric)
+      1. `weight` - Weight in kg (numeric)
+      1. `gender` - 0=male, 1=female, -1=unknown
+      1. `appearance_in_kinship` - Family history: 1=True, 0=False, -1=missing
+      1. `appearance_in_first_grade_kinship` - First-degree relative history: 1=True, 0=False, -1=missing
+      1. `effect_of_alcohol_on_tremor` - 0=Unknown, 1=No effect, 2=Reduced, 3=Increased, -1=missing
 
 ### **Directory structure:**
 

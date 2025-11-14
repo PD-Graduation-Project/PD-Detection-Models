@@ -3,6 +3,129 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
+class ClinicalMetadataEncoder(nn.Module):
+    """
+    Encodes clinical metadata with learned embeddings and projections.
+    Handles missing values (-1) gracefully with learned embeddings.
+    
+    Input metadata vector (8 dims):
+        [age_at_diagnosis, age, height, weight, gender, 
+         appearance_in_kinship, appearance_in_first_grade_kinship, 
+         effect_of_alcohol_on_tremor]
+    """
+    def __init__(self, output_dim=64, dropout=0.3):
+        super().__init__()
+        
+        # Continuous features projection (age, height, weight, BMI)
+        self.continuous_proj = nn.Sequential(
+            nn.Linear(5, 32),  # age_at_diagnosis, age, height, weight, BMI
+            nn.LayerNorm(32),
+            nn.GELU(),
+            nn.Dropout(dropout * 0.5),
+            nn.Linear(32, 48)
+        )
+        
+        # Categorical embeddings
+        self.gender_embed = nn.Embedding(3, 8)  # male=0, female=1, missing=-1->2
+        self.kinship_embed = nn.Embedding(3, 8)  # yes=1, no=0, missing=-1->2
+        self.first_kinship_embed = nn.Embedding(3, 8)  # yes=1, no=0, missing=-1->2
+        self.alcohol_effect_embed = nn.Embedding(5, 12)  # 0-3 + missing=-1->4
+        
+        # Fusion layer
+        self.fusion = nn.Sequential(
+            nn.Linear(48 + 8 + 8 + 8 + 12, 128),
+            nn.LayerNorm(128),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(128, output_dim)
+        )
+        
+        # Cross-attention for metadata-signal interaction
+        self.metadata_attn = nn.MultiheadAttention(
+            embed_dim=output_dim,
+            num_heads=4,
+            dropout=dropout * 0.5,
+            batch_first=True
+        )
+        
+    def forward(self, metadata):
+        """
+        Args:
+            metadata: [B, 8] tensor with values
+        Returns:
+            [B, output_dim] encoded metadata features
+        """
+        B = metadata.shape[0]
+        
+        # Extract individual features
+        age_at_diagnosis = metadata[:, 0]
+        age = metadata[:, 1]
+        height = metadata[:, 2]
+        weight = metadata[:, 3]
+        gender = metadata[:, 4].long()
+        kinship = metadata[:, 5].long()
+        first_kinship = metadata[:, 6].long()
+        alcohol = metadata[:, 7].long()
+        
+        # Compute BMI (handle missing values)
+        height_m = height / 100.0  # cm to m
+        bmi = torch.where(
+            (height > 0) & (weight > 0),
+            weight / (height_m ** 2 + 1e-6),
+            torch.zeros_like(weight)
+        )
+        
+        # Normalize continuous features (z-score with robust scaling)
+        def robust_normalize(x):
+            # Replace missing (-1) with 0 temporarily
+            x_valid = torch.where(x > 0, x, torch.zeros_like(x))
+            mean = x_valid[x_valid > 0].mean() if (x_valid > 0).any() else 0
+            std = x_valid[x_valid > 0].std() if (x_valid > 0).any() else 1
+            return torch.where(x > 0, (x - mean) / (std + 1e-6), torch.zeros_like(x))
+        
+        age_at_diagnosis_norm = robust_normalize(age_at_diagnosis)
+        age_norm = robust_normalize(age)
+        height_norm = robust_normalize(height)
+        weight_norm = robust_normalize(weight)
+        bmi_norm = robust_normalize(bmi)
+        
+        continuous = torch.stack([
+            age_at_diagnosis_norm,
+            age_norm,
+            height_norm,
+            weight_norm,
+            bmi_norm
+        ], dim=1)  # [B, 5]
+        
+        continuous_feat = self.continuous_proj(continuous)  # [B, 48]
+        
+        # Convert -1 to separate embedding index for missing values
+        gender_idx = torch.where(gender == -1, torch.tensor(2, device=gender.device), gender)
+        kinship_idx = torch.where(kinship == -1, torch.tensor(2, device=kinship.device), kinship)
+        first_kinship_idx = torch.where(first_kinship == -1, torch.tensor(2, device=first_kinship.device), first_kinship)
+        alcohol_idx = torch.where(alcohol == -1, torch.tensor(4, device=alcohol.device), alcohol)
+        
+        # Categorical embeddings
+        gender_feat = self.gender_embed(gender_idx)  # [B, 8]
+        kinship_feat = self.kinship_embed(kinship_idx)  # [B, 8]
+        first_kinship_feat = self.first_kinship_embed(first_kinship_idx)  # [B, 8]
+        alcohol_feat = self.alcohol_effect_embed(alcohol_idx)  # [B, 12]
+        
+        # Combine all features
+        combined = torch.cat([
+            continuous_feat,
+            gender_feat,
+            kinship_feat,
+            first_kinship_feat,
+            alcohol_feat
+        ], dim=1)  # [B, 48+8+8+8+12=84]
+        
+        # Fusion
+        metadata_feat = self.fusion(combined)  # [B, output_dim]
+        
+        return metadata_feat
+
+
 class StatisticalFeatureExtractor(nn.Module):
     """
     Lightweight torch version of statistical moments and simple time-domain features.

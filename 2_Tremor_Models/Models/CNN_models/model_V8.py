@@ -9,15 +9,6 @@ Combines:
 7. Contrastive features (asymmetry)
 8. Bilateral coordination
 9. Optional movement type embedding
-
-Usage:
-    # Single movement training
-    model = TremorNetV10(all_movements=False)
-    output = model(signals, handedness)
-    
-    # Multi-movement training
-    model = TremorNetV10(all_movements=True)
-    output = model(signals, handedness, movements)
 """
 
 import torch
@@ -61,7 +52,7 @@ class TremorNetV8(nn.Module):
         self.dominant_se1 = nn.Linear(256, 32)
         self.dominant_se2 = nn.Linear(32, 256)
         
-        # === FREQUENCY ANALYSIS (Mandatory) ===
+        # === FREQUENCY ANALYSIS ===
         self.frequency_analyzer = FrequencyAnalyzer(
             num_freq_bins=40,
             output_dim=128,
