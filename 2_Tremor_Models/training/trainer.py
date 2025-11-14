@@ -68,7 +68,7 @@ def train(model: torch.nn.Module,
     loss_fn = CombinedLoss(
         bce_weight=1.0,
         focal_weight=0.3,
-        tversky_weight=0.0,
+        tversky_weight=0.3,
         
         healthy_weight=1.0,     
         parkinson_weight=1.3,

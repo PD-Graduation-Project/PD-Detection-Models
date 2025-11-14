@@ -60,7 +60,7 @@ class TremorNetV9(nn.Module):
         
         # === FREQUENCY ANALYSIS ===
         self.frequency_analyzer = FrequencyAnalyzer(
-            num_freq_bins=40,
+            num_mels=40,
             output_dim=128,
             dropout=dropout
         )
@@ -115,12 +115,15 @@ class TremorNetV9(nn.Module):
         # === CONTRASTIVE PROJECTION ===
         self.contrast_proj = nn.Linear(128, 64)
         
+        # === DOMINANT FEATURE PROJECTION (256 -> 128 for stacking) ===
+        self.dom_proj = nn.Linear(256, 128)
+        
         # === CLASSIFIER ===
         # Input dimensions
         non_dom_dim = 128
         dom_dim = 256
         freq_dim = 128
-        stat_dim = 8
+        stat_dim = 32  # StatisticalFeatureExtractor default out_dim
         diff_dim = 64
         bilateral_dim = 64
         hand_dim = 48
@@ -130,7 +133,7 @@ class TremorNetV9(nn.Module):
         total_dim = non_dom_dim + dom_dim + freq_dim + stat_dim + diff_dim + bilateral_dim + hand_dim + movement_dim + metadata_dim
         
         self.fusion = nn.Sequential(
-            nn.Linear(total_dim, 640),
+            nn.Linear(total_dim, 640),  # total_dim will be 816 with all_movements=True
             nn.BatchNorm1d(640),
             nn.GELU(),
             nn.Dropout(dropout),
@@ -302,9 +305,12 @@ class TremorNetV9(nn.Module):
         
         # Metadata-modulated signal features (cross-attention)
         # Stack signal features to allow metadata to attend
+        # Project dom_feat to 128 to match other features
+        dom_feat_proj = self.dom_proj(dom_feat)  # [B, 256] -> [B, 128]
+        
         signal_stack = torch.stack([
             non_dom_feat,
-            dom_feat,
+            dom_feat_proj,  # Now 128 dims
             freq_feat
         ], dim=1)  # [B, 3, 128]
         
