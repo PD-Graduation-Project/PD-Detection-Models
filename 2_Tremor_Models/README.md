@@ -87,4 +87,4 @@ To ensure clean and standardized input for the model, several preprocessing step
 ---
 
 # TODO:
-- Search more for the frequency domain approach
+- Finish VAE approach testing
