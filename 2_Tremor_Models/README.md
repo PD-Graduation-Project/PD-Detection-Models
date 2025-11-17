@@ -85,6 +85,3 @@ To ensure clean and standardized input for the model, several preprocessing step
   - **Wrist encoding**: Wrist side was encoded as a separate scalar input to the model (0 = Left, 1 = Right).
 
 ---
-
-# TODO:
-- Finish VAE approach testing
