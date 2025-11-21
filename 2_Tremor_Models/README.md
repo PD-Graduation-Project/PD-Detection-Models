@@ -1,87 +1,257 @@
 # Tremor Dataset Overview
 
-- **Patients:** 469 total
+* **Patients:** 469 total
 
-  - 79 Healthy
-  - 276 Parkinson’s Disease (PD)
-  - 114 Other disorders
+  * 79 Healthy
+  * 276 Parkinson’s Disease (PD)
+  * 114 Other disorders
 
-- **Movements:** 11 different types (each performed with both left and right wrists -> 22 total recordings)
+* **Movements:** **11 merged movement types**
+  Each movement has **two recordings per sample**:
 
-- **Signal length:** 1024 or 2048 timepoints per file (movement-dependent)
+  * Left wrist
+  * Right wrist
+    → Stored together in a single `.npz` entry.
 
-- **Signal structure:** 6 IMU channels per timepoint (e.g., 3-axis accelerometer + 3-axis gyroscope)
+* **Signal length:** All signals are standardized to **1024 timepoints** (upsampled or downsampled).
+
+* **Signal structure:**
+  Each `.npz` file contains **two aligned IMU matrices**:
+
+  ```
+  left  wrist → (1024, 6)
+  right wrist → (1024, 6)
+  ```
+
+  6 channels = 3-axis accelerometer + 3-axis gyroscope.
 
 ---
 
-## Dataset Preparation
+# Dataset Preparation
 
-- Each `.npz` file contains:
+Each `.npz` file contains:
 
-  - `signal`: array of shape `(N, 6)` -> IMU sensor readings
-  - `label`: `0 = Healthy`, `1 = Parkinson's`, `2 = Other`
-  - `wrist`: `0 = Left`, `1 = Right`
-  - `subject_id`: unique identifier
-  - `metadata`: dict containing:
-      1. `age_at_diagnosis` - Age when diagnosed (numeric)
-      1. `age` - Current age (numeric)
-      1. `height` - Height in cm (numeric)
-      1. `weight` - Weight in kg (numeric)
-      1. `gender` - 0=male, 1=female, -1=unknown
-      1. `appearance_in_kinship` - Family history: 1=True, 0=False, -1=missing
-      1. `appearance_in_first_grade_kinship` - First-degree relative history: 1=True, 0=False, -1=missing
-      1. `effect_of_alcohol_on_tremor` - 0=Unknown, 1=No effect, 2=Reduced, 3=Increased, -1=missing
+### **1. `signal`**
 
-### **Directory structure:**
+Shape: `(2, 1024, 6)`
+Order is **always**:
 
-  ```
-  data_path/
-  ├── Healthy/
-  ├── Parkinson/
-  └── Other/
-  ```
+```
+signal[0] → left wrist IMU  
+signal[1] → right wrist IMU  
+```
 
-### **`TremorDataset` class:**
+**NOTE:** The dataset creation script **always saves (left, right)** regardless of subject handedness.
 
-  - Loads signals, wrist indicators, and labels from all groups
-  - Keeps wrist as a **separate scalar tensor** (`0 = Left`, `1 = Right`)
-  - Returns tuples of `(signal_tensor, wrist_tensor, label_tensor)`
-  - Added `subject_ids` filter.
-  ``` python
-  # Example:
-  # Say you have subjects: 1, 2, 3, 4, 5 in your data
-  # And you split them: train=[1, 2, 3], val=[4, 5]
+---
 
-  # When you do:
-  train_dataset = TremorDataset(
-      data_path=data_path,
-      subject_ids=[1, 2, 3],  # <-- can be list, set, or any iterable
-      ...
-  )
-  # This dataset will ONLY load samples from subjects 1, 2, and 3
-  # It will skip/ignore all .npz files from subjects 4 and 5
+### **2. `label`**
 
-  val_dataset = TremorDataset(
-      data_path=data_path,
-      subject_ids=[4, 5],  # <-- different subjects
-      ...
-  )
-  # This dataset will ONLY load samples from subjects 4 and 5
-  # It will skip/ignore all .npz files from subjects 1, 2, and 3
-  ```
+```
+0 = Healthy
+1 = Parkinson's Disease
+2 = Other disorders
+```
 
-### **`create_tremor_dataloaders()` function:**
+---
 
-  - Splits data into training and validation sets (stratified by label)
-  - Returns ready-to-train PyTorch `DataLoader` objects
+### **3. `wrist`**
 
-### Preprocessing **Steps**
+This is **subject handedness**, not the recording wrist:
 
-To ensure clean and standardized input for the model, several preprocessing steps were applied:
-  - **Resampling**: All signals were resampled or truncated to a fixed length of `1024` timepoints.
-  - **Normalization**: Each IMU channel was normalized using **z-score normalization** (zero mean, unit variance) to remove amplitude bias across patients.
-  - **Outlier removal**: Extremely noisy segments or files with missing readings were excluded.
-  - **Label encoding**: Labels were remapped to binary form for the classification task (0 = Healthy, 1 = PD).
-  - **Wrist encoding**: Wrist side was encoded as a separate scalar input to the model (0 = Left, 1 = Right).
+```
+0 = Left-handed subject
+1 = Right-handed subject
+```
+
+**NOTE:** This is NOT which wrist the recording came from.
+Recordings are always saved in (left_signal, right_signal) order.
+
+---
+
+### **4. `subject_id`**
+
+A unique integer ID (3-digit ID from PADS dataset).
+
+---
+
+### **5. `metadata` vector**
+
+Extracted from the dataset CSV and encoded numerically:
+
+| Field                               | Meaning                       | Notes                                                      |
+| ----------------------------------- | ----------------------------- | ---------------------------------------------------------- |
+| `age_at_diagnosis`                  | PD diagnosis age              | -1 if missing                                              |
+| `age`                               | current age                   | -1 if missing                                              |
+| `height`                            | cm                            | -1 if missing                                              |
+| `weight`                            | kg                            | -1 if missing                                              |
+| `gender`                            | 0=male, 1=female, -1=unknown  | categorical encoded                                        |
+| `appearance_in_kinship`             | tremor in family              | 1=True, 0=False, -1=missing                                |
+| `appearance_in_first_grade_kinship` | tremor in first-degree family | 1/0/-1                                                     |
+| `effect_of_alcohol_on_tremor`       | effect category               | Encoded as: 0=Unknown, 1=No effect, 2=Reduced, 3=Increased |
+
+**NOTE:**
+
+* All missing values become **-1**.
+* All categorical variables are **mapped to integers** before saving.
+
+---
+
+# Directory Structure
+
+Dataset is saved as **11 movement directories**, each containing 3 subfolders:
+
+```
+data_path/
+├── CrossArms/
+│   ├── Healthy/
+│   ├── Parkinson/
+│   └── Other/
+├── FingerNose/
+├── Rest/
+├── ... (total 11 movements)
+```
+
+Inside each label folder:
+
+```
+001.npz
+002.npz
+...
+```
+
+Every `.npz` file corresponds to **one subject and one movement**
+with **both wrist signals paired**.
+
+---
+
+# TremorDataset Class
+
+The dataset now loads:
+
+```
+(signal_tensor, handedness_tensor, movement_tensor, label_tensor, metadata_tensor)
+```
+
+### **Major Updates**
+
+* **Paired signals:**
+  Signals have shape `(2, T, 6)` → `(Left, Right)`.
+
+* **Handedness:**
+  Stored as a scalar (0 or 1) representing **subject handedness**.
+
+* **Movement index included:**
+  Allows joint multi-movement training or per-movement loaders.
+
+* **Metadata included:**
+  Returned as an 8-dim vector.
+
+* **Subject filtering included:**
+  Splitting is done by **subject**, not samples.
+
+---
+
+### Example: Subject-based filtering
+
+```python
+train_dataset = TremorDataset(
+    data_path=data_path,
+    subject_ids=[1, 2, 3],
+)
+
+val_dataset = TremorDataset(
+    data_path=data_path,
+    subject_ids=[4, 5],
+)
+```
+
+**NOTE:**
+This prevents leakage because:
+
+* All movements from subject X go to the same split.
+
+---
+
+# `create_tremor_dataloaders()` Function
+
+### Features:
+
+* Splits **by subject**, stratified by label.
+* Handles **class imbalance** using `WeightedRandomSampler`.
+* Can return:
+
+  1. **Unified train/val loaders**
+  2. **Per-movement loaders** (11 sets)
+
+### Returned sample format
+
+Each batch returns:
+
+```
+signal:   (B, 2, 1024, 6)
+handedness: (B,)
+movement:    (B,)
+label:       (B,)
+metadata:    (B, 8)
+```
+
+---
+
+# Preprocessing Steps
+
+All preprocessing now happens in `dataset_creation.py`.
+
+### **1. Remove NaNs**
+
+Replaces missing values with 0.
+
+### **2. Clip outliers**
+
+Range ±50 (empirically chosen for IMU sensors).
+
+### **3. Low-pass Butterworth filter**
+
+Cutoff = 10 Hz
+Ensures tremor-related frequencies are preserved.
+
+### **4. Resample**
+
+Every signal is resampled to **1024 samples**.
+
+**NOTE:**
+Original dataset had lengths 1024 and 2048 depending on movement.
+This step standardizes everything.
+
+### **5. Normalize**
+
+Z-score normalization per channel.
+
+**NOTE:**
+Normalization happens **after resampling**.
+
+---
+
+# Additional Notes (New)
+
+### **(1) Signals are stored as (left, right) even for right-handed subjects**
+
+This avoids confusion and makes the model's input stable.
+
+### **(2) Handedness is a separate scalar**
+
+Do NOT confuse with wrist order.
+
+### **(3) Missing metadata is encoded as -1**
+
+This allows the model to learn missingness patterns.
+
+### **(4) Movement directories are merged into 11 categories**
+
+The creation script handles the merging automatically.
+
+### **(5) Per-movement dataloaders are supported**
+
+Useful for movement-specific modeling.
 
 ---
