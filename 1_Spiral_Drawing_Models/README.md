@@ -12,7 +12,7 @@
 - Compared between all 5 models, accuracy and losses, when training them for:
     - 5 epochs
     - 10 epochs
-- Finetuned the best model , `DenseNet50`, and trained it for extra 50 epochs. (found in `experiments/ finetuning/ finetune_test1.iypnb`)
+- Finetuned the best model , `DenseNet201`, and trained it for extra 50 epochs. (found in `experiments/ finetuning/ finetune_test1.iypnb`)
 
 ## Best results from **PHASE ONE**
 - Validation Accuracy: **87.7%**
@@ -41,8 +41,8 @@
 - Changing the *scheduler* made the accuracy increase way faster.
 - The new *loss function* needed many hyperparameters tuning, but now it is balanced.
 - After only 10 epochs the model gave comparable outputs to the one trained for over 50 epochs. (found in `experiments/ finetuning/ finetune_test2.iypnb`)
-- `DenseNet50` is still superior in accuracy, recall, and model size. 
-- `VGG19_bn` is very promising, and has better recall, but the model is so much larger than `DenseNet50`. (may experiment with it more later)
+- `DenseNet201` is still superior in accuracy, recall, and model size. 
+- `VGG19_bn` is very promising, and has better recall, but the model is so much larger than `DenseNet201`. (may experiment with it more later)
 
 ---
 
@@ -68,5 +68,5 @@
 
 ## TO DO (for phase four maybe)
 - Unfreeze some layers in the middle of the model or add more hidden layers.
-- Compare `DenseNet50` with and without `CLAHE` in `val_dataloader`.
-- Compare `DenseNet50` with the trained image size of `(224, 224)` and with `(512, 512)`.
+- Compare `DenseNet201` with and without `CLAHE` in `val_dataloader`.
+- Compare `DenseNet201` with the trained image size of `(224, 224)` and with `(512, 512)`.
