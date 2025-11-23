@@ -53,4 +53,5 @@ Movement-Aware `TremorNetV9`.
 - Best *Training* **Accuracy**: **0.9456**
 - Best *Training* **F1-Score**: **0.9456**
 
-![](2_Tremor_Models/results/model%20V9/run%204/conf_mat.png)> Confusion matrix at threshold = 0.3
+![](2_Tremor_Models/results/model%20V9/run%204/conf_mat.png)
+> Confusion matrix at threshold = 0.3
