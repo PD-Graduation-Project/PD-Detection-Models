@@ -16,7 +16,7 @@ __pycache__/
 
 # TensorBoard runs
 # -----------------
-# runs/
+runs/
 # other_runs/
 # *.pdf
 folderico-vdmEDi.ico
