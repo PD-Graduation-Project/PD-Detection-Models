@@ -1,7 +1,9 @@
 import torch
 from torch.utils.data import Dataset, DataLoader, Subset
 import pandas as pd
+
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 
 
 # Parkinson Dataset
@@ -28,8 +30,12 @@ class ParkinsonDataset(Dataset):
         # 2. Separate features and labels
         self.y = df['status'].values.astype('float32')
         self.X = df.drop(columns=['status']).values.astype('float32')
+        
+        # 3. Normalizing data
+        scaler = MinMaxScaler()
+        self.X = scaler.fit_transform(self.X)
 
-        # 3. Convert to torch tensors
+        # 4. Convert to torch tensors
         self.X = torch.tensor(self.X)
         self.y = torch.tensor(self.y)
         
@@ -46,8 +52,8 @@ class ParkinsonDataset(Dataset):
 # -----------------------------------------
 def create_dataloaders(
         csv_path: str,
-        train_val_split: float,
-        batch_size: int,
+        train_val_split: float = 0.8,
+        batch_size: int = 16,
         random_seed: int = 42
     ):
     """

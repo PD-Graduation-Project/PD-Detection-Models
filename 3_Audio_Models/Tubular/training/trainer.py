@@ -178,8 +178,8 @@ def train(model:torch.nn.Module,
         # 9. print epoch summary
         print(f"Epoch no.{epoch+1} / {epochs} summary")
         print("-"*35)
-        print(f"Average train losses = {train_loss:.3f} | Train Acc: {train_acc:.3f} | Train Recall: {train_recall:.3f} | Train Precision: {train_precision:.3f} | Train F1: {train_f1:.3f}")
-        print(f"Average validation losses = {val_loss:.3f} | Val Acc:   {val_acc:.3f} | Val Recall:   {val_recall:.3f} | Val Precision: {val_precision:.3f} | Val F1: {val_f1:.3f}")
+        print(f"Train Acc: {train_acc:.3f} | Train F1: {train_f1:.3f}")
+        print(f"Val Acc:   {val_acc:.3f} | Val F1: {val_f1:.3f}")
         print("="*35, "\n")
         
     # 10. close writer
