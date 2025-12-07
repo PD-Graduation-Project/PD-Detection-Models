@@ -37,6 +37,7 @@ Detailed Properties:
 ---
 
 ## Results:
+### 1. WITHOUT PRE-TRAINING (real data only)
 - Best Model: `DenseNet121`
   - val_acc=0.9688
   - val_recall=1.0000
@@ -44,3 +45,13 @@ Detailed Properties:
   - val_f1=0.9800
 
 ![alt text](results/real_data/output.png)
+
+### 2. PRE-TRAINING (generated data plus real data)
+- Best Model: `EfficientNet-B0`
+  - val_loss=0.0001
+  - val_acc=1.0000
+  - val_recall=1.0000
+  - val_precision=1.0000
+  - val_f1=1.0000
+
+![alt text](results/real_and_generated/output.png)

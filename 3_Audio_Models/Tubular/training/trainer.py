@@ -88,9 +88,9 @@ def train(model:torch.nn.Module,
     # 3. load pretrained model if available
     # -------------------------------------
     if load_pretrained:
-        if os.path.exists(load_pretrained):
+        if os.path.exists(checkpoint_dir + load_pretrained):
             # load checkpoint
-            checkpoint = torch.load(load_pretrained, map_location=device)
+            checkpoint = torch.load(checkpoint_dir + load_pretrained, map_location=device)
             # load model
             model.load_state_dict(checkpoint['model_state_dict'])
             #load optimizer

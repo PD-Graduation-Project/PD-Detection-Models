@@ -62,7 +62,7 @@ Movement-Aware `TremorNetV9`.
 
 ## Part 3.1: Audio Model (Tubular) [DONE]
 ### Model used: 
-`DenseNet201`.
+`EfficientNet-B0`.
 
 ### Dataset size: 
 #### Generated data (used in pre-training):
@@ -81,15 +81,15 @@ Movement-Aware `TremorNetV9`.
 
 ### Number of trained epochs: 
 - **15**: pre-training on *generated* data
-- **25**: finetuned on *real* data with early stopping; planned 50.
+- **5**: finetuned on *real* data with early stopping; planned 50.
 
 ### Metrics:
-- Validation *Accuracy*: **96.88%**
+- Validation *Accuracy*: **100%**
 - Validation *Recall*: **1.0000**
-- Validation *precision*: **0.9615**
-- Validation *F1-Score*: **0.9800**
+- Validation *precision*: **1.0000**
+- Validation *F1-Score*: **1.0000**
 
-![](3_Audio_Models/Tubular/results/real_data/output.png)
+![](3_Audio_Models/Tubular/results/real_and_generated/output.png)
 
 ---
 ## Part 3.2: Audio Model (Audio) 
