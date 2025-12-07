@@ -77,6 +77,9 @@ def train(model:torch.nn.Module,
     # 1.4. scaler (to prevent underflow)
     scaler = torch.amp.GradScaler(device = device)
     
+    # 1.5. track best model (only save best checkpoint)
+    best_val_loss = float('inf')
+    
     # 2. init tensorboard writer
     # -----------------------------------------------
     if Tboard:
@@ -162,18 +165,24 @@ def train(model:torch.nn.Module,
         # 8. save checkpoint
         os.makedirs(checkpoint_dir, exist_ok=True)
         
-        torch.save({
-            'model_state_dict': model.state_dict(),
-            'optim_state_dict': optim.state_dict(),
-            
-            'val_loss': val_loss,
-            'val_acc':val_acc,
-            'val_recall':val_recall,
-            'val_precision': val_precision,
-            'val_f1': val_f1,
-        }, os.path.join(checkpoint_dir, f"{model_name}_epoch_{epoch+1}.pth"))
+        
+        # save only best model based on validation loss
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            torch.save({
+                'model_state_dict': model.state_dict(),
+                'optim_state_dict': optim.state_dict(),
 
-        print(f"Model: {model_name} saved.\n")
+                'val_loss': val_loss,
+                'val_acc':val_acc,
+                'val_recall':val_recall,
+                'val_precision': val_precision,
+                'val_f1': val_f1,
+            }, os.path.join(checkpoint_dir, f"{model_name}_BEST.pth"))
+
+            print(f"Best model updated and saved as {model_name}_BEST.pth\n")
+        else:
+            print(f"No improvement. Best val_loss={best_val_loss:.4f}\n")
         
         # 9. print epoch summary
         print(f"Epoch no.{epoch+1} / {epochs} summary")
