@@ -89,7 +89,7 @@ Movement-Aware `TremorNetV9`.
 - Validation *precision*: **0.9615**
 - Validation *F1-Score*: **0.9800**
 
-![](3_Audio_Models\Tubular\results\real_data\output.png)
+![](3_Audio_Models/Tubular/results/real_data/output.png)
 
 ---
 ## Part 3.2: Audio Model (Audio) 
