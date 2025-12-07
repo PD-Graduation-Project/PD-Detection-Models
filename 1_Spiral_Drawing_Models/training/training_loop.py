@@ -59,7 +59,7 @@ def train_one_epoch(model:torch.nn.Module,
         # 7. scale loss and back propagate
         scaler.scale(loss).backward()
         
-        # 8. [NEW] gradient clipping to prevent exploading gradients
+        # 8. gradient clipping to prevent exploading gradients
         scaler.unscale_(optim)
         clip_grad_norm_(model.parameters(), max_norm=1.0)
         
