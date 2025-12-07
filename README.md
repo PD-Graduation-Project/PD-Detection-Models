@@ -6,16 +6,18 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 `DenseNet201` with modified classifier.
 
 ### Dataset size: 
-**2611** Training, **653** Validation.
+- **2611**: Training
+- **653**: Validation
 
 ### Number of trained epochs: 
-**15** (initial model comparisons) + **43** (fine-tuning with early stopping; planned 50).
+- **15**: initial model comparisons
+- **43**: fine-tuning with early stopping; planned 50.
 
 ### Metrics:
-- Validation Accuracy: **97.02%**
-- Validation Recall: **0.9787**
-- Validation precision: **0.9609**
-- Validation F1-Score: **0.9689**
+- Validation *Accuracy*: **97.02%**
+- Validation *Recall*: **0.9787**
+- Validation *precision*: **0.9609**
+- Validation *F1-Score*: **0.9689**
 
 ![](1_Spiral_Drawing_Models/results/confusion_matrices/phase_3.png)
 
@@ -34,8 +36,8 @@ Movement-Aware `TremorNetV9`.
 
 ### Dataset size: 
 - **355** total patients where:
-    - 79 Healthy
-    - 276 Parkinson’s Disease (PD)
+    - **79** Healthy
+    - **276** Parkinson’s Disease (PD)
 - It consists of **11** different type of movements (each movement recorded twice for each wrist).
 - According to the movement type, some are 10 seconds (**1024** samples), and others are 20 seconds (**2048** samples)
 - The signal is structured with **6-channels** (3-axis accelerometer + 3-axis gyroscope.)
@@ -55,3 +57,39 @@ Movement-Aware `TremorNetV9`.
 
 ![](2_Tremor_Models/results/model%20V9/run%204/conf_mat.png)
 > Confusion matrix at threshold = 0.3
+
+---
+
+## Part 3.1: Audio Model (Tubular) [DONE]
+### Model used: 
+`DenseNet201`.
+
+### Dataset size: 
+#### Generated data (used in pre-training):
+- Model used: TVAE (Tabular VAE)
+- Generated data accuracy:
+    - Column Shapes Score: **83.06%**
+    - Column Pair Trends Score: **92.87%**
+    - Overall Score (Average): **87.97%**
+- Generated: 100k samples
+    - **80K**: Training
+    - **20K**: Validation
+
+#### Real data (used in finetuning):
+- **156**: Training
+- **39**: Validation
+
+### Number of trained epochs: 
+- **15**: pre-training on *generated* data
+- **25**: finetuned on *real* data with early stopping; planned 50.
+
+### Metrics:
+- Validation *Accuracy*: **96.88%**
+- Validation *Recall*: **1.0000**
+- Validation *precision*: **0.9615**
+- Validation *F1-Score*: **0.9800**
+
+![](3_Audio_Models\Tubular\results\real_data\output.png)
+
+---
+## Part 3.2: Audio Model (Audio) 
