@@ -76,8 +76,12 @@ Movement-Aware `TremorNetV9`.
     - **20K**: Validation
 
 #### Real data (used in finetuning):
-- **156**: Training
-- **39**: Validation
+- Using 80-20 split:
+  - **156**: Training
+  - **39**: Validation
+- Using 50-50 split:
+  - **97**: Training
+  - **98**: Validation
 
 ### Number of trained epochs: 
 - **15**: pre-training on *generated* data
@@ -89,7 +93,8 @@ Movement-Aware `TremorNetV9`.
 - Validation *precision*: **1.0000**
 - Validation *F1-Score*: **1.0000**
 
-![](3_Audio_Models/Tubular/results/real_and_generated/output.png)
+![](3_Audio_Models/Tubular/results/real_and_generated/80-20_split/output.png)
+![](3_Audio_Models/Tubular/results/real_and_generated/50-50_split/output.png)
 
 ---
 ## Part 3.2: Audio Model (Audio) 

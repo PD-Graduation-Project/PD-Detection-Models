@@ -46,7 +46,7 @@ Detailed Properties:
 
 ![alt text](results/real_data/output.png)
 
-### 2. PRE-TRAINING (generated data plus real data)
+### 2. PRE-TRAINING (generated data plus real data) (80-20 split)
 - Best Model: `EfficientNet-B0`
   - val_loss=0.0001
   - val_acc=1.0000
@@ -54,4 +54,14 @@ Detailed Properties:
   - val_precision=1.0000
   - val_f1=1.0000
 
-![alt text](results/real_and_generated/output.png)
+![alt text](results/real_and_generated/80-20_split/output.png)
+
+### 3. PRE-TRAINING (generated data plus real data) (50-50 split)
+- Best Model: `EfficientNet-B0`
+  - val_loss=0.0032
+  - val_acc=1.0000
+  - val_recall=1.0000
+  - val_precision=1.0000
+  - val_f1=1.0000
+
+![alt text](results/real_and_generated/50-50_split/output.png)
