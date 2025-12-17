@@ -74,7 +74,7 @@ def create_dataloaders(
     indices = list(range(dataset_size))
 
     # 2. labels needed for stratified split
-    labels = dataset.y.numpy()
+    labels = dataset.y.numpy().astype(int)
     
     # 3. Stratified train/validation spli
     train_indices, val_indices = train_test_split(

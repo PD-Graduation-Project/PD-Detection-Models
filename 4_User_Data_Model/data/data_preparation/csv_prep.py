@@ -59,6 +59,20 @@ def create_filtered_classified_csv(
 
     df["height_to_weight"] = df.apply(height_weight_class, axis=1)
 
+    # -------------------------------------------------
+    # Fill missing values with -1 for all columns
+    # -------------------------------------------------
+    columns_to_check = [
+        "age",
+        "height_to_weight",
+        "gender",
+        "appearance_in_kinship",
+        "appearance_in_first_grade_kinship"
+    ]
+    
+    for col in columns_to_check:
+        if col in df.columns:
+            df[col] = df[col].fillna(-1)
 
     # -------------------------------------------------
     # Select final columns

@@ -52,6 +52,7 @@ def train_TVAE(csv_dir: str,
     # 1. Load the dataset
     # ---------------------
     real_df = pd.read_csv(csv_dir)
+    real_df.drop(columns=['id'], inplace= True)
     
     # Plot class counts
     plot_class_counts(real_df, target_col="label")
@@ -158,6 +159,7 @@ def generate_voice_data(csv_dir: str,
     # 4. Evaluate generated data
     # ----------------------------
     real_df = pd.read_csv(csv_dir)
+    real_df.drop(columns=['id'], inplace= True)
     synth_df = pd.read_csv(synth_csv_path)
     
     report = evaluate_quality(
