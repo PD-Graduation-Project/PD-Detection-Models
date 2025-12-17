@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from data_visualization.plots import plot_class_counts
+from plots import plot_class_counts
 
 from ucimlrepo import fetch_ucirepo 
 
@@ -31,39 +31,8 @@ def _clean_columns(columns):
         cleaned_list.append(cleaned)
     return cleaned_list
 
-
-
-def _get_real_data():
-    """
-    Load and preprocess the Parkinson's dataset from the UCI Machine Learning Repository.
-
-    Steps performed:
-        1. Fetch dataset (ID = 174).
-        2. Merge feature and target DataFrames.
-        3. Clean column names using _clean_columns().
-        4. Convert all columns to numeric (non-numeric values → NaN).
-
-    Returns:
-        pd.DataFrame: Preprocessed dataset combining features and targets.
-    """
-    
-    # 1. Fetch dataset
-    parkinsons = fetch_ucirepo(id=174)
-
-    # 2. make one DataFrame with features + target(s)
-    df = pd.concat([parkinsons.data.features, parkinsons.data.targets], axis=1)
-
-    # 3. Clean column names
-    df.columns = _clean_columns(df.columns)
-
-    # 4. Ensure numerics
-    df = df.apply(pd.to_numeric, errors="coerce")
-    
-    return df
-
-
-
-def train_TVAE(output_dir: str,
+def train_TVAE(csv_dir: str,
+            output_dir: str,
             epochs: int = 2000,
             create_metadata: bool = True):
     """
@@ -82,10 +51,10 @@ def train_TVAE(output_dir: str,
     
     # 1. Load the dataset
     # ---------------------
-    real_df = _get_real_data()
+    real_df = pd.read_csv(csv_dir)
     
     # Plot class counts
-    plot_class_counts(real_df, target_col="status")
+    plot_class_counts(real_df, target_col="label")
     
     # 2. Create or load Metadata
     # -----------------------------
@@ -99,8 +68,8 @@ def train_TVAE(output_dir: str,
         
     # 3. split into healthy vs PD (for balancing data)
     # ---------------------------------------------------
-    healthy_df = real_df[real_df["status"] == 0]
-    pd_df = real_df[real_df["status"] == 1]
+    healthy_df = real_df[real_df["label"] == 0]
+    pd_df = real_df[real_df["label"] == 1]
 
     # 4. Init TWO TVAE synthesizers
     # ------------------------------
@@ -132,7 +101,8 @@ def train_TVAE(output_dir: str,
 
 
 
-def generate_voice_data(output_dir: str,
+def generate_voice_data(csv_dir: str,
+                        output_dir: str,
                         file_name: str = "parkinsons_generated",
                         load_existing_model: bool = True,
                         num_generated_samples: int = 20000,
@@ -187,7 +157,7 @@ def generate_voice_data(output_dir: str,
     
     # 4. Evaluate generated data
     # ----------------------------
-    real_df = _get_real_data()
+    real_df = pd.read_csv(csv_dir)
     synth_df = pd.read_csv(synth_csv_path)
     
     report = evaluate_quality(
@@ -201,54 +171,5 @@ def generate_voice_data(output_dir: str,
     print(report.get_properties())
     print('-'*35)
     
-    # 5. Filter data
-    # ---------------
-    if filter_data:
-        filtered_df = _filter_synthetic_data(real_df, 
-                                            synth_df, 
-                                            metadata,
-                                            threshold_std)
-        
-        synth_csv_path  = os.path.join(output_dir, file_name+"_filtered.csv")
-        synthetic_df.to_csv(synth_csv_path , index=False)
-        print ("Filtered generated data and saved at", synth_csv_path)
-        
-        # 4. Re-evaluate generated data after filtering
-        # -----------------------------------------------
-        report = evaluate_quality(
-            real_data=real_df,
-            synthetic_data=filtered_df,
-            metadata=metadata
-        )
-
-        print("Overall Quality Score:", report.get_score())
-        print("Detailed Properties:")
-        print(report.get_properties())
-        
-        return filtered_df
-    
     return synth_df
 
-
-def _filter_synthetic_data(real_df, synthetic_df, metadata, threshold_std=10):
-    """Remove outliers that are too far from real data distribution."""
-    mask = pd.Series([True] * len(synthetic_df))
-    
-    for col in tqdm(real_df.columns, desc="Filtering outliers"):
-        if col == 'status':
-            continue
-        
-        real_mean = real_df[col].mean()
-        real_std = real_df[col].std()
-        
-        # Keep samples within threshold standard deviations
-        col_mask = (
-            (synthetic_df[col] >= real_mean - threshold_std * real_std) &
-            (synthetic_df[col] <= real_mean + threshold_std * real_std)
-        )
-        mask = mask & col_mask
-    
-    filtered_df = synthetic_df[mask].reset_index(drop=True)
-    print(f"Kept {len(filtered_df)}/{len(synthetic_df)} samples ({len(filtered_df)/len(synthetic_df)*100:.1f}%)")
-    
-    return filtered_df
