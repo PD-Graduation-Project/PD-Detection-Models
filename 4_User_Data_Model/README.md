@@ -44,5 +44,5 @@ Detailed Properties:
 - val_recall=0.9881
 - val_precision=1.0000
 - val_f1=0.9939
-- 
+
 ![alt text](results/finetuned/conf_mat.png)
