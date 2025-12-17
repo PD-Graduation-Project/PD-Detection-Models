@@ -98,3 +98,33 @@ Movement-Aware `TremorNetV9`.
 
 ---
 ## Part 3.2: Audio Model (Audio) 
+
+---
+
+## Part 4: Subject's Metadata Model
+### Model used: 
+`EfficientNet-B0`.
+
+#### Generated data (used in pre-training):
+- Model used: TVAE (Tabular VAE)
+- Generated data accuracy:
+    - Column Shapes Score: **91.69%**
+    - Column Pair Trends Score: **87.36%**
+    - Overall Score (Average): **89.53%**
+- Generated: 100k samples
+    - **80K**: Training
+    - **20K**: Validation
+
+#### Real data (used in finetuning):
+- Using 80-20 split:
+  - **284**: Training
+  - **71**: Validation
+
+
+### Metrics:
+- Validation *Accuracy*: **98.96%**
+- Validation *Recall*: **98.81**
+- Validation *precision*: **1.0000**
+- Validation *F1-Score*: **99.39**
+
+![alt text](4_User_Data_Model/results/finetuned/conf_mat.png)

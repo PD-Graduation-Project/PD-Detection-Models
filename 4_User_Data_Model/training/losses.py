@@ -43,18 +43,18 @@ class CombinedLoss(nn.Module):
                 # losses weights (final equation)
                 bce_weight=1.0,
                 focal_weight=0.6,
-                tversky_weight=0.6,
+                tversky_weight=0.7,
                 
                 # positive class (PD) weight
                 pos_weight=1.7,
                 
                 # focal params
-                focal_alpha=0.6,
+                focal_alpha=0.8,
                 focal_gamma=1.5,
                 
                 # tversky params
-                tversky_alpha=0.65,
-                tversky_beta=0.35):
+                tversky_alpha=0.7,
+                tversky_beta=0.3):
         super().__init__()
         
         # 1. init all params
