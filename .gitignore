@@ -7,7 +7,8 @@ project_datasets/
 # -------------
 __pycache__/
 .vscode/
-
+folderico-vdmEDi.ico
+desktop.ini
 
 # Models
 # -------
@@ -18,8 +19,7 @@ __pycache__/
 # -----------------
 runs/
 # other_runs/
-# *.pdf
-folderico-vdmEDi.ico
-desktop.ini
+_quick_run/
 
-quick_run/
+
+# *.pdf
