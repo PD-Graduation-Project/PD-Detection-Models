@@ -1,5 +1,5 @@
 trainer:
-  epochs: 5
+  epochs: 50
   lr: 3e-4
 
 losses:
