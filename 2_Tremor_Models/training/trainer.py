@@ -6,6 +6,18 @@ from .tensorboard_logger import log_metrics_to_tensorboard
 from torch.utils.tensorboard import SummaryWriter
 import os
 
+import yaml
+from pathlib import Path
+
+# Load config file
+CONFIG_PATH = Path("..\config.yaml")
+
+def load_config():
+    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+config = load_config()
+
 
 def train(model: torch.nn.Module,
         train_dataloader: torch.utils.data.DataLoader,
@@ -18,8 +30,8 @@ def train(model: torch.nn.Module,
         run_name: str = "MODEL",
         Tboard: bool = True,
 
-        epochs: int = 5,
-        max_lr: float = 3e-4, 
+        epochs: int = config["trainer"]["epochs"],
+        max_lr: float = config["trainer"]["lr"], 
         per_movement: bool = False,
         
         debug_mode:bool = True,):
@@ -66,18 +78,18 @@ def train(model: torch.nn.Module,
     #  1.1. Combined loss function for binary classification with class imbalance
     # Adjusted for WeightedRandomSampler (batches are already balanced)
     loss_fn = CombinedLoss(
-        bce_weight=1.0,
-        focal_weight=0.3,
-        tversky_weight=0.3,
+        bce_weight=config["losses"]["bce_weight"],
+        focal_weight=config["losses"]["focal_weight"],
+        tversky_weight=config["losses"]["tversky_weight"],
         
-        healthy_weight=1.0,     
-        parkinson_weight=1.3,
+        healthy_weight=config["losses"]["healthy_weight"],     
+        parkinson_weight=config["losses"]["parkinson_weight"],
         
-        focal_alpha=0.25,        
-        focal_gamma=2.0,
+        focal_alpha=config["losses"]["focal_alpha"],        
+        focal_gamma=config["losses"]["focal_gamma"],
         
-        tversky_alpha=0.3,      
-        tversky_beta=0.7,
+        tversky_alpha=config["losses"]["tversky_alpha"],      
+        tversky_beta=config["losses"]["tversky_beta"],
     )
 
     # 1.2. optimizer (with weight decay)

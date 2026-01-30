@@ -32,6 +32,9 @@ class TremorDataset(Dataset):
         - label  : int (0 = Healthy, 1 = Parkinson, 2 = Other)
         - wrist  : int (0 = Left-handed, 1 = Right-handed) 
         - subject_id : int or str
+        - metadata : dict (age_at_diagnosis, age, height, weight, gender,
+                          appearance_in_kinship, appearance_in_first_grade_kinship,
+                          effect_of_alcohol_on_tremor)
 
     Parameters
     ----------
@@ -60,6 +63,10 @@ class TremorDataset(Dataset):
         - handedness_tensor : scalar (0 = Left-handed, 1 = Right-handed), dtype=torch.long
         - movement_tensor   : scalar (movement index 0-10), dtype=torch.long
         - label_tensor      : scalar (0 = Healthy, 1 = Parkinson, 2 = Other), dtype=torch.long
+        - metadata_tensor   : shape (8,), dtype=torch.float32  # [age_at_diagnosis, age, height, 
+                                                              #  weight, gender, appearance_in_kinship,
+                                                              #  appearance_in_first_grade_kinship,
+                                                              #  effect_of_alcohol_on_tremor]
     """
     def __init__(self,
                 data_path: str,

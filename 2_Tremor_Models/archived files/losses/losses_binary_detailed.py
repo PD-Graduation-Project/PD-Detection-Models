@@ -11,6 +11,69 @@ class CombinedLoss(nn.Module):
     Designed for: 77% Parkinson (majority) vs 23% Healthy (minority)
     
     Final Loss = w1*BCE + w2*Focal + w3*Tversky
+
+    PARAMETER GUIDE - WHAT EACH DOES:
+    ==================================
+    
+    LOSS COMPONENT WEIGHTS (balance between loss types):
+    ----------------------------------------------------
+    - bce_weight: Weight for standard BCE loss (stable baseline)
+    - focal_weight: Weight for Focal loss (focuses on hard examples)
+    - tversky_weight: Weight for Tversky loss (controls FN vs FP trade-off)
+    
+    CLASS IMBALANCE CORRECTION:
+    ---------------------------
+    - healthy_weight: Penalty multiplier for missing Healthy samples (minority class)
+                    ↑ higher = model pays more attention to Healthy class
+                    For 77/23 split: use ~3.3 (ratio: 0.77/0.23)
+                    
+    - parkinson_weight: Penalty multiplier for missing Parkinson samples (majority class)
+                        Usually keep at 1.0 since PD is already 77% of data
+                        Only increase if PD recall is too low
+    
+    FOCAL LOSS PARAMS (handles hard-to-classify examples):
+    -------------------------------------------------------
+    - focal_alpha: Which class to focus on
+                < 0.5 = focus on MINORITY (Healthy) - RECOMMENDED for imbalanced data
+                > 0.5 = focus on MAJORITY (Parkinson)
+                = 0.5 = balanced
+                For 77/23 split: use 0.23 (match minority proportion)
+                
+    - focal_gamma: How much to focus on hard examples
+                = 0: regular BCE (no focusing)
+                = 2: standard (moderate focusing) - RECOMMENDED
+                > 2: aggressive focusing on hardest examples
+                Higher = model focuses more on mistakes
+    
+    TVERSKY LOSS PARAMS (precision vs recall trade-off):
+    -----------------------------------------------------
+    - tversky_alpha: False Negative penalty (controls RECALL)
+                    ↑ higher = punish missing positives more = HIGHER RECALL
+                    Lower = allow more FN = lower recall, higher precision
+                    
+    - tversky_beta: False Positive penalty (controls PRECISION)
+                    ↑ higher = punish false alarms more = HIGHER PRECISION
+                    Lower = allow more FP = higher recall, lower precision
+                    
+    Recommended for balanced F1: alpha + beta = 1.0
+    - For recall focus: alpha=0.7, beta=0.3
+    - For balanced: alpha=0.5, beta=0.5
+    - For precision focus: alpha=0.3, beta=0.7
+    
+    COMMON SCENARIOS:
+    -----------------
+    1. Model predicts everything as Parkinson (high recall, low precision):
+        - Increase healthy_weight (e.g., 3.5 → 4.5)
+        - Decrease focal_alpha (e.g., 0.25 → 0.20)
+        - Increase tversky_beta for precision (e.g., 0.3 → 0.4)
+
+    2. Model misses too many Parkinson cases (low recall):
+        - Increase tversky_alpha (e.g., 0.7 → 0.8)
+        - Increase focal_gamma (e.g., 2 → 3)
+        
+    3. Model is unstable/overfitting:
+        - Decrease focal_weight (e.g., 1.0 → 0.5)
+        - Increase bce_weight (e.g., 0.5 → 0.8)
     """
     
     def __init__(self,

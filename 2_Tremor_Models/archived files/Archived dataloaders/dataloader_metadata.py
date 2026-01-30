@@ -24,6 +24,9 @@ def create_tremor_dataloaders(
             - wrist_tensor    : scalar (0 = Left-handed, 1 = Right-handed)
             - movement_tensor : scalar (0-10), movement type
             - label_tensor    : scalar (0 = Healthy, 1 = Parkinson, 2 = Other)
+            - metadata_tensor : shape (8,), [age_at_diagnosis, age, height, weight, gender,
+                                          appearance_in_kinship, appearance_in_first_grade_kinship,
+                                          effect_of_alcohol_on_tremor]
     - Splits dataset by subjects into train/validation (stratified by label).
     - Returns DataLoaders ready for model training.
     

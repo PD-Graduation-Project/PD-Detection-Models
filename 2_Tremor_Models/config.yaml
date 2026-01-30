@@ -1,0 +1,27 @@
+trainer:
+  epochs: 5
+  lr: 3e-4
+
+losses:
+  # Loss component weights
+  bce_weight: 1.0
+  focal_weight: 0.3
+  tversky_weight: 0.3
+  # Class imbalance correction (for 77% PD, 23% Healthy)
+  healthy_weight: 1.0     
+  parkinson_weight: 1.3
+  # Focal loss params (focus on minority Healthy class)
+  focal_alpha: 0.25 # Which class to focus on
+  #                   < 0.5 = focus on MINORITY (Healthy) - RECOMMENDED for imbalanced data
+  #                   > 0.5 = focus on MAJORITY (Parkinson)
+  #                   = 0.5 = balanced
+  focal_gamma: 2.0 # How much to focus on hard examples
+  #                  = 0: regular BCE (no focusing)
+  #                  = 2: standard (moderate focusing) - RECOMMENDED
+  #                  > 2: aggressive focusing on hardest examples
+  #                  Higher = model focuses more on mistakes
+  # Tversky params (balanced F1-score)
+  tversky_alpha: 0.3  # FN penalty (recall)    ↑ higher = punish missing positives more = HIGHER RECALL
+  #                                            Lower = allow more FN = lower recall, higher precision
+  tversky_beta: 0.7   # FP penalty (precision) ↑ higher = punish false alarms more = HIGHER PRECISION
+  #                                             Lower = allow more FP = higher recall, lower precision
