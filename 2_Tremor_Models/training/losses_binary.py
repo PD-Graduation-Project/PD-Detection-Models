@@ -4,8 +4,6 @@ import torch.nn.functional as F
 
 # Weighted Combined Losses class
 # -------------------------------
-# Weighted Combined Losses class
-# -------------------------------
 class CombinedLoss(nn.Module):
     """
     Combined BinaryCrossEntropy + Focal + Tversky Loss for imbalanced binary classification.
