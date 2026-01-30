@@ -60,7 +60,7 @@ Movement-Aware `TremorNetV9`.
 
 ---
 
-## Part 3.1: Audio Model (Tubular) [DONE]
+## Part 3.1: Audio Model (Tabular) [DONE]
 ### Model used: 
 `EfficientNet-B0`.
 
@@ -93,8 +93,8 @@ Movement-Aware `TremorNetV9`.
 - Validation *precision*: **1.0000**
 - Validation *F1-Score*: **1.0000**
 
-![](3_Audio_Models/Tubular/results/real_and_generated/80-20_split/output.png)
-![](3_Audio_Models/Tubular/results/real_and_generated/50-50_split/output.png)
+![](3_Audio_Models/Tabular/results/real_and_generated/80-20_split/output.png)
+![](3_Audio_Models/Tabular/results/real_and_generated/50-50_split/output.png)
 
 ---
 ## Part 3.2: Audio Model (Audio) 
