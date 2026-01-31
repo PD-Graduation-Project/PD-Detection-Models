@@ -6,9 +6,8 @@ from .tremor_modules import FrequencyAnalyzer, StatisticalFeatureExtractor
 """
 TODO:
 1. make 1 cnn path, but increase the weight of the output of the dominant hand (instead of 2 cnn pathes)
-2. split frequency features into per second (instead of the entire 10 seconds)
-3. modularize the frequency and statistical features better
-4. remove metadata
+2. remove metadata
+3. understand and trace _compute_pooled_features better
 """
 
 class TremorNetV10(nn.Module):
