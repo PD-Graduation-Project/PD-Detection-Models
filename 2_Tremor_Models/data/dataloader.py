@@ -9,7 +9,7 @@ def create_tremor_dataloaders(
         batch_size: int = 32,
         train_val_split: float = 0.8,
         random_seed: int = 42,
-        include_other: bool = True,
+        include_other: bool = False,
         print_details: bool = False,
         per_movement: bool = False):
     """
@@ -19,7 +19,7 @@ def create_tremor_dataloaders(
     
     - Loads preprocessed .npz signals from all movement folders.
     - Each sample contains:
-        (signal_tensor, wrist_tensor, movement_tensor, label_tensor, metadata_tensor)
+        (signal_tensor, wrist_tensor, movement_tensor, label_tensor)
             - signal_tensor   : shape (2, T, 6), IMU signal (left-signals, right-signals)
             - wrist_tensor    : scalar (0 = Left-handed, 1 = Right-handed)
             - movement_tensor : scalar (0-10), movement type
@@ -61,7 +61,6 @@ def create_tremor_dataloaders(
     temp_dataset = TremorDataset(
         data_path=data_path,
         include_other=include_other,
-        print_details=False,
     )
     
     # 2. Get all unique subjects and their labels
@@ -101,7 +100,7 @@ def create_tremor_dataloaders(
         print(f"\nTrain subjects by label:")
         print(f"  Healthy: {train_label_counts[0]}, Parkinson: {train_label_counts[1]}, Other: {train_label_counts[2]}")
         print(f"Val subjects by label:")
-        print(f"  Healthy: {val_label_counts[0]}, Parkinson: {val_label_counts[1]}, Other: {val_label_counts[2]}")
+        print(f"  Healthy: {val_label_counts[0]}, Parkinson: {val_label_counts[1]}, Other: {val_label_counts[2]}\n\n")
     
     # --------------------------------------------------------------
     # Option A: return all the movements in the same dataloader:
@@ -113,14 +112,12 @@ def create_tremor_dataloaders(
             data_path=data_path,
             subject_ids=train_subjects,
             include_other=include_other,
-            print_details=print_details,
         )
         
         val_dataset = TremorDataset(
             data_path=data_path,
             subject_ids=val_subjects,
             include_other=include_other,
-            print_details=False,
         )
         
         # 5. WeightedRandomSampler for class imbalance in training set
@@ -147,7 +144,7 @@ def create_tremor_dataloaders(
         val_dataloader = DataLoader(
             val_dataset,
             batch_size=batch_size,
-            shuffle=False,
+            shuffle=True,
             pin_memory=True,
         )
 
@@ -171,14 +168,12 @@ def create_tremor_dataloaders(
             data_path=data_path,
             subject_ids=train_subjects,
             include_other=include_other,
-            print_details=print_details,
         )
         
         val_dataset = TremorDataset(
             data_path=data_path,
             subject_ids=val_subjects,
             include_other=include_other,
-            print_details=False,
         )
         
         # 5. Init movement dataloaders dict

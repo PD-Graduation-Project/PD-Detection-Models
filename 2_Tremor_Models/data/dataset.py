@@ -209,3 +209,7 @@ class TremorDataset(Dataset):
         for idx, name in enumerate(self.movement_names):
             movement_counts[name] = self.movements.count(idx)
         return movement_counts
+    
+    def get_unique_subjects(self):
+        """Get list of unique subject IDs in this dataset (used in dataloader)"""
+        return sorted(set(self.subject_ids_list))
