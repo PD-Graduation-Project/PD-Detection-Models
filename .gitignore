@@ -21,6 +21,6 @@ _FINAL_MODELS/
 runs/
 # other_runs/
 _quick_run/
-
+*.txt
 
 # *.pdf

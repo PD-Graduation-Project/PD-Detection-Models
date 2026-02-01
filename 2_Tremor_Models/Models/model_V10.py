@@ -20,9 +20,12 @@ class TremorNetV10(nn.Module):
             movements: [B] movement type indices (optional)
     Output: [B, 1] tremor severity prediction
     """
-    def __init__(self, dropout=0.45, all_movements=False, num_movements=11,
-                dom_hand_weight=3.0,
+    def __init__(self, dropout=0.35, 
+                all_movements=False, 
+                num_movements=11,
+                dom_hand_weight=2.0,
                 non_dom_weight=1.0):
+        
         super().__init__()
         self.all_movements = all_movements
         self.dropout = nn.Dropout(dropout)

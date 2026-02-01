@@ -22,7 +22,7 @@ losses:
   #                  > 2: aggressive focusing on hardest examples
   #                  Higher = model focuses more on mistakes
   # Tversky params (balanced F1-score)
-  tversky_alpha: 0.3  # FN penalty (recall)    ↑ higher = punish missing positives more = HIGHER RECALL
+  tversky_alpha: 0.7  # FN penalty (recall)    ↑ higher = punish missing positives more = HIGHER RECALL
   #                                            Lower = allow more FN = lower recall, higher precision
-  tversky_beta: 0.7   # FP penalty (precision) ↑ higher = punish false alarms more = HIGHER PRECISION
+  tversky_beta: 0.3   # FP penalty (precision) ↑ higher = punish false alarms more = HIGHER PRECISION
   #                                             Lower = allow more FP = higher recall, lower precision
