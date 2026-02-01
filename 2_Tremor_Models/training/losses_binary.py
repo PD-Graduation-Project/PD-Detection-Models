@@ -125,15 +125,16 @@ class CombinedLoss(nn.Module):
         
         return total_loss
 
-# Per-class metrics computation
-# -------------------------------
-def compute_metrics(preds, labels, threshold=0.5):
+# metrics computation
+# ---------------------
+def compute_metrics(preds, labels, movement_ids=None, threshold=0.5):
     """
     Compute overall and per-class metrics for binary classification.
     
     Args:
         preds: [N, 1] or [N] - raw logits
         labels: [N, 1] or [N] - binary labels {0=Healthy, 1=Parkinson}
+        movement_ids: [N] integers 0..num_movements-1
         threshold: classification threshold
         
     Returns:
@@ -187,6 +188,14 @@ def compute_metrics(preds, labels, threshold=0.5):
     actual_healthy_count = (labels == 0).sum().item()
     actual_pd_count = (labels == 1).sum().item()
     
+    # 7. Per-movement metrics (optional)
+    movement_stats = None
+    if movement_ids is not None:
+        movements_stats = movement_metrics(preds=preds,
+                                        labels=labels,
+                                        movement_ids=movement_ids)
+
+    
     return {
         # 0. Confusion matrix
         # ---------------------
@@ -236,5 +245,38 @@ def compute_metrics(preds, labels, threshold=0.5):
             'actual_pd': actual_pd_count,
             'pred_healthy_ratio': pred_healthy_count / total,
             'pred_pd_ratio': pred_pd_count / total
-        }
+        },
+        
+        # 6. Movements stats
+        # -------------------
+        'per_movement_counts': movement_stats  # None if movement_ids not provided
     }
+
+def movement_metrics(preds, labels, movement_ids, threshold=0.5, num_movements=11):
+    """
+    Count correct/wrong predictions for each movement.
+    
+    Args:
+        preds: [N] raw logits
+        labels: [N] binary labels {0,1}
+        movement_ids: [N] integers 0..num_movements-1
+        threshold: classification threshold
+        num_movements: total number of different movements
+    
+    Returns:
+        dict: movement_id -> {'correct': x, 'wrong': y}
+    """
+    preds_bin = (torch.sigmoid(preds).view(-1) >= threshold).float()
+    labels = labels.view(-1)
+    movement_ids = movement_ids.view(-1)
+
+    stats = {}
+    for m in range(num_movements):
+        mask = (movement_ids == m)
+        m_labels = labels[mask]
+        m_preds = preds_bin[mask]
+
+        correct = (m_labels == m_preds).sum().item()
+        wrong = (m_labels != m_preds).sum().item()
+        stats[m] = {'correct': correct, 'wrong': wrong}
+    return stats

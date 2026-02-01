@@ -10,8 +10,7 @@ def train_one_epoch(model: torch.nn.Module,
                     train_dataloader: torch.utils.data.DataLoader,
                     
                     loss_fn: torch.nn.Module,
-                    metric_fn, 
-                    compute_per_class_metrics,
+                    metric_fn,
                     optim: torch.optim,
                     
                     scaler,
@@ -111,7 +110,6 @@ def validate(model: torch.nn.Module,
             val_dataloader: torch.utils.data.DataLoader,
             loss_fn: torch.nn.Module,
             metric_fn,
-            compute_per_class_metrics,
             device,
             per_movement):
     """
@@ -169,7 +167,6 @@ def validate(model: torch.nn.Module,
     all_labels = torch.cat(all_labels, dim=0)
     
     overall_metrics = metric_fn(all_preds, all_labels) # -> includes per-class metrics
-    
     
     # 12. return average loss, and overall metrics
     avg_loss = total_losses / len(val_dataloader)
