@@ -97,15 +97,12 @@ def train_one_epoch(model: torch.nn.Module,
     all_preds = torch.cat(all_preds, dim=0)
     all_labels = torch.cat(all_labels, dim=0)
     
-    overall_metrics = metric_fn(all_preds, all_labels)
+    overall_metrics = metric_fn(all_preds, all_labels) # -> includes per-class metrics
     
-    # 15. Compute per-class metrics
-    per_class_metrics = compute_per_class_metrics(all_preds, all_labels)
-    
-    # 16. return average loss, overall metrics, and per-class metrics
+    # 15. return average loss, and overall metrics
     avg_loss = total_losses / len(train_dataloader)
 
-    return avg_loss, overall_metrics, per_class_metrics
+    return avg_loss, overall_metrics,
             
 
 # Validation function loop
@@ -171,13 +168,11 @@ def validate(model: torch.nn.Module,
     all_preds = torch.cat(all_preds, dim=0)
     all_labels = torch.cat(all_labels, dim=0)
     
-    overall_metrics = metric_fn(all_preds, all_labels)
+    overall_metrics = metric_fn(all_preds, all_labels) # -> includes per-class metrics
     
-    # 11. Compute per-class metrics
-    per_class_metrics = compute_per_class_metrics(all_preds, all_labels)
     
-    # 12. return average loss, overall metrics, and per-class metrics
+    # 12. return average loss, and overall metrics
     avg_loss = total_losses / len(val_dataloader)
 
-    return avg_loss, overall_metrics, per_class_metrics
+    return avg_loss, overall_metrics
 

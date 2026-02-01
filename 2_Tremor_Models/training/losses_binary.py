@@ -125,52 +125,11 @@ class CombinedLoss(nn.Module):
         
         return total_loss
 
-
-# Binary Metrics Function
-# ------------------------
-def binary_metrics(preds, labels, threshold=0.5):
-    """
-    Compute accuracy, recall, precision, and F1-score for binary classification.
-
-    Args:
-        preds (Tensor): raw logits from model, shape [B, 1] or [B]
-        labels (Tensor): ground-truth labels, shape [B, 1] or [B]
-        threshold (float): classification threshold on sigmoid output
-
-    Returns:
-        dict: {
-            'accuracy': float,
-            'recall': float,
-            'precision': float,
-            'f1': float
-        }
-    """
-    probs = torch.sigmoid(preds).view(-1)
-    labels = labels.view(-1)
-    preds_bin = (probs >= threshold).float()
-    
-    tp = ((preds_bin == 1) & (labels == 1)).float().sum()
-    fn = ((preds_bin == 0) & (labels == 1)).float().sum()
-    fp = ((preds_bin == 1) & (labels == 0)).float().sum()
-    
-    accuracy = (preds_bin == labels).float().mean()
-    recall = tp / (tp + fn + 1e-8)
-    precision = tp / (tp + fp + 1e-8)
-    f1 = 2 * (precision * recall) / (precision + recall + 1e-8)
-    
-    return {
-        "accuracy": accuracy.item(),
-        "recall": recall.item(),
-        "precision": precision.item(),
-        "f1": f1.item()
-    }
-
-
 # Per-class metrics computation
 # -------------------------------
-def compute_per_class_metrics(preds, labels, threshold=0.5):
+def compute_metrics(preds, labels, threshold=0.5):
     """
-    Compute per-class metrics for binary classification.
+    Compute overall and per-class metrics for binary classification.
     
     Args:
         preds: [N, 1] or [N] - raw logits
@@ -180,35 +139,47 @@ def compute_per_class_metrics(preds, labels, threshold=0.5):
     Returns:
         dict with per-class metrics and confusion matrix
     """
-    # Convert to binary predictions
+    # 1. Convert to binary predictions
     probs = torch.sigmoid(preds).view(-1)
     labels = labels.view(-1)
     preds_bin = (probs >= threshold).float()
     
-    # Confusion matrix components
+    # 2. Confusion matrix components
+    # ==================================
     tp = ((preds_bin == 1) & (labels == 1)).float().sum()
     tn = ((preds_bin == 0) & (labels == 0)).float().sum()
     fp = ((preds_bin == 1) & (labels == 0)).float().sum()
     fn = ((preds_bin == 0) & (labels == 1)).float().sum()
     
-    # Per-class metrics
-    # -----------------
+    # 3. Overall metrics
+    # ====================
+    accuracy = (preds_bin == labels).float().mean()
+    recall = tp / (tp + fn + 1e-8)
+    precision = tp / (tp + fp + 1e-8)
+    f1 = 2 * (precision * recall) / (precision + recall + 1e-8)
     
-    # Healthy class (label=0, predicted as 0)
+    # 4. Per-class metrics
+    # ==================================
+    
+    # 4.1. Healthy class (label=0, predicted as 0)
+    # -----------------------------------------------
     healthy_recall = tn / (tn + fp + 1e-8)      # True Negative Rate (Specificity)
     healthy_precision = tn / (tn + fn + 1e-8)   # Negative Predictive Value
     healthy_f1 = 2 * (healthy_precision * healthy_recall) / (healthy_precision + healthy_recall + 1e-8)
     
-    # Parkinson class (label=1, predicted as 1)
+    # 4.2. Parkinson class (label=1, predicted as 1)
+    # -----------------------------------------------
     pd_recall = tp / (tp + fn + 1e-8)           # Sensitivity / True Positive Rate
     pd_precision = tp / (tp + fp + 1e-8)        # Positive Predictive Value
     pd_f1 = 2 * (pd_precision * pd_recall) / (pd_precision + pd_recall + 1e-8)
     
-    # Balanced metrics
+    # 5. Balanced metrics
+    # =====================
     balanced_accuracy = (healthy_recall + pd_recall) / 2
     macro_f1 = (healthy_f1 + pd_f1) / 2
     
-    # Prediction distribution (to detect if model predicts all one class)
+    # 6. Prediction distribution (to detect if model predicts all one class)
+    # ============================
     total = len(labels)
     pred_healthy_count = (preds_bin == 0).sum().item()
     pred_pd_count = (preds_bin == 1).sum().item()
@@ -217,7 +188,8 @@ def compute_per_class_metrics(preds, labels, threshold=0.5):
     actual_pd_count = (labels == 1).sum().item()
     
     return {
-        # Confusion matrix
+        # 0. Confusion matrix
+        # ---------------------
         'confusion_matrix': {
             'TP': tp.item(),
             'TN': tn.item(),
@@ -225,25 +197,38 @@ def compute_per_class_metrics(preds, labels, threshold=0.5):
             'FN': fn.item()
         },
         
-        # Healthy class (label=0)
+        # 1. Overall metrics
+        # ---------------------
+        'overall_metrics': {
+        "accuracy": accuracy.item(),
+        "recall": recall.item(),
+        "precision": precision.item(),
+        "f1": f1.item()
+        },
+        
+        # 2. Healthy class (label=0)
+        # ----------------------------
         'healthy': {
             'recall': healthy_recall.item(),        # How many Healthy we found
             'precision': healthy_precision.item(),  # How accurate our Healthy predictions are
             'f1': healthy_f1.item()
         },
         
-        # Parkinson class (label=1)
+        # 3. Parkinson class (label=1)
+        # ------------------------------
         'parkinson': {
             'recall': pd_recall.item(),             # How many PD we found
             'precision': pd_precision.item(),       # How accurate our PD predictions are
             'f1': pd_f1.item()
         },
         
-        # Balanced metrics
+        # 4. Balanced metrics
+        # --------------------
         'balanced_accuracy': balanced_accuracy.item(),
         'macro_f1': macro_f1.item(),
         
-        # Prediction distribution (detect if model is biased)
+        # 5. Prediction distribution (detect if model is biased)
+        # ----------------------------
         'prediction_dist': {
             'predicted_healthy': pred_healthy_count,
             'predicted_pd': pred_pd_count,

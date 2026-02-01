@@ -8,8 +8,6 @@ def log_metrics_to_tensorboard(
         val_loss: float,
         train_overall: dict,
         val_overall: dict,
-        train_per_class: dict,
-        val_per_class: dict,
         current_lr: float):
     """
     Logs all training metrics to TensorBoard.
@@ -21,8 +19,6 @@ def log_metrics_to_tensorboard(
         val_loss: Validation loss
         train_overall: Overall metrics dict from binary_metrics()
         val_overall: Overall validation metrics dict
-        train_per_class: Per-class metrics dict from compute_per_class_metrics()
-        val_per_class: Per-class validation metrics dict
         current_lr: Current learning rate
     """
     
@@ -32,53 +28,57 @@ def log_metrics_to_tensorboard(
     
     # 2. Overall metrics
     for metric_name in ["accuracy", "recall", "precision", "f1"]:
-        writer.add_scalar(f"Overall/{metric_name}/train", train_overall[metric_name], epoch)
-        writer.add_scalar(f"Overall/{metric_name}/val", val_overall[metric_name], epoch)
+        writer.add_scalar(f"Overall/{metric_name}/train", 
+                        train_overall['overall_metrics'][metric_name], 
+                        epoch)
+        writer.add_scalar(f"Overall/{metric_name}/val", 
+                        val_overall['overall_metrics'][metric_name], 
+                        epoch)
         
     # 3. Per-class metrics
     for class_name in ["healthy", "parkinson"]:
         for metric in ["recall", "precision", "f1"]:
             writer.add_scalar(
                 f"PerClass/{class_name}_{metric}/train",
-                train_per_class[class_name][metric],
+                train_overall[class_name][metric],
                 epoch
             )
             writer.add_scalar(
                 f"PerClass/{class_name}_{metric}/val",
-                val_per_class[class_name][metric],
+                val_overall[class_name][metric],
                 epoch
             )
             
     # 4. Balanced metrics
-    writer.add_scalar("Balanced/accuracy/train", train_per_class['balanced_accuracy'], epoch)
-    writer.add_scalar("Balanced/accuracy/val", val_per_class['balanced_accuracy'], epoch)
-    writer.add_scalar("Balanced/macro_f1/train", train_per_class['macro_f1'], epoch)
-    writer.add_scalar("Balanced/macro_f1/val", val_per_class['macro_f1'], epoch)
+    writer.add_scalar("Balanced/accuracy/train", train_overall['balanced_accuracy'], epoch)
+    writer.add_scalar("Balanced/accuracy/val", val_overall['balanced_accuracy'], epoch)
+    writer.add_scalar("Balanced/macro_f1/train", train_overall['macro_f1'], epoch)
+    writer.add_scalar("Balanced/macro_f1/val", val_overall['macro_f1'], epoch)
     
     # 5. Prediction distribution (detect bias)
     writer.add_scalar(
         "PredDist/train_healthy_ratio",
-        train_per_class['prediction_dist']['pred_healthy_ratio'],
+        train_overall['prediction_dist']['pred_healthy_ratio'],
         epoch
     )
     writer.add_scalar(
         "PredDist/train_pd_ratio",
-        train_per_class['prediction_dist']['pred_pd_ratio'],
+        train_overall['prediction_dist']['pred_pd_ratio'],
         epoch
     )
     writer.add_scalar(
         "PredDist/val_healthy_ratio",
-        val_per_class['prediction_dist']['pred_healthy_ratio'],
+        val_overall['prediction_dist']['pred_healthy_ratio'],
         epoch
     )
     writer.add_scalar(
         "PredDist/val_pd_ratio",
-        val_per_class['prediction_dist']['pred_pd_ratio'],
+        val_overall['prediction_dist']['pred_pd_ratio'],
         epoch
     )
     
     # 6. Confusion matrix as scalars
-    for key, value in val_per_class['confusion_matrix'].items():
+    for key, value in val_overall['confusion_matrix'].items():
         writer.add_scalar(f"ConfusionMatrix/{key}", value, epoch)
     
     # 7. Learning rate

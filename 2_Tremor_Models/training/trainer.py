@@ -1,5 +1,5 @@
 import torch
-from .losses_binary import CombinedLoss, binary_metrics, compute_per_class_metrics
+from .losses_binary import CombinedLoss, compute_metrics
 from .training_loop import train_one_epoch, validate
 from .tensorboard_logger import log_metrics_to_tensorboard
 
@@ -146,12 +146,11 @@ def train(model: torch.nn.Module,
         print("-" * 35)
 
         # 6. train
-        train_loss, train_overall, train_per_class = train_one_epoch(
+        train_loss, train_overall = train_one_epoch(
             model= model,
             train_dataloader= train_dataloader,
             loss_fn= loss_fn,
-            metric_fn= binary_metrics,
-            compute_per_class_metrics= compute_per_class_metrics,
+            metric_fn= compute_metrics,
             optim= optim,
             scaler= scaler,
             device= device,
@@ -159,12 +158,11 @@ def train(model: torch.nn.Module,
         )
 
         # 7. validate
-        val_loss, val_overall, val_per_class = validate(
+        val_loss, val_overall = validate(
             model= model,
             val_dataloader= val_dataloader,
             loss_fn= loss_fn,
-            metric_fn= binary_metrics,
-            compute_per_class_metrics= compute_per_class_metrics,
+            metric_fn= compute_metrics,
             device= device,
             per_movement= per_movement
         )
@@ -184,14 +182,12 @@ def train(model: torch.nn.Module,
                 val_loss=val_loss,
                 train_overall=train_overall,
                 val_overall=val_overall,
-                train_per_class=train_per_class,
-                val_per_class=val_per_class,
                 current_lr=current_lr
             )
 
         # 9. Save the best model only
         # ------------------------------
-        current_balanced_acc = val_per_class['balanced_accuracy']
+        current_balanced_acc = val_overall['balanced_accuracy']
         if current_balanced_acc > best_balanced_acc:
             best_balanced_acc = current_balanced_acc
             best_model_path = os.path.join(checkpoint_dir, f"{model_name}_BEST.pth")
@@ -202,9 +198,8 @@ def train(model: torch.nn.Module,
                 'train_loss': train_loss,
                 'val_loss': val_loss,
                 'val_overall': val_overall,
-                'val_per_class': val_per_class,
-                'balanced_accuracy': val_per_class['balanced_accuracy'],
-                'macro_f1': val_per_class['macro_f1']
+                'balanced_accuracy': val_overall['balanced_accuracy'],
+                'macro_f1': val_overall['macro_f1']
             }, best_model_path)
             
             print(f"[BEST] New best balanced_accuracy: {best_balanced_acc:.3f} (saved)\n")
@@ -215,19 +210,19 @@ def train(model: torch.nn.Module,
         print("-" * 35)
         
         print(f"  Loss: Train={train_loss:.4f}, Val={val_loss:.4f}")
-        print(f"  Balanced Acc: Train={train_per_class['balanced_accuracy']:.3f}, Val={val_per_class['balanced_accuracy']:.3f}")
+        print(f"  Balanced Acc: Train={train_overall['balanced_accuracy']:.3f}, Val={val_overall['balanced_accuracy']:.3f}")
         
         # Extra details for debugging mode
         if debug_mode:
-            print(f"  Macro F1: Train={train_per_class['macro_f1']:.3f}, Val={val_per_class['macro_f1']:.3f}")
-            print(f"  Healthy F1: Train={train_per_class['healthy']['f1']:.3f}, Val={val_per_class['healthy']['f1']:.3f}")
-            print(f"  PD F1: Train={train_per_class['parkinson']['f1']:.3f}, Val={val_per_class['parkinson']['f1']:.3f}")
+            print(f"  Macro F1: Train={train_overall['macro_f1']:.3f}, Val={val_overall['macro_f1']:.3f}")
+            print(f"  Healthy F1: Train={train_overall['healthy']['f1']:.3f}, Val={val_overall['healthy']['f1']:.3f}")
+            print(f"  PD F1: Train={train_overall['parkinson']['f1']:.3f}, Val={val_overall['parkinson']['f1']:.3f}")
             
-            val_dist = val_per_class['prediction_dist']
+            val_dist = val_overall['prediction_dist']
             print(f"  Val Predictions: {val_dist['predicted_healthy']}H/{val_dist['predicted_pd']}PD "
                     f"(Actual: {val_dist['actual_healthy']}H/{val_dist['actual_pd']}PD)")
             
-            cm = val_per_class['confusion_matrix']
+            cm = val_overall['confusion_matrix']
             print(f"  Confusion Matrix: TP={cm['TP']:.0f}, TN={cm['TN']:.0f}, FP={cm['FP']:.0f}, FN={cm['FN']:.0f}")
         
         print("=" * 35, "\n")
