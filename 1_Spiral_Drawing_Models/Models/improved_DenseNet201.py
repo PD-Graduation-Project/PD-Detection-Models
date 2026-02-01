@@ -1,7 +1,8 @@
 from torchvision.models import densenet201
 from torch import nn, inference_mode
 
-class DenseNet201Improved(nn.Module):
+def create_improved_densenet(dropout_rate=0.5, 
+                            hidden_units=[512, 128]):
     """
     Creates an improved DenseNet201 model for BINARY classification (single output).
     
@@ -18,51 +19,47 @@ class DenseNet201Improved(nn.Module):
     Returns:
         Modified DenseNet201 model with binary output
     """
-    def __init__(self,
-                dropout_rate=0.5, 
-                hidden_units=[512, 128]):
-        super().__init__()
-        # 1. load pretrained DenseNet201 model
-        self.densenet_model = densenet201(weights="DEFAULT")
+    # 1. load pretrained DenseNet201 model
+    densenet_model = densenet201(weights="DEFAULT")
 
-        # 2. get the pretrained weights of the original conv2d block (input)
-        old_conv = self.densenet_model.features[0]
+    # 2. get the pretrained weights of the original conv2d block (input)
+    old_conv = densenet_model.features[0]
 
-        # 3. create new conv2d layer for 1-channel (grayscale) input
-        new_conv = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    # 3. create new conv2d layer for 1-channel (grayscale) input
+    new_conv = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
 
-        # 4. average RGB weights to form grayscale weights
-        with inference_mode():
-            new_conv.weight[:] = old_conv.weight.mean(dim=1, keepdim=True)
-            if old_conv.bias is not None:
-                new_conv.bias[:] = old_conv.bias
+    # 4. average RGB weights to form grayscale weights
+    with inference_mode():
+        new_conv.weight[:] = old_conv.weight.mean(dim=1, keepdim=True)
+        if old_conv.bias is not None:
+            new_conv.bias[:] = old_conv.bias
 
-        # 5. replace the input conv layer
-        self.densenet_model.features[0] = new_conv
+    # 5. replace the input conv layer
+    densenet_model.features[0] = new_conv
 
-        # 6. freeze model parameters
-        for param in self.densenet_model.parameters():
-            param.requires_grad = False
+    # 6. freeze model parameters
+    for param in densenet_model.parameters():
+        param.requires_grad = False
 
 
-        # 7. [NEW] build improved classifier
-        classifier_layers = []
+    # 7. [NEW] build improved classifier
+    classifier_layers = []
+    
+    # 7.1. build dense layers with dropout
+    in_features=1920 # DenseNet201 output features
+    
+    for hidden_size in hidden_units:
+        classifier_layers.extend([
+            nn.Linear(in_features, hidden_size),
+            nn.ReLU(),
+            nn.Dropout(dropout_rate)
+        ])
+        in_features = hidden_size
         
-        # 7.1. build dense layers with dropout
-        in_features=1920 # DenseNet201 output features
-        
-        for hidden_size in hidden_units:
-            classifier_layers.extend([
-                nn.Linear(in_features, hidden_size),
-                nn.ReLU(),
-                nn.Dropout(dropout_rate)
-            ])
-            in_features = hidden_size
-            
-        # 7.2. final layer: make the output to one class (for binary classification)
-        classifier_layers.append( nn.Linear(in_features, 1) )
-        
-        # 8. replace final classifier with our new improved one
-        self.densenet_model.classifier = nn.Sequential(*classifier_layers)
+    # 7.2. final layer: make the output to one class (for binary classification)
+    classifier_layers.append( nn.Linear(in_features, 1) )
+    
+    # 8. replace final classifier with our new improved one
+    densenet_model.classifier = nn.Sequential(*classifier_layers)
 
-        return self.densenet_model
+    return densenet_model
