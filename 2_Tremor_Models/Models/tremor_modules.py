@@ -107,7 +107,7 @@ class FrequencyAnalyzer(nn.Module):
     Output: [B, 11, output_dim] where 11 = 10 seconds + 1 full signal
     """
 
-    def __init__(self, sample_rate=100, n_fft=256,
+    def __init__(self, sample_rate=100, n_fft=128,
                 hop_length=None, # The number of samples to skip between consecutive STFT windows.
                                 #  Smaller hop = more time resolution but more computation.
                 output_dim=128, dropout=0.2):
@@ -259,10 +259,11 @@ class FrequencyAnalyzer(nn.Module):
             [B, C, F, T] spectrogram (F=freq bins, T=time frames)
         """
         stfts = []
+        window = torch.hann_window(self.n_fft, device='cuda')  # smooth Hann window
         for ch in range(sig.shape[1]):
             x = sig[:, ch, :]  # [B, T]
             S = torch.stft(x, n_fft=self.n_fft, hop_length=self.hop,
-                            return_complex=True, center=True, window=None)
+                        return_complex=True, center=True, window=window)
             P = (S.abs() ** 2) # power
             logP = torch.log1p(P) # log (1+p) -> for stability
             stfts.append(logP)

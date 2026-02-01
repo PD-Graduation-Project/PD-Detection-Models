@@ -1,6 +1,7 @@
 trainer:
   epochs: 50
   lr: 3e-4
+  checkpoint_dir: "checkpoints/model_10"
 
 losses:
   # Loss component weights

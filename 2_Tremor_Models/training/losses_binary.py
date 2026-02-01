@@ -191,7 +191,7 @@ def compute_metrics(preds, labels, movement_ids=None, threshold=0.5):
     # 7. Per-movement metrics (optional)
     movement_stats = None
     if movement_ids is not None:
-        movements_stats = movement_metrics(preds=preds,
+        movement_stats = movement_metrics(preds=preds,
                                         labels=labels,
                                         movement_ids=movement_ids)
 

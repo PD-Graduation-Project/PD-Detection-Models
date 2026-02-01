@@ -30,6 +30,7 @@ def train_one_epoch(model: torch.nn.Module,
     # 1.1. Store all predictions and labels for per-class metrics
     all_preds = []
     all_labels = []
+    all_movements = []
     
     # 2. loop through train_dataloader
     pbar = tqdm(
@@ -85,6 +86,7 @@ def train_one_epoch(model: torch.nn.Module,
         # 11. store predictions and labels for metrics
         all_preds.append(logits.detach())
         all_labels.append(labels.detach())
+        all_movements.append(movements.detach())
         
         # 12. compute total loss
         total_losses += loss.item()
@@ -95,8 +97,9 @@ def train_one_epoch(model: torch.nn.Module,
     # 14. Compute overall metrics on entire epoch
     all_preds = torch.cat(all_preds, dim=0)
     all_labels = torch.cat(all_labels, dim=0)
+    all_movements = torch.cat(all_movements, dim=0)  # -> [N_total]
     
-    overall_metrics = metric_fn(all_preds, all_labels) # -> includes per-class metrics
+    overall_metrics = metric_fn(all_preds, all_labels, movement_ids=all_movements) # -> includes per-class metrics
     
     # 15. return average loss, and overall metrics
     avg_loss = total_losses / len(train_dataloader)
@@ -126,6 +129,7 @@ def validate(model: torch.nn.Module,
     # Store all predictions and labels for per-class metrics
     all_preds = []
     all_labels = []
+    all_movements = []
     
     # 2. loop through val_dataloader (in inference_mode)
     with torch.inference_mode():
@@ -152,6 +156,7 @@ def validate(model: torch.nn.Module,
             # 7. store predictions and labels
             all_preds.append(logits.detach())
             all_labels.append(labels.detach())
+            all_movements.append(movements.detach())
             
             # 8. compute total loss
             total_losses += loss.item()
@@ -165,8 +170,9 @@ def validate(model: torch.nn.Module,
     # 10. Compute overall metrics on entire epoch
     all_preds = torch.cat(all_preds, dim=0)
     all_labels = torch.cat(all_labels, dim=0)
+    all_movements = torch.cat(all_movements, dim=0)  # -> [N_total]
     
-    overall_metrics = metric_fn(all_preds, all_labels) # -> includes per-class metrics
+    overall_metrics = metric_fn(all_preds, all_labels, movement_ids=all_movements) # -> includes per-class metrics
     
     # 12. return average loss, and overall metrics
     avg_loss = total_losses / len(val_dataloader)

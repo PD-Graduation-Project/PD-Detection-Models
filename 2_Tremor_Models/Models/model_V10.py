@@ -38,16 +38,23 @@ class TremorNetV10(nn.Module):
         self.frequency_analyzer = FrequencyAnalyzer(output_dim=128, dropout=dropout) # -> [B, 11, 128]
         self.stat_extractor = StatisticalFeatureExtractor(out_dim=32) # -> [B, 32]
         
-        # 3. Bilateral coordination
+        # 3. Temporal attention for frequency features [B, 11, 128] -> [B, 128]
+        self.temporal_freq_attn = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.Tanh(),
+            nn.Linear(64, 1)
+        )
+        
+        # 4. Bilateral coordination
         self.bilateral_attn = nn.MultiheadAttention(
             embed_dim=128, num_heads=4, 
             dropout=dropout * 0.5, batch_first=True
         )
         
-        # 4. Asymmetry projection
+        # 5. Asymmetry projection
         self.contrast_proj = nn.Linear(128, 64)
         
-        # 5. Embeddings (Handedness & movement type)
+        # 6. Embeddings (Handedness & movement type)
         self.hand_embed = nn.Embedding(2, 48)
         self.hand_proj = nn.Sequential(
             nn.Linear(48, 96), nn.LayerNorm(96), nn.Tanh(),
@@ -61,7 +68,7 @@ class TremorNetV10(nn.Module):
                 nn.Dropout(dropout * 0.3), nn.Linear(64, 32)
             )
         
-        # 6. Final fusion classifier
+        # 7. Final fusion classifier
         # Features: weighted_cnn(128) + freq(128) + stat(64) + bilateral(64) + asymmetry(64) + hand(48) + movement(32 if enabled) = 528
         cnn_dim = 128
         freq_dim = 128
@@ -114,21 +121,21 @@ class TremorNetV10(nn.Module):
         # 3. Compute dominant hand weights (3.0x for dominant, 1.0x for non-dominant)        
         if handedness_mix is not None: 
             # 3.1. Mixup case: soft weighting
-            left_w = handedness_mix[:, 0].view(B, 1, 1)   # [B, 1, 1]
-            right_w = handedness_mix[:, 1].view(B, 1, 1)
+            left_w = handedness_mix[:, 0].view(B, 1)   # [B, 1]
+            right_w = handedness_mix[:, 1].view(B, 1)
             
             left_scale = left_w * self.dom_hand_weight + right_w * self.non_dom_weight
             right_scale = right_w * self.dom_hand_weight + left_w * self.non_dom_weight
         else:
             # 3.2. Standard case: hard weighting
-            is_left = (handedness == 0).float().view(B, 1, 1)
-            is_right = (handedness == 1).float().view(B, 1, 1)
+            is_left = (handedness == 0).float().view(B, 1)
+            is_right = (handedness == 1).float().view(B, 1)
             
             left_scale = is_left * self.dom_hand_weight + is_right * self.non_dom_weight
             right_scale = is_right * self.dom_hand_weight + is_left * self.non_dom_weight
         
         # 3.3. Weight CNN "outputs" based on hand dominance
-        cnn_feat = (left_scale * left_cnn + right_scale * right_cnn) / (dom_weight + non_dom_weight)  # [B, 128]
+        cnn_feat = (left_scale * left_cnn + right_scale * right_cnn) / (self.dom_hand_weight + self.non_dom_weight)  # [B, 128]
         
         # 4. Frequency analysis on unweighted left/right
         freq_feat_temporal = self.frequency_analyzer(left_raw, right_raw)  # [B, 11, 128]

@@ -10,7 +10,7 @@ import yaml
 from pathlib import Path
 
 # Load config file
-CONFIG_PATH = Path("..\config.yaml")
+CONFIG_PATH = Path("config.yaml")
 
 def load_config():
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
@@ -24,14 +24,14 @@ def train(model: torch.nn.Module,
         val_dataloader: torch.utils.data.DataLoader,
 
         load_pretrained: str = None,
-        checkpoint_dir: str = "checkpoints/",
+        checkpoint_dir: str = config["trainer"]["checkpoint_dir"],
         model_name: str = "MODEL",
 
         run_name: str = "MODEL",
         Tboard: bool = True,
 
         epochs: int = config["trainer"]["epochs"],
-        max_lr: float = config["trainer"]["lr"], 
+        max_lr: float = float(config["trainer"]["lr"]), 
         per_movement: bool = False,
         
         debug_mode:bool = True,):
@@ -224,7 +224,11 @@ def train(model: torch.nn.Module,
             with open(movements_log_path, "a") as f:  # append mode
                 f.write(f"Epoch {epoch + 1}:\n")
                 for m_id, stats in movement_stats.items():
-                    f.write(f"  Movement {m_id}: Correct={stats['correct']}, Wrong={stats['wrong']}\n")
+                    correct = stats['correct']
+                    wrong = stats['wrong']
+                    total = correct + wrong
+                    acc_percent = (correct / total * 100) if total > 0 else 0.0
+                    f.write(f"  Movement {m_id}: Correct={correct}, Wrong={wrong} ==> Accuracy={acc_percent:.2f}%\n")
                 f.write("\n")
 
         
