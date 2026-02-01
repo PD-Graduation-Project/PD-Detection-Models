@@ -120,7 +120,7 @@ class FrequencyAnalyzer(nn.Module):
         self.samples_per_second = sample_rate  # ~100 samples/sec
 
         # --------------------------------------------------------------------
-        # Spectrogram CNN encoder
+        # Spectrogram CNN encoder -> Learns time–frequency patterns
         # Input channels: 8 -> (left x,y,z, left mag, right x,y,z, right mag)
         # --------------------------------------------------------------------
         self.spec_encoder = nn.Sequential(
@@ -239,7 +239,7 @@ class FrequencyAnalyzer(nn.Module):
         # 5. CNN encoding
         encoded = self.spec_encoder(spec_norm)  # [B, output_dim//2]
         
-        # 6. Compute pooled features
+        # 6. Compute pooled features (energy bands & coherence)
         pooled = self._compute_pooled_features(spec_stack, spec_l, spec_r)  # [B, 11]
         pooled_proj = self.pool_proj(pooled)  # [B, output_dim//2]
         
@@ -297,41 +297,44 @@ class FrequencyAnalyzer(nn.Module):
         
         Returns:
             [B, 11] feature vector:
-                - [0]: global mean power
-                - [1:6]: energy in 5 frequency bands
-                - [6:11]: coherence in 5 frequency bands
+                - [0]: global mean power -> from stack
+                - [1:6]: energy in 5 frequency bands -> from stack
+                - [6:11]: coherence in 5 frequency bands -> from left and right
         """
         B, _, Fdim, _ = spec_stack.shape
         
-        # Frequency axis
+        # 0. Frequency axis (Frequencies for each spectrogram row) (0 -> Nyquist (fs/2))
         freqs = torch.linspace(0, self.fs / 2, Fdim, device=spec_stack.device)
         
-        # Band energies (5 bands)
-        band_energies = []
-        for i in range(len(self.band_edges) - 1):
-            mask = (freqs >= self.band_edges[i]) & (freqs < self.band_edges[i + 1])
-            if mask.sum() == 0:
-                band_energies.append(torch.zeros(B, device=spec_stack.device))
-            else:
-                power = spec_stack[:, :, mask, :].sum(dim=(2, 3)).mean(dim=1)
-                band_energies.append(power)
+        # 1. Global average power (how strong the motion is)
+        global_mean = spec_stack.mean(dim=[1, 2, 3])
         
-        # Left-right coherence per band (5 bands)
-        coherences = []
+        # 2. Band energies (5 bands)
+        band_energies = [] # energy per frequency band
+        
+        # 3. Left-right coherence per band (5 bands)
+        coherences = [] # left–right similarity per band
+        
         for i in range(len(self.band_edges) - 1):
+            # mask -> only pick the frequencies in this band
             mask = (freqs >= self.band_edges[i]) & (freqs < self.band_edges[i + 1])
-            if mask.sum() == 0:
+            
+            if mask.sum() == 0: # no vlaues in this energy band -> all zeros
+                band_energies.append(torch.zeros(B, device=spec_stack.device))
                 coherences.append(torch.zeros(B, device=spec_stack.device))
             else:
+                # total energy in this frequency  band
+                power = spec_stack[:, :, mask, :].sum(dim=(2, 3)).mean(dim=1)
+                band_energies.append(power) # -> store one number (energy) per band
+                
+                # left and right energy in this band (to get coherence)
                 l_power = spec_l[:, :, mask, :].sum(dim=(2, 3)).mean(dim=1)
                 r_power = spec_r[:, :, mask, :].sum(dim=(2, 3)).mean(dim=1)
                 
+                # dot porduct shows how similar/different they are from each other
                 dot = l_power * r_power
-                denom = torch.sqrt(l_power**2) * torch.sqrt(r_power**2) + 1e-6
-                coherences.append(dot / denom)
-        
-        # Global mean power
-        global_mean = spec_stack.mean(dim=[1, 2, 3])
+                denom = torch.sqrt(l_power**2) * torch.sqrt(r_power**2) + 1e-6 # -> normalization
+                coherences.append(dot / denom) # -> store one number (coherence) per band
         
         # Combine all features
         return torch.cat([
