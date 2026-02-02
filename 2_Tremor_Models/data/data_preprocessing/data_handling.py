@@ -6,22 +6,16 @@ import pandas as pd
 # ===================
 # Meta-data loading
 # ===================
-
 def load_all_files(path, dataframe=True):
     """
-    Load all .json files from the defined directory and return selected meta data.
+    Load all .json files from the defined directory and return all the loaded meta data.
     
     What it does:
         - Finds all .json files in the given path
         - Loads each JSON file
         - Flattens nested JSON into a pandas DataFrame
         - Returns list of DataFrames
-        
-    Only the following keys are kept from each JSON:
-        - id
-        - condition
-        - handedness
-        
+
     Parameters
     ----------
     path : str
@@ -32,27 +26,14 @@ def load_all_files(path, dataframe=True):
     data_list = []
     search_space = glob(path + '*json')
     search_space.sort()
-
-    keep_keys = {"id", "condition", "handedness"}
-
     for f_name in search_space:
         with open(f_name, 'r') as f:
-            raw_data = json.load(f)
-
-            # flatten first
-            flat_data = flatten_dict(raw_data)
-            flat_df = pd.DataFrame(flat_data)
-
-            # keep only required keys if they exist
-            flat_df = flat_df[[k for k in keep_keys if k in flat_df.columns]]
-
+            data = json.load(f)
             if dataframe:
-                data_list.append(flat_df)
-            else:
-                data_list.append(flat_df.to_dict(orient="records"))
-
+                data = flatten_dict(data)
+                data = pd.DataFrame(data)
+            data_list.append(data)
     return data_list
-
 
 # ===================
 # Raw signal loading
@@ -69,9 +50,9 @@ def get_data_from_txt_file(path, n_channels):
 
 # Sorted according to discriminability of PD
 MOVEMENT_GROUPS = {
-    "Postural tasks": ["StretchHold", "HoldWeight", "Entrainment1", "Entrainment2"],
-    "Kinetic tasks": ["DrinkGlas", "CrossArms", "TouchNose"],
-    "Resting tasks": ["Relaxed1", "Relaxed2", "RelaxedTask1", "RelaxedTask2"],
+    "Postural_tasks": ["StretchHold", "HoldWeight", "Entrainment1", "Entrainment2"],
+    "Kinetic_tasks": ["DrinkGlas", "CrossArms", "TouchNose"],
+    "Resting_tasks": ["Relaxed1", "Relaxed2", "RelaxedTask1", "RelaxedTask2"],
 }
 
 
@@ -97,6 +78,8 @@ def get_data_from_observation(path, meta_file):
         - Postural tasks
         - Kinetic tasks
         - Resting tasks
+    
+    All recordings within a group are padded to the same length.
     """
 
     grouped_records = {k: [] for k in MOVEMENT_GROUPS.keys()}
@@ -112,32 +95,45 @@ def get_data_from_observation(path, meta_file):
         # 3. load raw data
         file_path = meta_item['file_name']
         record = get_data_from_txt_file(path + file_path, len(meta_item['channels']))
-        record = np.swapaxes(record, 0, 1)
+        record = np.swapaxes(record, 0, 1) # Transposes so rows = channels, columns = time points
 
         channels = ['_'.join([meta_item['device_location'], ch]) for ch in meta_item['channels']]
 
-        # 4. split long recordings (1 & 2 are NOT separate movements)
-        step = record.shape[1] // n_splits
+        # 4. Re-organize the raw data so that each record has the same length and all records fit into one matrix
+        step = record.shape[1] // n_splits # -> If a recording is 2× the minimum length, **split it in half**
         if n_splits > 1:
-            record = np.concatenate(
-                [record[:, n:n + step] for n in range(0, record.shape[1], step)],
-                axis=1,
-            )
+            split_records = [record[:, n:n + step] for n in range(0, record.shape[1], step)]
+            split_channels_list = []
+            for split_idx in range(len(split_records)):
+                split_channels_list.append(['_'.join([f'{meta_item["record_name"]}{split_idx+1}', ch]) for ch in channels])
+        else:
+            split_records = [record]
+            split_channels_list = [['_'.join([meta_item['record_name'], ch]) for ch in channels]]
 
-        channels = ['_'.join([meta_item['record_name'], ch]) for ch in channels]
-
-        # 5. assign to movement group
+        # 5. assign each split to its movement group
         group = _movement_to_group(meta_item['record_name'])
         if group is None:
             continue
 
-        grouped_records[group].append(record)
-        grouped_channels[group].extend(channels)
+        for split_rec, split_chans in zip(split_records, split_channels_list):
+            grouped_records[group].append(split_rec)
+            grouped_channels[group].extend(split_chans)
 
-    # 6. concatenate per group
+    # 6. concatenate per group (with padding to max length)
     for group in grouped_records:
         if len(grouped_records[group]) > 0:
-            grouped_records[group] = np.concatenate(grouped_records[group], axis=0)
+            # Find max length in this group
+            max_length = max(rec.shape[1] for rec in grouped_records[group])
+            
+            # Pad all records to max length
+            padded_records = []
+            for rec in grouped_records[group]:
+                if rec.shape[1] < max_length:
+                    padding = np.zeros((rec.shape[0], max_length - rec.shape[1]), dtype=rec.dtype)
+                    rec = np.concatenate([rec, padding], axis=1)
+                padded_records.append(rec)
+            
+            grouped_records[group] = np.concatenate(padded_records, axis=0)
         else:
             grouped_records[group] = None
 

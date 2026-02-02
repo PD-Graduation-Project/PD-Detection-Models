@@ -1,6 +1,7 @@
 # Datasets
 # ---------
 project_datasets/
+preprocessed_dataset/
 
 
 # Cashe files
