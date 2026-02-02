@@ -68,9 +68,9 @@ def preprocess_movement(df: pd.DataFrame, overwrite: bool = False):
     Output
     ------
     Writes three binary files (one per movement group):
-        <subject_id>_Postural tasks_ml.bin
-        <subject_id>_Kinetic tasks_ml.bin
-        <subject_id>_Resting tasks_ml.bin
+        <subject_id>_Postural_tasks_ml.bin
+        <subject_id>_Kinetic_tasks_ml.bin
+        <subject_id>_Resting_tasks_ml.bin
 
     Each file contains:
     - Accelerometer signals only (gyro + time removed)
