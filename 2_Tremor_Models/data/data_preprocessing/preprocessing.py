@@ -1,4 +1,4 @@
-import multiprocessing
+from multiprocessing import Pool
 import os
 from pathlib import Path
 import pandas as pd
@@ -160,7 +160,6 @@ def preprocess_movement(df: pd.DataFrame, overwrite: bool = False):
         # ------------------------------------------------
         # 2.2.4 Signal preprocessing
         # ------------------------------------------------
-
         # Remove gravitational offset using L1 trend filtering
         acc_data = data[process_mask, :]
 
@@ -213,6 +212,19 @@ if __name__ == '__main__':
 
     df_list = load_all_files(movement_dir)
 
-    # Run sequentially (safer)
-    for df_element in tqdm(df_list, desc="Preprocessing subjects"):
-        preprocess_movement(df_element)
+    # OPTION 1: Run sequentially (safer)
+    # for df_element in tqdm(df_list, desc="Preprocessing subjects"):
+    #     preprocess_movement(df_element)
+        
+    # OPTION 2: Run in parallel
+    CHUNK_SIZE = 2      # number of subjects per batch
+    N_WORKERS = 2       # number of processes
+
+    with Pool(processes=N_WORKERS) as pool:
+        for _ in tqdm(
+            pool.imap_unordered(preprocess_movement, df_list, chunksize=CHUNK_SIZE),
+            total=len(df_list),
+            desc="Preprocessing subjects"
+        ):
+            pass
+
