@@ -1,5 +1,4 @@
 ## Dataset used: 
-[Parkinsons dataset — UCI ML Repository (ID 174)](https://archive.ics.uci.edu/dataset/174/parkinsons)
 
 ![alt text](data/data_visualization/image.png)
 
@@ -9,19 +8,19 @@
 - TVAE (Tabular VAE)
 
 ```
-(1/2) Evaluating Column Shapes: |██████████| 23/23 [00:00<00:00, 139.02it/s]|
-Column Shapes Score: 83.06%
+(1/2) Evaluating Column Shapes: |██████████| 26/26 [00:00<00:00, 72.99it/s]|
+Column Shapes Score: 87.43%
 
-(2/2) Evaluating Column Pair Trends: |██████████| 253/253 [00:02<00:00, 88.52it/s]|
-Column Pair Trends Score: 92.87%
+(2/2) Evaluating Column Pair Trends: |██████████| 325/325 [00:05<00:00, 57.29it/s]|
+Column Pair Trends Score: 92.2%
 
-Overall Score (Average): 87.97%
+Overall Score (Average): 89.81%
 
-Overall Quality Score: 0.8796556104364323
+Overall Quality Score: 0.8981411166402432
 Detailed Properties:
              Property     Score
-0       Column Shapes  0.830607
-1  Column Pair Trends  0.928704
+0       Column Shapes  0.874290
+1  Column Pair Trends  0.921992
 -----------------------------------
 ```
 
