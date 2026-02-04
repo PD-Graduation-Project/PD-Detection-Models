@@ -16,21 +16,18 @@ class TremorDataset(Dataset):
         │   │     ├── 001.npz
         │   │     ├── 002.npz
         │   │     └── ...
-        │   ├── Parkinson/
-        │   │     ├── 003.npz
-        │   │     └── ...
-        │   └── Other/
+        │   └── Parkinson/
+        │         ├── 003.npz
         │         └── ...
         ├── Movement2/  (e.g., "FingerNose")
         │   ├── Healthy/
-        │   ├── Parkinson/
-        │   └── Other/
+        │   └── Parkinson/
         └── ...
 
     Each .npz contains:
         - signal : tuple of 2 np.ndarrays
-                    ((1024, 6), (1024, 6)) -> (Left, Right) - ALWAYS in this order
-        - label  : int (0 = Healthy, 1 = Parkinson, 2 = Other)
+                    ((1024, 3), (1024, 3)) -> (Left, Right) - ALWAYS in this order
+        - label  : int (0 = Healthy, 1 = Parkinson)
         - wrist  : int (0 = Left-handed, 1 = Right-handed) 
         - subject_id : int or str
         - metadata: not going to be used.
@@ -47,28 +44,23 @@ class TremorDataset(Dataset):
     subject_ids : list of int, optional
         If provided, only load samples from these specific subject IDs.
         Useful for train/val/test splitting by subject to avoid data leakage.
-        
-    include_other : bool, default=False
-        Whether to include the "Other" class (label=2)
 
     Returns
     -------
     tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
         (signal_tensor, handedness_tensor, movement_tensor, label_tensor) per sample.
-        - signal_tensor     : shape (2, T, 6), dtype=torch.float32  # (Left, Right)
+        - signal_tensor     : shape (2, T, 3), dtype=torch.float32  # (Left, Right) with 3 channels
         - handedness_tensor : scalar (0 = Left-handed, 1 = Right-handed), dtype=torch.long
         - movement_tensor   : scalar (movement index 0-10), dtype=torch.long
-        - label_tensor      : scalar (0 = Healthy, 1 = Parkinson, 2 = Other), dtype=torch.long
+        - label_tensor      : scalar (0 = Healthy, 1 = Parkinson), dtype=torch.long
     """
     def __init__(self,
                 data_path: str,
                 movement_names: list = None,
-                subject_ids: list = None,
-                include_other: bool = False):
+                subject_ids: list = None):
         super().__init__()
         
         self.data_path = Path(data_path)
-        self.include_other = include_other
         self.subject_ids = set(subject_ids) if subject_ids is not None else None
         
         # 1. Movements inits
@@ -97,20 +89,15 @@ class TremorDataset(Dataset):
                 print(f"Warning: Movement folder '{movement_name}' not found, skipping...")
                 continue
             
-            # 3.2. init Healthy, Parkinson, Other subfolders dir
+            # 3.2. init Healthy, Parkinson subfolders dir
             dirs = {
                 0: movement_path / "Healthy",
                 1: movement_path / "Parkinson",
-                2: movement_path / "Other",
             }
             
             # 4. add all data
             # -----------------
             for label, dir_path in dirs.items():
-                # 5.1. skip the 'other' label if 'include_other' is False
-                if label == 2 and not include_other:
-                    continue
-                
                 # 5.2. get all '.npz' data in each directory
                 if dir_path.exists():
                     for file in dir_path.glob("*.npz"):
@@ -140,7 +127,7 @@ class TremorDataset(Dataset):
         signal = torch.tensor(
             self.signals[index],
             dtype=torch.float32
-        )  # shape: (2, T, 6)
+        )  # shape: (2, T, 3)
         
         # 2. wrist (handedness)
         # ----------------------
@@ -179,8 +166,8 @@ class TremorDataset(Dataset):
         # 1. extract tuple of both wrist signals (ALWAYS left, right order)
         left_signal, right_signal = npz["signal"]
         
-        # 2. stack them into (2, T, 6)
-        signal = np.stack([left_signal, right_signal], axis=0).astype(np.float32)
+        # 2. extract first 3 channels and stack into (2, T, 3)
+        signal = np.stack([left_signal[:, :3], right_signal[:, :3]], axis=0).astype(np.float32)
         
         # 3. extract handedness (0 = Left-handed, 1 = Right-handed)
         handedness = int(npz["wrist"])
@@ -200,7 +187,6 @@ class TremorDataset(Dataset):
         return {
             'Healthy': self.labels.count(0),
             'Parkinson': self.labels.count(1),
-            'Other': self.labels.count(2)
         }
     
     def get_movement_distribution(self):
