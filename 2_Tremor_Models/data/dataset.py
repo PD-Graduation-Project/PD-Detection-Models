@@ -28,7 +28,7 @@ class TremorDataset(Dataset):
         - signal : tuple of 2 np.ndarrays
                     ((1024, 3), (1024, 3)) -> (Left, Right) - ALWAYS in this order
         - label  : int (0 = Healthy, 1 = Parkinson)
-        - wrist  : int (0 = Left-handed, 1 = Right-handed) 
+        - handedness  : int (0 = Left-handed, 1 = Right-handed) 
         - subject_id : int or str
         - metadata: not going to be used.
 
@@ -129,7 +129,7 @@ class TremorDataset(Dataset):
             dtype=torch.float32
         )  # shape: (2, T, 3)
         
-        # 2. wrist (handedness)
+        # 2. handedness (handedness)
         # ----------------------
         handedness = torch.tensor(
             self.handedness[index],
@@ -163,14 +163,14 @@ class TremorDataset(Dataset):
         if self.subject_ids is not None and subject_id not in self.subject_ids:
             return None
         
-        # 1. extract tuple of both wrist signals (ALWAYS left, right order)
+        # 1. extract tuple of both handedness signals (ALWAYS left, right order)
         left_signal, right_signal = npz["signal"]
         
         # 2. extract first 3 channels and stack into (2, T, 3)
         signal = np.stack([left_signal[:, :3], right_signal[:, :3]], axis=0).astype(np.float32)
         
         # 3. extract handedness (0 = Left-handed, 1 = Right-handed)
-        handedness = int(npz["wrist"])
+        handedness = int(npz["handedness"])
         
         # 4.5. finally return everything separately
         return signal, handedness, movement_idx, label, subject_id

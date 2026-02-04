@@ -155,7 +155,7 @@ class FrequencyAnalyzer(nn.Module):
         )
         
         # Frequency band edges (Hz)
-        self.band_edges = [0.5, 3, 6, 12, 20, 40]
+        self.band_edges = [0, 4, 6, 8, 12, 25]
 
     # ======================================================================
     # Forward Pass
@@ -254,7 +254,7 @@ class FrequencyAnalyzer(nn.Module):
             [B, C, F, T] spectrogram (F=freq bins, T=time frames)
         """
         stfts = []
-        window = torch.hann_window(self.n_fft, device='cuda')  # smooth Hann window
+        window = torch.hann_window(self.n_fft, device=sig.device)  # smooth Hann window
         for ch in range(sig.shape[1]):
             x = sig[:, ch, :]  # [B, T]
             S = torch.stft(x, n_fft=self.n_fft, hop_length=self.hop,

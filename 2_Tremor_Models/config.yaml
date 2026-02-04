@@ -1,13 +1,13 @@
 trainer:
   epochs: 50
-  lr: 3e-4
+  lr: 1e-3
   checkpoint_dir: "checkpoints/model_10"
 
 losses:
   # Loss component weights
   bce_weight: 1.0
-  focal_weight: 0.3
-  tversky_weight: 0.3
+  focal_weight: 0.4
+  tversky_weight: 0.4
   # Class imbalance correction (for 77% PD, 23% Healthy)
   healthy_weight: 1.0     
   parkinson_weight: 1.3
