@@ -17,8 +17,8 @@ class ParkinsonDataset(Dataset):
 
     Behavior:
         - Loads the CSV using pandas.
-        - Features = all columns except 'status'.
-        - Target = 'status'.
+        - Features = all columns except 'label'.
+        - Target = 'label'.
         - Converts both to float32 PyTorch tensors.
     """
     def __init__(self, csv_path: str):
@@ -28,8 +28,8 @@ class ParkinsonDataset(Dataset):
         df = pd.read_csv(csv_path)
 
         # 2. Separate features and labels
-        self.y = df['status'].values.astype('float32')
-        self.X = df.drop(columns=['status']).values.astype('float32')
+        self.y = df['label'].values.astype('float32')
+        self.X = df.drop(columns=['label']).values.astype('float32')
         
         # 3. Normalizing data
         scaler = MinMaxScaler()
