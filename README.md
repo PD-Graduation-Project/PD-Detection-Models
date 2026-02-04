@@ -19,7 +19,7 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 - Validation *precision*: **0.9609**
 - Validation *F1-Score*: **0.9689**
 
-![](1_Spiral_Drawing_Models/results/confusion_matrices/phase_3.png)
+![](1_Spiral_Drawing_Models/results/archived/confusion_matrices/phase_3.png)
 
 ## Part 2: Tremor Model [IN-PROGRESS]
 ### Model used: 
@@ -60,41 +60,7 @@ Movement-Aware `TremorNetV9`.
 
 ---
 
-## Part 3.1: Audio Model (Tabular) [DONE]
-### Model used: 
-`EfficientNet-B0`.
-
-### Dataset size: 
-#### Generated data (used in pre-training):
-- Model used: TVAE (Tabular VAE)
-- Generated data accuracy:
-    - Column Shapes Score: **83.06%**
-    - Column Pair Trends Score: **92.87%**
-    - Overall Score (Average): **87.97%**
-- Generated: 100k samples
-    - **80K**: Training
-    - **20K**: Validation
-
-#### Real data (used in finetuning):
-- Using 80-20 split:
-  - **156**: Training
-  - **39**: Validation
-- Using 50-50 split:
-  - **97**: Training
-  - **98**: Validation
-
-### Number of trained epochs: 
-- **15**: pre-training on *generated* data
-- **5**: finetuned on *real* data with early stopping; planned 50.
-
-### Metrics:
-- Validation *Accuracy*: **100%**
-- Validation *Recall*: **1.0000**
-- Validation *precision*: **1.0000**
-- Validation *F1-Score*: **1.0000**
-
-![](3_Audio_Models/Tabular/results/real_and_generated/80-20_split/output.png)
-![](3_Audio_Models/Tabular/results/real_and_generated/50-50_split/output.png)
+## Part 3.1: Audio Model (Tabular)
 
 ---
 ## Part 3.2: Audio Model (Audio) 
@@ -127,4 +93,4 @@ Movement-Aware `TremorNetV9`.
 - Validation *precision*: **1.0000**
 - Validation *F1-Score*: **99.39**
 
-![alt text](4_User_Data_Model/results/finetuned/conf_mat.png)
+![alt text](4_User_Data_Model/results/archived/finetuned/conf_mat.png)
