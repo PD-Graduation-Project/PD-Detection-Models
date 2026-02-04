@@ -11,9 +11,9 @@ class EfficientNet1D(nn.Module):
         
         # Load EfficientNet-B0 (you can use b1, b2, ..., b7)
         if pretrained:
-            self.efficientnet = models.efficientnet_b0(weights=models.EfficientNet_B0_Weights.DEFAULT)
+            self.efficientnet = models.efficientnet_b1(weights=models.EfficientNet_B1_Weights.DEFAULT)
         else:
-            self.efficientnet = models.efficientnet_b0(weights=None)
+            self.efficientnet = models.efficientnet_b1(weights=None)
         
         # CHANGE 1: Replace first conv layer
         self.efficientnet.features[0][0] = nn.Conv2d(
