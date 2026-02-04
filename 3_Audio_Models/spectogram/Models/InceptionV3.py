@@ -32,7 +32,7 @@ class InceptionV3Binary(nn.Module):
         if pretrained:
             self.inception = inception_v3(
                 weights=Inception_V3_Weights.DEFAULT,
-                aux_logits=False,
+                aux_logits=True,
             )
         else:
             self.inception = inception_v3(
@@ -60,6 +60,10 @@ class InceptionV3Binary(nn.Module):
         classifier_layers.append(nn.Linear(in_features, 1))
 
         self.inception.fc = nn.Sequential(*classifier_layers)
+        
+        # 4. Disable aux classifier by overwriting with identity
+        self.inception.aux_logits = False
+        self.inception.AuxLogits = nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """

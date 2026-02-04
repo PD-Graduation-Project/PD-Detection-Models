@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torchvision.models import mobilenet_v3_small, MobileNet_V3_small_Weights
+from torchvision.models import mobilenet_v3_small, MobileNet_V3_Small_Weights
 
 
 class MobileNetV3SmallBinary(nn.Module):
@@ -30,7 +30,7 @@ class MobileNetV3SmallBinary(nn.Module):
         # 1. Load MobileNetV3-Small backbone (RGB by default)
         if pretrained:
             self.mobilenet = mobilenet_v3_small(
-                weights=MobileNet_V3_small_Weights.DEFAULT
+                weights=MobileNet_V3_Small_Weights.DEFAULT
             )
         else:
             self.mobilenet = mobilenet_v3_small(weights=None)
@@ -39,9 +39,9 @@ class MobileNetV3SmallBinary(nn.Module):
         for param in self.mobilenet.parameters():
             param.requires_grad = False
 
-        # 3. Build improved classifier head
+        # 3. Build improved classifier head (Dynamically get input features from the last classifier layer)
         classifier_layers = []
-        in_features = self.mobilenet.classifier[3].in_features  # 1280
+        in_features = self.mobilenet.classifier[-1].in_features  # 1280
 
         for hidden_size in hidden_units:
             classifier_layers.extend([
@@ -54,7 +54,7 @@ class MobileNetV3SmallBinary(nn.Module):
         # Final binary output
         classifier_layers.append(nn.Linear(in_features, 1))
 
-        self.mobilenet.classifier = nn.Sequential(*classifier_layers)
+        self.mobilenet.classifier[3] = nn.Sequential(*classifier_layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """

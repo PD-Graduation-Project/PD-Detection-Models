@@ -107,6 +107,9 @@ def train(model:torch.nn.Module,
             
     # 4. full training loop
     # ----------------------
+    best_val_acc = -1.0  # initialize best accuracy
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    
     for epoch in range(epochs):
         print(f"Training model:{model_name} epoch no.{epoch+1} / {epochs}")
         print("-"*35)

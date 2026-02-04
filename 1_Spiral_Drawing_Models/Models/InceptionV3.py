@@ -22,7 +22,7 @@ class InceptionV3Binary(nn.Module):
 
         # 1. Load InceptionV3
         if pretrained:
-            self.inception = inception_v3(weights=Inception_V3_Weights.DEFAULT, aux_logits=False)
+            self.inception = inception_v3(weights=Inception_V3_Weights.DEFAULT, aux_logits=True)
         else:
             self.inception = inception_v3(weights=None, aux_logits=False)
 
@@ -44,12 +44,15 @@ class InceptionV3Binary(nn.Module):
 
         # 4. Replace first conv
         self.inception.Conv2d_1a_3x3.conv = new_conv
+        
+        # 5. disable RGB normalization step (Inception expects 3 channels by default)
+        self.inception._transform_input = lambda x: x
 
-        # 5. Freeze backbone
+        # 6. Freeze backbone
         for param in self.inception.parameters():
             param.requires_grad = False
 
-        # 6. Build improved classifier
+        # 7. Build improved classifier
         classifier_layers = []
         in_features = self.inception.fc.in_features  # 2048
 
@@ -64,6 +67,10 @@ class InceptionV3Binary(nn.Module):
         # Final binary output
         classifier_layers.append(nn.Linear(in_features, 1))
         self.inception.fc = nn.Sequential(*classifier_layers)
+        
+        # 8. Disable aux classifier by overwriting with identity
+        self.inception.aux_logits = False
+        self.inception.AuxLogits = nn.Identity()
 
     def forward(self, x):
         """

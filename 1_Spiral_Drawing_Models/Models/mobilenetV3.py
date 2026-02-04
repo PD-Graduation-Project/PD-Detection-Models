@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torchvision.models import mobilenet_v3_large, MobileNet_V3_large_Weights
+from torchvision.models import mobilenet_v3_large, MobileNet_V3_Large_Weights
 from torch import inference_mode
 
 
@@ -21,7 +21,7 @@ class MobileNetV3LargeBinary(nn.Module):
 
         # 1. Load MobileNetV3-Large
         if pretrained:
-            self.mobilenet = mobilenet_v3_large(weights=MobileNet_V3_large_Weights.DEFAULT)
+            self.mobilenet = mobilenet_v3_large(weights=MobileNet_V3_Large_Weights.DEFAULT)
         else:
             self.mobilenet = mobilenet_v3_large(weights=None)
 
@@ -48,9 +48,9 @@ class MobileNetV3LargeBinary(nn.Module):
         for param in self.mobilenet.parameters():
             param.requires_grad = False
 
-        # 6. Build improved classifier
+        # 6. Build improved classifier (Dynamically get input features from the last classifier layer)
         classifier_layers = []
-        in_features = self.mobilenet.classifier[3].in_features  # 1280
+        in_features = self.mobilenet.classifier[-1].in_features  # 1280
 
         for hidden_size in hidden_units:
             classifier_layers.extend([
@@ -62,7 +62,7 @@ class MobileNetV3LargeBinary(nn.Module):
 
         # Final binary output
         classifier_layers.append(nn.Linear(in_features, 1))
-        self.mobilenet.classifier = nn.Sequential(*classifier_layers)
+        self.mobilenet.classifier[3] = nn.Sequential(*classifier_layers)
 
     def forward(self, x):
         """
