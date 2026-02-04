@@ -162,27 +162,19 @@ def train(model:torch.nn.Module,
             writer.add_scalar("LearningRate", current_lr, epoch)
         
         
-        # 8. save checkpoint
-        os.makedirs(checkpoint_dir, exist_ok=True)
-        
-        
-        # save only best model based on validation loss
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
+        # 8. Save only the best model based on validation accuracy
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
             torch.save({
                 'model_state_dict': model.state_dict(),
                 'optim_state_dict': optim.state_dict(),
-
                 'val_loss': val_loss,
-                'val_acc':val_acc,
-                'val_recall':val_recall,
+                'val_acc': val_acc,
+                'val_recall': val_recall,
                 'val_precision': val_precision,
                 'val_f1': val_f1,
-            }, os.path.join(checkpoint_dir, f"{model_name}_BEST.pth"))
-
-            print(f"Best model updated and saved as {model_name}_BEST.pth\n")
-        else:
-            print(f"No improvement. Best val_loss={best_val_loss:.4f}\n")
+            }, os.path.join(checkpoint_dir, f"{model_name}_best.pth"))
+            print(f"Model {model_name} saved as BEST model (val_acc={val_acc:.4f}).\n")
         
         # 9. print epoch summary
         print(f"Epoch no.{epoch+1} / {epochs} summary")

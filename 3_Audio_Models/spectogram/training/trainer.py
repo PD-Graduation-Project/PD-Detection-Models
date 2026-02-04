@@ -20,7 +20,8 @@ def train(model:torch.nn.Module,
         max_lr:float = 1e-3,):
     
     """
-    Train a binary classification model with TensorBoard logging and checkpoint saving.
+    Train a binary classification model with TensorBoard logging 
+    and save only the best model based on validation accuracy.
 
     Args:
         model (torch.nn.Module): Model to be trained.
@@ -159,15 +160,9 @@ def train(model:torch.nn.Module,
             writer.add_scalar("LearningRate", current_lr, epoch)
         
         
-        # 8. save checkpoint (only best model)
-        os.makedirs(checkpoint_dir, exist_ok=True)
-
-        # keep track of best validation loss
-        if 'best_val_loss' not in globals():
-            best_val_loss = float('inf')
-
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
+        # 8. Save only the best model based on validation accuracy
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
             torch.save({
                 'model_state_dict': model.state_dict(),
                 'optim_state_dict': optim.state_dict(),
@@ -177,8 +172,7 @@ def train(model:torch.nn.Module,
                 'val_precision': val_precision,
                 'val_f1': val_f1,
             }, os.path.join(checkpoint_dir, f"{model_name}_best.pth"))
-
-            print(f"Model: {model_name} saved as BEST model.\n")
+            print(f"Model {model_name} saved as BEST model (val_acc={val_acc:.4f}).\n")
 
         
         # 9. print epoch summary

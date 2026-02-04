@@ -1,12 +1,11 @@
 import torch
 import torch.nn as nn
-from torchvision.models import efficientnet_b1, EfficientNet_B1_Weights
+from torchvision.models import efficientnet_b2, EfficientNet_B2_Weights
 from torch import inference_mode
 
-
-class EfficientNetB1Binary(nn.Module):
+class EfficientNetB2Binary(nn.Module):
     """
-    EfficientNet-B1 adapted for BINARY classification with a custom classifier head
+    EfficientNet-B2 adapted for BINARY classification with a custom classifier head
     and grayscale input (1 channel) using RGB weight averaging.
 
     Key improvements:
@@ -19,11 +18,11 @@ class EfficientNetB1Binary(nn.Module):
     def __init__(self, dropout_rate=0.5, hidden_units=[512, 128], pretrained=True):
         super().__init__()
 
-        # 1. Load EfficientNet-B1
+        # 1. Load EfficientNet-B2
         if pretrained:
-            self.efficientnet = efficientnet_b1(weights=EfficientNet_B1_Weights.DEFAULT)
+            self.efficientnet = efficientnet_b2(weights=EfficientNet_B2_Weights.DEFAULT)
         else:
-            self.efficientnet = efficientnet_b1(weights=None)
+            self.efficientnet = efficientnet_b2(weights=None)
 
         # 2. Modify first conv layer for grayscale input
         old_conv = self.efficientnet.features[0][0]
@@ -50,7 +49,7 @@ class EfficientNetB1Binary(nn.Module):
 
         # 6. Build improved classifier
         classifier_layers = []
-        in_features = self.efficientnet.classifier[1].in_features  # 1280 for B1
+        in_features = self.efficientnet.classifier[1].in_features  # 1408 for B2
 
         for hidden_size in hidden_units:
             classifier_layers.extend([
