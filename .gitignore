@@ -25,3 +25,4 @@ _quick_run/
 *.txt
 
 # *.pdf
+.env
