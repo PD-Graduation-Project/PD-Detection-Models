@@ -16,7 +16,7 @@
 
 ## Best results from **PHASE ONE**
 - Validation Accuracy: **87.7%**
-- ![alt text](results/confusion_matrices/phase_1.png)
+- ![alt text](../results/confusion_matrices/phase_1.png)
 
 ## Conclusion
 - Need to fix false negatives being more than false postives.
@@ -35,7 +35,7 @@
 - Validation Accuracy: **89.37%**
 - Validation Recall: **0.8407**
 - Number of trained epochs: **15** (initial model comparisons) + **31** (fine-tuning with early stopping; planned 50).
-- ![](results/confusion_matrices/phase_2.png)
+- ![](../results/confusion_matrices/phase_2.png)
 
 ## Conclusion
 - Changing the *scheduler* made the accuracy increase way faster.
@@ -58,13 +58,13 @@
 - Validation precision: **0.9609**
 - Validation F1-Score: **0.9689**
 - Number of trained epochs: **15** (initial model comparisons) + **43** (fine-tuning with early stopping; planned 50).
-![alt text](results/confusion_matrices/phase_3.png)
+![alt text](../results/confusion_matrices/phase_3.png)
 
 ## Conclusion
 - Massive improvement in accuracy and recall, along with a sharp drop in losses.
 - Comaprison in accuracy and losses between phase 2 and phase 3:
-    - ![](results/Phase_3/finetuning/val_acc.png)
-    - ![](results/Phase_3/finetuning/val_loss.png)
+    - ![](../results/Phase_3/finetuning/val_acc.png)
+    - ![](../results/Phase_3/finetuning/val_loss.png)
 
 ## TO DO (for phase four maybe)
 - Unfreeze some layers in the middle of the model or add more hidden layers.
