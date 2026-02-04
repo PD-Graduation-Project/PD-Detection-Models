@@ -46,8 +46,8 @@ class SpectrogramDataset(Dataset):
         ])
 
         # Load all image paths and labels
-        healthy_files = list(self.healthy_dir.glob("*.png"))
-        pd_files = list(self.pd_dir.glob("*.png"))
+        healthy_files = list(self.healthy_dir.glob("*.jpg"))
+        pd_files = list(self.pd_dir.glob("*.jpg"))
 
         self.img_files = healthy_files + pd_files
         self.labels = [0] * len(healthy_files) + [1] * len(pd_files)  # 0=Healthy, 1=PD
