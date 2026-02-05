@@ -4,6 +4,7 @@ import pandas as pd
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
+import joblib  # for saving/loading the scaler
 
 
 # Parkinson Dataset
@@ -14,7 +15,7 @@ class ParkinsonDataset(Dataset):
 
     Args:
         csv_path (str): Path to the CSV file.
-
+        
     Behavior:
         - Loads the CSV using pandas.
         - Features = all columns except 'label'.
@@ -23,7 +24,7 @@ class ParkinsonDataset(Dataset):
     """
     def __init__(self, csv_path: str):
         super().__init__()
-
+        
         # 1. Load CSV file
         df = pd.read_csv(csv_path)
 
@@ -34,6 +35,8 @@ class ParkinsonDataset(Dataset):
         # 3. Normalizing data
         scaler = MinMaxScaler()
         self.X = scaler.fit_transform(self.X)
+        
+        self.scaler = scaler  # save scaler for later use
 
         # 4. Convert to torch tensors
         self.X = torch.tensor(self.X)
@@ -54,7 +57,8 @@ def create_dataloaders(
         csv_path: str,
         train_val_split: float = 0.8,
         batch_size: int = 16,
-        random_seed: int = 42
+        random_seed: int = 42,
+        return_scaler:bool = False
     ):
     """
     Creates training and validation DataLoaders from the CSV dataset.
@@ -64,12 +68,17 @@ def create_dataloaders(
         train_val_split (float): Fraction for training (e.g., 0.8 → 80% train).
         batch_size (int): Batch size for DataLoaders.
         random_seed (int): Seed for reproducible splitting.
+        return_scaler (bool): wether to return the scaler or not
 
     Returns:
         (train_loader, val_loader)
     """
     # 1. Load full datase
     dataset = ParkinsonDataset(csv_path)
+    
+    if return_scaler:
+        joblib.dump(dataset.scaler, "audio_scaler.save")
+    
     dataset_size = len(dataset)
     indices = list(range(dataset_size))
 

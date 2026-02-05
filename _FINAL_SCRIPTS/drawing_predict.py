@@ -60,7 +60,7 @@ def predict(image_or_path,
     # 5. Load model
     model = MobileNetV3LargeBinary().to(device)
     checkpoint = torch.load(
-        "FINAL_MODELS/Spiral_Drawing_Model.pth",
+        "FINAL_MODELS/FINAL_PTH/Spiral_Drawing_Model.pth",
         map_location=device
     )
     model.load_state_dict(checkpoint["model_state_dict"])
@@ -69,6 +69,6 @@ def predict(image_or_path,
     # 6. Inference
     with torch.inference_mode():
         logits = model(image)
-        probability = torch.sigmoid(logits).item()
+        prob = torch.sigmoid(logits).item()
 
-    return probability
+    return prob

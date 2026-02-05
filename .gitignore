@@ -15,6 +15,7 @@ desktop.ini
 # -------
 *.pth
 *.pt
+*.save
 
 
 # TensorBoard runs

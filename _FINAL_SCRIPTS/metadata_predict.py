@@ -164,7 +164,7 @@ def predict(x, device=None):
 
     model = DenseNet1691D().to(device)
     checkpoint = torch.load(
-        "FINAL_MODELS/Metadata_Model_best.pth",
+        "FINAL_MODELS/FINAL_PTH/Metadata_Model.pth",
         map_location=device
     )
     model.load_state_dict(checkpoint["model_state_dict"])
@@ -174,6 +174,6 @@ def predict(x, device=None):
 
     with torch.inference_mode():
         logits = model(X)
-        probability = torch.sigmoid(logits).item()
+        prob = torch.sigmoid(logits).item()
 
-    return probability
+    return prob

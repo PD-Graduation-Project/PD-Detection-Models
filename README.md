@@ -29,6 +29,34 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 ---
 
 ## Part 3.1: Audio Model (Tabular)
+### Models compared:
+![](3_Audio_Models/Tabular/results/training/acc.png)
+
+### Model used: 
+`DenseNet169`.
+
+#### Generated data (used in pre-training):
+- Model used: TVAE (Tabular VAE)
+- Generated data accuracy:
+    - Column Shapes Score: **87.43%**
+    - Column Pair Trends Score: **92.2%**
+    - Overall Score (Average): **89.81%**
+- Generated: 100k samples
+    - **80K**: Training
+    - **20K**: Validation
+
+#### Real data (used in finetuning):
+- **40**: Training
+- **41**: Validation
+
+
+### Metrics:
+- Validation *Accuracy*: **100.00%**
+- Validation *Recall*: **100.00%**
+- Validation *precision*: **100.00%**
+- Validation *F1-Score*: **100.00%**
+
+![alt text](3_Audio_Models/Tabular/results/finetuning/output.png)
 
 ---
 ## Part 3.2: Audio Model (Spectogram) 
