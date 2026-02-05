@@ -18,9 +18,9 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 
 ### Metrics:
 - *Accuracy*: **98.81%**
-- *Recall*: **99.27**
-- *precision*: **98.30**
-- *F1-Score*: **98.75**
+- *Recall*: **99.27%**
+- *precision*: **98.30%**
+- *F1-Score*: **98.75%**
 
 ![](1_Spiral_Drawing_Models/results/finetuning/output.png)
 
@@ -36,8 +36,11 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 ---
 
 ## Part 4: Subject's Metadata Model
+### Models compared:
+![](4_User_Data_Model/results/training/acc.png)
+
 ### Model used: 
-`EfficientNet-B0`.
+`DenseNet169`.
 
 #### Generated data (used in pre-training):
 - Model used: TVAE (Tabular VAE)
@@ -50,15 +53,14 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
     - **20K**: Validation
 
 #### Real data (used in finetuning):
-- Using 80-20 split:
-  - **284**: Training
-  - **71**: Validation
+- **284**: Training
+- **71**: Validation
 
 
 ### Metrics:
-- Validation *Accuracy*: **98.96%**
-- Validation *Recall*: **98.81**
-- Validation *precision*: **1.0000**
-- Validation *F1-Score*: **99.39**
+- Validation *Accuracy*: **99.22%**
+- Validation *Recall*: **99.06%**
+- Validation *precision*: **100.00%**
+- Validation *F1-Score*: **99.52%**
 
-![alt text](4_User_Data_Model/results/archived/finetuned/conf_mat.png)
+![alt text](4_User_Data_Model/results/finetuning/output.png)
