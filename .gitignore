@@ -15,7 +15,7 @@ desktop.ini
 # -------
 *.pth
 *.pt
-_FINAL_MODELS/
+
 
 # TensorBoard runs
 # -----------------

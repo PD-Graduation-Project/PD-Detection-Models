@@ -2,24 +2,27 @@
 Multi-modal Parkinson’s Disease detection pipelines featuring models for spiral drawing, tremor, and audio-based analysis.
 
 ## Part 1: Spiral and wave drawings Model [DONE]
+### Models compared:
+![](1_Spiral_Drawing_Models/results/training/acc.png)
+
 ### Model used: 
-`DenseNet201` with modified classifier.
+`MobileNetV3LargeBinary` with modified classifier.
 
 ### Dataset size: 
 - **2611**: Training
 - **653**: Validation
 
 ### Number of trained epochs: 
-- **15**: initial model comparisons
-- **43**: fine-tuning with early stopping; planned 50.
+- **20**: initial model comparisons
+- **50**: fine-tuning with early stopping; planned 50.
 
 ### Metrics:
-- Validation *Accuracy*: **97.02%**
-- Validation *Recall*: **0.9787**
-- Validation *precision*: **0.9609**
-- Validation *F1-Score*: **0.9689**
+- *Accuracy*: **98.81%**
+- *Recall*: **99.27**
+- *precision*: **98.30**
+- *F1-Score*: **98.75**
 
-![](1_Spiral_Drawing_Models/results/archived/confusion_matrices/phase_3.png)
+![](1_Spiral_Drawing_Models/results/finetuning/output.png)
 
 ## Part 2: Tremor Model [IN-PROGRESS]
 
