@@ -24,7 +24,7 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 
 ![](1_Spiral_Drawing_Models/results/finetuning/output.png)
 
-## Part 2: Tremor Model [IN-PROGRESS]
+## Part 2: Tremor Model
 
 ---
 
@@ -63,7 +63,7 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 
 ---
 
-## Part 4: Subject's Metadata Model
+## Part 4: Subject's Metadata Model [DONE]
 ### Models compared:
 ![](4_User_Data_Model/results/training/acc.png)
 
