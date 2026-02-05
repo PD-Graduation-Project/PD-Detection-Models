@@ -17,7 +17,7 @@ def train(model:torch.nn.Module,
         Tboard:bool = True,
         
         epochs:int = 5,
-        max_lr:float = 1e-3,):
+        max_lr:float = 5e-5,):
     
     """
     Train a binary classification model with TensorBoard logging 
@@ -61,18 +61,16 @@ def train(model:torch.nn.Module,
     optim = torch.optim.AdamW(
         model.parameters(),
         lr = max_lr,
-        weight_decay= 1e-5,
+        weight_decay= 1e-3,
     )
     
     # 1.3. scheduler 
-    scheduler = torch.optim.lr_scheduler.OneCycleLR(
-        optimizer= optim,
-        max_lr= max_lr,
-        epochs=epochs,
-        steps_per_epoch=len(train_dataloader),
-        pct_start=0.3,            # warm up for 30% of training (default)
-        div_factor=25,            # Start LR = max_lr/25 (more conservative start) (default)
-        final_div_factor=1e4      # End LR = max_lr/10000 (fine-tune at end) (default)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer=optim,
+        mode='min',
+        factor=0.5,
+        patience=5,
+        min_lr=1e-7,
     )
     
     # 1.4. scaler (to prevent underflow)
@@ -122,7 +120,6 @@ def train(model:torch.nn.Module,
             loss_fn,
             binary_metrics,
             optim,
-            scheduler,
             
             scaler,
             device
@@ -138,6 +135,8 @@ def train(model:torch.nn.Module,
             binary_metrics,
             device
         )
+        
+        scheduler.step(val_loss)
         
         
         if Tboard:

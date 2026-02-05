@@ -9,52 +9,23 @@ class CombinedLoss(nn.Module):
     Combined BCE + Focal + Tversky Loss optimized for extreme recall (minimize false negatives).
     
     Final Loss = w1*BCE + w2*Focal + w3*Tversky
-    
-    HYPERPARAMETER EFFECTS:
-    -----------------------
-    pos_weight (default=4.0):
-        ↑ Higher = MORE penalty on FN, model predicts PD more often
-        ↓ Lower = LESS penalty on FN, model predicts Healthy more often
-    
-    focal_alpha (default=0.85):
-        ↑ Higher = focus MORE on positive class (PD cases)
-        ↓ Lower = focus MORE on negative class (Healthy cases)
-    
-    focal_gamma (default=3.0):
-        ↑ Higher = focus MORE on hard-to-classify examples
-        ↓ Lower = treat all examples more equally
-        (0 = regular BCE, 2-3 = typical, 5 = extreme focus)
-    
-    tversky_alpha (default=0.85):
-        ↑ Higher = penalize False Negatives MORE (miss PD cases)
-        ↓ Lower = penalize False Negatives LESS
-    
-    tversky_beta (default=0.15):
-        ↑ Higher = penalize False Positives MORE (false alarms)
-        ↓ Lower = penalize False Positives LESS
-        
-    Note: tversky_alpha + tversky_beta should ≈ 1.0
-    
-    Component weights (bce_weight, focal_weight, tversky_weight):
-        ↑ Higher = that loss component has MORE influence
-        ↓ Lower = that loss component has LESS influence
     """
     def __init__(self,
                 # losses weights (final equation)
                 bce_weight=1.0,
-                focal_weight=0.5,
-                tversky_weight=0.5,
+                focal_weight=0,
+                tversky_weight=0,
                 
                 # positive class (PD) weight
-                pos_weight=1.5,
+                pos_weight=1.1,
                 
                 # focal params
                 focal_alpha=0.6,
                 focal_gamma=1.5,
                 
                 # tversky params
-                tversky_alpha=0.60,
-                tversky_beta=0.40):
+                tversky_alpha=0.55,
+                tversky_beta=0.45):
         super().__init__()
         
         # 1. init all params

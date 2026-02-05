@@ -10,7 +10,6 @@ def train_one_epoch(model:torch.nn.Module,
                     loss_fn:torch.nn.Module,
                     acc_fn, 
                     optim:torch.optim,
-                    scheduler,
                     
                     scaler,
                     device):
@@ -59,23 +58,18 @@ def train_one_epoch(model:torch.nn.Module,
         # 7. scale loss and back propagate
         scaler.scale(loss).backward()
         
-        # 8. gradient clipping to prevent exploading gradients
-        scaler.unscale_(optim)
-        clip_grad_norm_(model.parameters(), max_norm=1.0)
-        
-        # 9. step the opimizer, the scheduler, and update the scaler
+        # 8. step the opimizer, the scheduler, and update the scaler
         scaler.step(optim)
-        scheduler.step()
         scaler.update()
 
-        # 10. compute total loss and metrics
+        # 9. compute total loss and metrics
         total_losses += loss.item()
         total_acc += acc
         total_recall += recall
         total_precision += precision
         total_f1 += f1
         
-        # 11. update progress bar
+        # 10. update progress bar
         pbar.set_postfix({
             'Loss': f'{loss.item():.4f}',
             'Accuracy': f'{acc:.4f}',
@@ -84,7 +78,7 @@ def train_one_epoch(model:torch.nn.Module,
             'F1': f'{f1:.4f}'
         })
         
-    # 12. return average losses and metrics
+    # 11. return average losses and metrics
     avg_losses = total_losses / len(train_dataloader)
     avg_acc = total_acc/ len(train_dataloader)
     avg_recall = total_recall / len(train_dataloader)

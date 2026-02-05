@@ -3,6 +3,7 @@ import torch
 import torchaudio
 import soundfile as sf
 from torch.utils.data import Dataset
+import torchvision.transforms.functional as TF
 
 
 class SpectrogramDataset(Dataset):
@@ -25,6 +26,7 @@ class SpectrogramDataset(Dataset):
         self,
         healthy_dir: str,
         pd_dir: str,
+        img_size:tuple = (512, 512),
         
         sample_rate: int = 16000,
         max_length: float = 5.0,
@@ -37,6 +39,7 @@ class SpectrogramDataset(Dataset):
     ):
         super().__init__()
         
+        self.img_size = img_size
         self.sample_rate = sample_rate
         self.max_length = int(max_length * sample_rate)  # convert to samples
         self.spectrogram_type = spectrogram_type
@@ -82,6 +85,7 @@ class SpectrogramDataset(Dataset):
             if f.endswith('.wav'):
                 self.file_paths.append(os.path.join(pd_dir, f))
                 self.labels.append(1)
+                
 
     def __len__(self):
         return len(self.file_paths)
@@ -128,6 +132,9 @@ class SpectrogramDataset(Dataset):
         
         # 9. convert to 3-channel (RGB-like) for pretrained models
         spec = spec.repeat(3, 1, 1)  # (3, freq, time)
+        
+        # 10. RESIZE TO SQUARE
+        spec = TF.resize(spec, size=self.img_size)
         
         return {
             "image": spec.squeeze(0) if spec.shape[0] == 1 else spec,

@@ -14,15 +14,15 @@ class ResNet18Binary(nn.Module):
     4. SINGLE output neuron (for BCEWithLogitsLoss)
 
     Args:
-        dropout_rate (float): Dropout probability (default: 0.5)
+        dropout_rate (float): Dropout probability (default: 0.7)
         hidden_units (list[int]): Hidden layer sizes for classifier head
         pretrained (bool): Whether to load ImageNet pretrained weights
     """
 
     def __init__(
         self,
-        dropout_rate: float = 0.5,
-        hidden_units: list[int] = [512, 128],
+        dropout_rate: float = 0.7,
+        hidden_units: list[int] = [256, 128],
         pretrained: bool = True,
     ):
         super().__init__()

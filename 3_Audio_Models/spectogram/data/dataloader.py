@@ -7,12 +7,13 @@ def create_dataloaders(
     healthy_dir: str,
     pd_dir: str,
     batch_size: int = 8,
+    img_size:tuple = (512, 512),
     
     train_val_split: float = 0.8,
     sample_rate: int = 16000,
     n_fft: int = 512,
     hop_length: int = 256,
-    n_mels: int = 128,
+    n_mels: int = 64,
     
     spectrogram_type: str = 'mel',  # 'linear' or 'mel'
     random_seed: int = 42,
@@ -40,6 +41,8 @@ def create_dataloaders(
     train_dataset = SpectrogramDataset(
         healthy_dir=healthy_dir,
         pd_dir=pd_dir,
+        img_size=img_size,
+        
         sample_rate=sample_rate,
         n_fft=n_fft,
         hop_length=hop_length,
@@ -51,6 +54,8 @@ def create_dataloaders(
     val_dataset = SpectrogramDataset(
         healthy_dir=healthy_dir,
         pd_dir=pd_dir,
+        img_size=img_size,
+        
         sample_rate=sample_rate,
         n_fft=n_fft,
         hop_length=hop_length,
