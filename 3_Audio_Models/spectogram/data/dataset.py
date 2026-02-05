@@ -1,81 +1,135 @@
+import os
+import torch
+import torchaudio
+import soundfile as sf
 from torch.utils.data import Dataset
-from pathlib import Path
-import random
 
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
-from PIL import Image
-import numpy as np
 
 class SpectrogramDataset(Dataset):
     """
-    PyTorch dataset class for spectrogram images for Parkinson’s Disease (PD) classification.
-
-    Key points:
-        - Loads RGB spectrogram images from two directories (Healthy and PD).
-        - Assigns labels automatically (0: Healthy, 1: PD).
-        - Shuffles data reproducibly using a fixed random seed.
-        - No data augmentation applied to preserve spectrogram information.
-        - Only resizing, normalization, and conversion to tensor are performed.
-
+    PyTorch dataset for converting raw .wav files to spectrograms for PD classification.
+    
+    Supports both linear and mel-scale spectrograms.
+    
     Args:
-        healthy_dir (str): Path to the directory containing healthy spectrogram images.
-        pd_dir (str): Path to the directory containing PD spectrogram images.
-        img_size (tuple): Target image size (height, width) after resizing.
-        random_seed (int): Random seed for reproducible shuffling.
+        healthy_dir (str): Path to Healthy wav files.
+        pd_dir (str): Path to PD wav files.
+        sample_rate (int): Target sample rate.
+        n_fft (int): FFT window size.
+        hop_length (int): Hop length for STFT.
+        n_mels (int): Number of mel bands (only for mel spectrograms).
+        spectrogram_type (str): 'linear' or 'mel'.
+        augment (bool): Apply time/frequency masking augmentation.
     """
     def __init__(
         self,
         healthy_dir: str,
         pd_dir: str,
-        img_size: tuple = (512, 512),
-        random_seed: int = 42,
+        
+        sample_rate: int = 16000,
+        max_length: float = 5.0,
+        n_fft: int = 512,
+        hop_length: int = 256,
+        n_mels: int = 128,
+        
+        spectrogram_type: str = 'mel',  # 'linear' or 'mel'
+        augment: bool = False,
     ):
         super().__init__()
-
-        # Initialize paths and parameters
-        self.healthy_dir = Path(healthy_dir)
-        self.pd_dir = Path(pd_dir)
-        self.img_size = img_size
-
-        # Define transforms: resize, normalize, convert to tensor
-        self.transforms = A.Compose([
-            A.Resize(height=img_size[0], width=img_size[1]),
-            A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255.0),
-            ToTensorV2()
-        ])
-
-        # Load all image paths and labels
-        healthy_files = list(self.healthy_dir.glob("*.jpg"))
-        pd_files = list(self.pd_dir.glob("*.jpg"))
-
-        self.img_files = healthy_files + pd_files
-        self.labels = [0] * len(healthy_files) + [1] * len(pd_files)  # 0=Healthy, 1=PD
-
-        # Shuffle data with fixed random seed
-        combined = list(zip(self.img_files, self.labels))
-        random.seed(random_seed)
-        random.shuffle(combined)
-        self.img_files, self.labels = zip(*combined)
+        
+        self.sample_rate = sample_rate
+        self.max_length = int(max_length * sample_rate)  # convert to samples
+        self.spectrogram_type = spectrogram_type
+        self.augment = augment
+        
+        # spectrogram transforms
+        # --------------------------
+        # 1. MEL_Scale 
+        if spectrogram_type == 'mel':
+            self.spec_transform = torchaudio.transforms.MelSpectrogram(
+                sample_rate=sample_rate,
+                n_fft=n_fft,
+                hop_length=hop_length,
+                n_mels=n_mels,
+            )
+        # 2. linear
+        else:  
+            self.spec_transform = torchaudio.transforms.Spectrogram(
+                n_fft=n_fft,
+                hop_length=hop_length,
+            )
+        
+        # convert to dB scale
+        self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB()
+        
+        # augmentation (time/frequency masking)
+        if augment:
+            self.time_mask = torchaudio.transforms.TimeMasking(time_mask_param=30)
+            self.freq_mask = torchaudio.transforms.FrequencyMasking(freq_mask_param=15)
+        
+        # collect file paths
+        self.file_paths = []
+        self.labels = []
+        
+        # healthy (label=0)
+        for f in os.listdir(healthy_dir):
+            if f.endswith('.wav'):
+                self.file_paths.append(os.path.join(healthy_dir, f))
+                self.labels.append(0)
+        
+        # pd (label=1)
+        for f in os.listdir(pd_dir):
+            if f.endswith('.wav'):
+                self.file_paths.append(os.path.join(pd_dir, f))
+                self.labels.append(1)
 
     def __len__(self):
-        return len(self.img_files)
+        return len(self.file_paths)
 
     def __getitem__(self, idx):
-        # Load image and label
-        img_path = self.img_files[idx]
-        label = self.labels[idx]
-
-        # Load RGB image
-        img = Image.open(img_path).convert('RGB')
-
-        # Convert to numpy array
-        img = np.array(img)
-
-        # Apply transforms (resize, normalize, to tensor)
-        img = self.transforms(image=img)["image"]
-
+        # 1. load with soundfile (no FFmpeg needed)
+        waveform, sr = sf.read(self.file_paths[idx])
+        waveform = torch.from_numpy(waveform).float()
+        
+        # 2. Ensure shape is (channels, samples)
+        if waveform.dim() == 1:
+            waveform = waveform.unsqueeze(0)  # mono: (1, samples)
+        else:
+            waveform = waveform.T  # stereo: (2, samples)
+        
+        # 3. resample if needed
+        if sr != self.sample_rate:
+            waveform = torchaudio.transforms.Resample(sr, self.sample_rate)(waveform)
+        
+        # 4. mono
+        if waveform.shape[0] > 1:
+            waveform = torch.mean(waveform, dim=0, keepdim=True)
+            
+        # 5. PAD/TRIM to fixed length BEFORE spectrogram
+        if waveform.shape[1] > self.max_length:
+            waveform = waveform[:, :self.max_length]
+        else:
+            waveform = torch.nn.functional.pad(
+                waveform, 
+                (0, self.max_length - waveform.shape[1])
+            )
+        
+        # 6. convert to spectrogram
+        spec = self.spec_transform(waveform)  # (1, freq, time)
+        spec = self.amplitude_to_db(spec)
+        
+        # 7. augmentation
+        if self.augment:
+            spec = self.time_mask(spec)
+            spec = self.freq_mask(spec)
+        
+        # 8. normalize to [0, 1]
+        spec = (spec - spec.min()) / (spec.max() - spec.min() + 1e-8)
+        
+        # 9. convert to 3-channel (RGB-like) for pretrained models
+        spec = spec.repeat(3, 1, 1)  # (3, freq, time)
+        
         return {
-            "image": img,
-            "label": label
+            "image": spec.squeeze(0) if spec.shape[0] == 1 else spec,
+            "label": self.labels[idx]
         }
