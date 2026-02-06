@@ -33,7 +33,7 @@ Notes:
 
 import torch
 import numpy as np
-from FINAL_MODELS.densenet169 import DenseNet1691D
+from models.densenet169 import DenseNet1691D
 
 
 # -------------------------------------------------
@@ -82,9 +82,9 @@ def normalize_bool(val) -> float:
 def normalize_gender(val) -> float:
     if isinstance(val, str):
         v = val.strip().lower()
-        if v == "male":
+        if v == "male" or "M":
             return 1.0
-        if v == "female":
+        if v == "female" or "F":
             return 0.0
     if val in [0, 1, -1]:
         return float(val)
@@ -164,7 +164,7 @@ def predict(x, device=None):
 
     model = DenseNet1691D().to(device)
     checkpoint = torch.load(
-        "FINAL_MODELS/FINAL_PTH/Metadata_Model.pth",
+        "weights/Metadata_Model.pth",
         map_location=device
     )
     model.load_state_dict(checkpoint["model_state_dict"])
