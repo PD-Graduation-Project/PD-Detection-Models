@@ -1,8 +1,8 @@
 import os
 import torch
 import torchaudio
+import soundfile as sf
 from torch.utils.data import Dataset
-
 
 class AudioDataset(Dataset):
     def __init__(
@@ -37,30 +37,44 @@ class AudioDataset(Dataset):
         return len(self.file_paths)
 
     def __getitem__(self, idx):
-        # 1. load audio
-        waveform, sr = torchaudio.load(self.file_paths[idx])
+        # 1. load with soundfile
+        waveform, sr = sf.read(self.file_paths[idx])
+        waveform = torch.from_numpy(waveform).float()
         
-        # 2. resample if needed
+        # 2. Ensure shape is (channels, samples) - soundfile returns (samples,) or (samples, channels)
+        if waveform.dim() == 1:
+            waveform = waveform.unsqueeze(0)  # mono: (1, samples)
+        else:
+            waveform = waveform.T  # stereo: (samples, channels) -> (channels, samples)
+        
+        # 3. resample if needed
         if sr != self.sample_rate:
             waveform = torchaudio.transforms.Resample(sr, self.sample_rate)(waveform)
         
-        # 3. mono
+        # 4. convert to mono if stereo
         if waveform.shape[0] > 1:
             waveform = torch.mean(waveform, dim=0, keepdim=True)
         
-        # 4. pad/trim to max_length
+        # 5. Ensure waveform is (1, samples) before indexing
+        if waveform.dim() == 1:
+            waveform = waveform.unsqueeze(0)
+        
+        # 6. PAD/TRIM to fixed length
         if waveform.shape[1] > self.max_length:
             waveform = waveform[:, :self.max_length]
         else:
-            waveform = torch.nn.functional.pad(waveform, (0, self.max_length - waveform.shape[1]))
+            waveform = torch.nn.functional.pad(
+                waveform, 
+                (0, self.max_length - waveform.shape[1])
+            )
         
-        # 5. optional augmentation
+        # 7. optional augmentation
         if self.augment:
-            # 5.1. add gaussian noise
+            # 7.1. add gaussian noise
             noise = torch.randn_like(waveform) * 0.005
             waveform = waveform + noise
             
-            # 5.2. random gain
+            # 7.2. random gain
             waveform = waveform * (0.8 + 0.4 * torch.rand(1))
         
         return waveform.squeeze(0), self.labels[idx]
