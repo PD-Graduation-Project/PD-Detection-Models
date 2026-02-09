@@ -10,10 +10,7 @@ class TremorDataset(Dataset):
     
     Expected .npz format:
         - features   : 1D array of shape (num_features,)  # NEW
-                        Size depends on preprocessing:
-                        - Paper method (magnitude + 1 hand): 22 features
-                        - Both hands magnitude: 44 features  
-                        - Both hands all axes: 132 features
+                        Size depends on preprocessing
         - label      : int (0 = Healthy, 1 = Parkinson)
         - handedness : int (0 = Left, 1 = Right)
         - subject_id : int
