@@ -41,9 +41,9 @@ def train_one_epoch(model: torch.nn.Module,
     
     for batch in pbar:
         # 3. unpack and move data to device
-        signals, handedness, movements, labels  = [b.to(device) for b in batch] 
+        features, handedness, movements, labels  = [b.to(device) for b in batch] 
         """
-        # signals: [B, 2, T, 3]
+        # features: [B, 66]
         # handedness: [B]
         # movements: [B]
         # labels: [B]
@@ -52,19 +52,12 @@ def train_one_epoch(model: torch.nn.Module,
         # 4. enable auto mixed precision (AMP) for efficiency
         with torch.amp.autocast(device_type=device):
             
-            # 5. forward pass (model takes signals, handedness, and movement):
-            # Use mixup during training
-            if random.random() < 0.15:
-                lambda_mix = np.random.beta(0.4, 0.4)  # Mixup strength
-                logits = model(signals, handedness, mixup_lambda=lambda_mix) if per_movement else model(signals, 
-                                                                                                        handedness, 
-                                                                                                        movements, 
-                                                                                                        mixup_lambda=lambda_mix)
-            else:
-                logits = model(signals, handedness) if per_movement else model(signals, 
-                                                                            handedness,
-                                                                            movements)
-
+            # 5. forward pass (model takes features, handedness, and movement)
+            logits = model(features, handedness) if per_movement else model(
+                features,
+                handedness,
+                movements
+            )
                         
             # 6. calculate the loss
             loss = loss_fn(logits, labels)
@@ -99,12 +92,12 @@ def train_one_epoch(model: torch.nn.Module,
     all_labels = torch.cat(all_labels, dim=0)
     all_movements = torch.cat(all_movements, dim=0)  # -> [N_total]
     
-    overall_metrics = metric_fn(all_preds, all_labels, movement_ids=all_movements) # -> includes per-class metrics
+    overall_metrics = metric_fn(all_preds, all_labels, movement_ids=all_movements)
     
     # 15. return average loss, and overall metrics
     avg_loss = total_losses / len(train_dataloader)
 
-    return avg_loss, overall_metrics,
+    return avg_loss, overall_metrics
             
 
 # Validation function loop
@@ -141,14 +134,16 @@ def validate(model: torch.nn.Module,
         
         for batch in pbar:
             # 3. unpack and move data to device
-            signals, handedness, movements, labels = [b.to(device) for b in batch]
+            features, handedness, movements, labels = [b.to(device) for b in batch]
                 
             # 4. enable auto mixed precision (AMP)
             with torch.amp.autocast(device_type=device):
                 # 5. forward pass
-                logits = model(signals, handedness) if per_movement else model(signals, 
-                                                                                handedness,
-                                                                                movements)
+                logits = model(features, handedness) if per_movement else model(
+                    features,
+                    handedness,
+                    movements
+                )
                                             
                 # 6. calculate loss
                 loss = loss_fn(logits, labels)
@@ -163,19 +158,15 @@ def validate(model: torch.nn.Module,
             
             # 9. update progress bar
             pbar.set_postfix({'Loss': f'{loss.item():.4f}'})
-            # probs = torch.sigmoid(logits)
-            # print(f"Val sigmoid mean={probs.mean():.3f}, std={probs.std():.3f}, >0.5={(probs>0.5).float().mean():.3f}")
-
             
     # 10. Compute overall metrics on entire epoch
     all_preds = torch.cat(all_preds, dim=0)
     all_labels = torch.cat(all_labels, dim=0)
     all_movements = torch.cat(all_movements, dim=0)  # -> [N_total]
     
-    overall_metrics = metric_fn(all_preds, all_labels, movement_ids=all_movements) # -> includes per-class metrics
+    overall_metrics = metric_fn(all_preds, all_labels, movement_ids=all_movements)
     
     # 12. return average loss, and overall metrics
     avg_loss = total_losses / len(val_dataloader)
 
     return avg_loss, overall_metrics
-
