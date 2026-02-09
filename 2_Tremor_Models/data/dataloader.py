@@ -18,8 +18,8 @@ def create_tremor_dataloaders(
     
     - Loads preprocessed .npz signals from all movement folders.
     - Each sample contains:
-        (signal_tensor, wrist_tensor, movement_tensor, label_tensor)
-            - signal_tensor   : shape (2, T, 3), IMU signal (left-signals, right-signals)
+        (features, wrist_tensor, movement_tensor, label_tensor)
+            - features   : IMU signal features
             - wrist_tensor    : scalar (0 = Left-handed, 1 = Right-handed)
             - movement_tensor : scalar (0-10), movement type
             - label_tensor    : scalar (0 = Healthy, 1 = Parkinson)

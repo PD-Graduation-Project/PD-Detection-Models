@@ -47,17 +47,6 @@ def _segment_signal(data, window_size=1024, overlap=0.5):
     
     return segments
 
-def _compute_basic_stats(data):
-    """
-    Compute basic statistics for each channel for optional normalization.
-    Returns mean and std for each channel.
-    """
-    mean = np.mean(data, axis=0, keepdims=True)
-    std = np.std(data, axis=0, keepdims=True)
-    std = np.where(std == 0, 1.0, std)  # avoid division by zero
-    return mean, std
-
-
 # ------------------------
 # Main dataset creation function
 # ------------------------
@@ -181,10 +170,6 @@ def create_clean_dataset(
         left_data = _handle_missing_values(left_data)
         right_data = _handle_missing_values(right_data)
 
-        # Compute normalization stats (optional for user)
-        left_mean, left_std = _compute_basic_stats(left_data)
-        right_mean, right_std = _compute_basic_stats(right_data)
-
         # Segment signals
         left_segments = _segment_signal(left_data, window_size, overlap)
         right_segments = _segment_signal(right_data, window_size, overlap)
@@ -205,15 +190,6 @@ def create_clean_dataset(
                 'movement_name': movement_name,
                 'segment_idx': seg_idx
             }
-            
-            # Optionally save normalization stats
-            if save_normalization_stats:
-                save_dict.update({
-                    'left_mean': left_mean.astype(np.float32),
-                    'left_std': left_std.astype(np.float32),
-                    'right_mean': right_mean.astype(np.float32),
-                    'right_std': right_std.astype(np.float32)
-                })
             
             filename = f"{subject_id}_seg{seg_idx:03d}.npz"
             np.savez_compressed(out_dir / filename, **save_dict)

@@ -6,53 +6,25 @@ from tqdm import tqdm
 
 class TremorDataset(Dataset):
     """
-    PyTorch Dataset for loading tremor movement signals from ALL movements.
-
-    Expected folder layout:
+    MODIFIED: Now loads FEATURES instead of raw signals.
     
-    data_path/
-        ├── Movement1/  (e.g., "CrossArms")
-        │   ├── Healthy/
-        │   │     ├── 001.npz
-        │   │     ├── 002.npz
-        │   │     └── ...
-        │   └── Parkinson/
-        │         ├── 003.npz
-        │         └── ...
-        ├── Movement2/  (e.g., "FingerNose")
-        │   ├── Healthy/
-        │   └── Parkinson/
-        └── ...
+    Expected .npz format:
+        - features   : 1D array of shape (num_features,)  # NEW
+                        Size depends on preprocessing:
+                        - Paper method (magnitude + 1 hand): 22 features
+                        - Both hands magnitude: 44 features  
+                        - Both hands all axes: 132 features
+        - label      : int (0 = Healthy, 1 = Parkinson)
+        - handedness : int (0 = Left, 1 = Right)
+        - subject_id : int
+        - movement_name, segment_idx : metadata
 
-    Each .npz contains:
-        - signal : tuple of 2 np.ndarrays
-                    ((1024, 3), (1024, 3)) -> (Left, Right) - ALWAYS in this order
-        - label  : int (0 = Healthy, 1 = Parkinson)
-        - handedness  : int (0 = Left-handed, 1 = Right-handed) 
-        - subject_id : int or str
-        - metadata: not going to be used.
-
-    Parameters
-    ----------
-    data_path : str or Path
-        Path to the root directory containing all movement folders.
-        
-    movement_names : list of str, optional
-        List of movement folder names to include. If None, automatically detects
-        all subdirectories in data_path.
-        
-    subject_ids : list of int, optional
-        If provided, only load samples from these specific subject IDs.
-        Useful for train/val/test splitting by subject to avoid data leakage.
-
-    Returns
-    -------
-    tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
-        (signal_tensor, handedness_tensor, movement_tensor, label_tensor) per sample.
-        - signal_tensor     : shape (2, T, 3), dtype=torch.float32  # (Left, Right) with 3 channels
-        - handedness_tensor : scalar (0 = Left-handed, 1 = Right-handed), dtype=torch.long
-        - movement_tensor   : scalar (movement index 0-10), dtype=torch.long
-        - label_tensor      : scalar (0 = Healthy, 1 = Parkinson), dtype=torch.long
+    Returns per sample:
+        (features, handedness, movement, label)
+        - features  : shape (num_features,) - variable based on preprocessing
+        - handedness: scalar (0 or 1)
+        - movement  : scalar (movement index)
+        - label     : scalar (0 or 1)
     """
     def __init__(self,
                 data_path: str,
@@ -63,139 +35,100 @@ class TremorDataset(Dataset):
         self.data_path = Path(data_path)
         self.subject_ids = set(subject_ids) if subject_ids is not None else None
         
-        # 1. Movements inits
-        # -------------------
-        # 1.1. Automatically detect movement folders if not provided
+        # 1. Auto-detect movements
         if movement_names is None:
             movement_names = sorted([
                 d.name for d in self.data_path.iterdir() 
                 if d.is_dir() and not d.name.startswith('.')
             ])
         
-        # 1.2. Create movement name to index mapping
         self.movement_names = movement_names
-        
-        # 2. Init lists for all data
         all_samples = []
         
-        # 3. Load data from each movement folder
-        # ----------------------------------------
+        # 2. Load data from each movement folder
         for movement_idx, movement_name in enumerate(
-            tqdm(movement_names, desc="Loading data", total=len(movement_names)) ):
-            movement_path = self.data_path / movement_name
+            tqdm(movement_names, desc="Loading features", total=len(movement_names))):
             
-            # 3.1. check for dir availability
+            movement_path = self.data_path / movement_name
             if not movement_path.exists():
-                print(f"Warning: Movement folder '{movement_name}' not found, skipping...")
                 continue
             
-            # 3.2. init Healthy, Parkinson subfolders dir
+            # 2.1. Load from Healthy and Parkinson folders
             dirs = {
                 0: movement_path / "Healthy",
                 1: movement_path / "Parkinson",
             }
             
-            # 4. add all data
-            # -----------------
             for label, dir_path in dirs.items():
-                # 5.2. get all '.npz' data in each directory
                 if dir_path.exists():
                     for file in dir_path.glob("*.npz"):
                         result = self._process_npz(file, label, movement_idx)
                         if result is not None:
                             all_samples.append(result)
         
-        # 5. Store samples (NO shuffling here - do it at DataLoader level or after splitting)
-        self.signals = [s[0] for s in all_samples]
+        # 3. Store samples
+        self.features = [s[0] for s in all_samples]  # CHANGED: features not signals
         self.handedness = [s[1] for s in all_samples]
         self.movements = [s[2] for s in all_samples]
         self.labels = [s[3] for s in all_samples]
         self.subject_ids_list = [s[4] for s in all_samples]
         
     def __len__(self):
-        return len(self.signals)
+        return len(self.features)
     
     def __getitem__(self, index):
         """
-        Returns
-        -------
-        tuple(torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor)
-            (signal_tensor, handedness_tensor, movement_tensor, label_tensor)
+        Returns: (features, handedness, movement, label)
         """
-        # 1. Signal 
-        # ----------
-        signal = torch.tensor(
-            self.signals[index],
+        # NEW: Load feature vector instead of raw signal
+        features = torch.tensor(
+            self.features[index],
             dtype=torch.float32
-        )  # shape: (2, T, 3)
+        )  # shape: (num_features,) e.g., (264,)
         
-        # 2. handedness (handedness)
-        # ----------------------
-        handedness = torch.tensor(
-            self.handedness[index],
-            dtype=torch.long
-        )
+        handedness = torch.tensor(self.handedness[index], dtype=torch.long)
+        movement = torch.tensor(self.movements[index], dtype=torch.long)
+        label = torch.tensor(self.labels[index], dtype=torch.long)
         
-        # 3. movement
-        # -------------
-        movement = torch.tensor(
-            self.movements[index],
-            dtype=torch.long
-        )
-        
-        # 4. label
-        # --------- 
-        label = torch.tensor(
-            self.labels[index],
-            dtype=torch.long
-        )
-        
-        return signal, handedness, movement, label
+        return features, handedness, movement, label
     
-    # Helper function to process .npz files
-    # -------------------------------------------
     def _process_npz(self, file, label, movement_idx):
-        """Load (Left, Right) signals, and handedness from .npz file"""
+        """
+        MODIFIED: Load features instead of raw signals
+        """
         npz = np.load(file, allow_pickle=True)
         
-        # 0. Check subject_id filter
+        # Filter by subject
         subject_id = int(npz["subject_id"])
         if self.subject_ids is not None and subject_id not in self.subject_ids:
             return None
         
-        # 1. extract tuple of both handedness signals (ALWAYS left, right order)
-        left_signal, right_signal = npz["signal"]
+        # NEW: Load feature vector instead of signal
+        features = npz["features"].astype(np.float32)
         
-        # 2. extract first 3 channels and stack into (2, T, 3)
-        signal = np.stack([left_signal[:, :3], right_signal[:, :3]], axis=0).astype(np.float32)
-        
-        # 3. extract handedness (0 = Left-handed, 1 = Right-handed)
+        # Keep everything else the same
         handedness = int(npz["handedness"])
         
-        # 4.5. finally return everything separately
-        return signal, handedness, movement_idx, label, subject_id
+        return features, handedness, movement_idx, label, subject_id
     
+    # Keep all helper methods unchanged
     def get_movement_name(self, movement_idx):
-        """Get movement name from index"""
         return self.movement_names[movement_idx]
     
     def list_movements(self):
         return {name: idx for idx, name in enumerate(self.movement_names)}
     
     def get_class_distribution(self):
-        """Get distribution of classes across dataset"""
         return {
             'Healthy': self.labels.count(0),
             'Parkinson': self.labels.count(1),
         }
     
     def get_movement_distribution(self):
-        """Get distribution of samples per movement"""
         movement_counts = {}
         for idx, name in enumerate(self.movement_names):
             movement_counts[name] = self.movements.count(idx)
         return movement_counts
     
     def get_unique_subjects(self):
-        """Get list of unique subject IDs in this dataset (used in dataloader)"""
         return sorted(set(self.subject_ids_list))
