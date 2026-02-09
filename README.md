@@ -60,6 +60,8 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 
 ### Metrics:
 - Validation *Accuracy*: **91.17%**
+- Validation *Recall*: **90.03%**
+- Validation *precision*: **92.13%**
 - Validation *F1-Score*: **91.16%**
 
 ![alt text](2_Tremor_Models/results/training/output.png)
