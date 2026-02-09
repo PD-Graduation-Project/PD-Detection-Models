@@ -96,7 +96,7 @@ def train(model: torch.nn.Module,
     optim = torch.optim.AdamW(
         model.parameters(),
         lr=max_lr,
-        weight_decay=5e-5,
+        weight_decay=1e-4,
     )
 
     # 1.3. scheduler  (reduces LR when validation loss plateaus)
@@ -104,8 +104,8 @@ def train(model: torch.nn.Module,
         optimizer=optim,
         mode='min',          # monitor val_loss
         factor=0.5,          # reduce LR by 50%
-        patience=2,          # wait 2 epochs before reducing
-        min_lr=1e-6,         # CHANGED: Set minimum LR to prevent too small values
+        patience=5,          # wait 5 epochs before reducing
+        min_lr=1e-6,         # Set minimum LR to prevent too small values
         threshold= 0.01,     # Add threshold for meaningful improvement
     )
 

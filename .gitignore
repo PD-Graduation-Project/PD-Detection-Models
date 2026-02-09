@@ -2,6 +2,7 @@
 # ---------
 project_datasets/
 preprocessed_dataset/
+*.csv
 
 
 # Cashe files

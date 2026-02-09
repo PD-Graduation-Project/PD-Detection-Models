@@ -12,11 +12,11 @@ losses:
   healthy_weight: 1.0     
   parkinson_weight: 1.2
   # Focal loss params (focus on minority Healthy class)
-  focal_alpha: 0.1 # Which class to focus on
+  focal_alpha: 0.2 # Which class to focus on
   #                   < 0.5 = focus on MINORITY (Healthy) - RECOMMENDED for imbalanced data
   #                   > 0.5 = focus on MAJORITY (Parkinson)
   #                   = 0.5 = balanced
-  focal_gamma: 5.0 # How much to focus on hard examples
+  focal_gamma: 3.0 # How much to focus on hard examples
   #                  = 0: regular BCE (no focusing)
   #                  = 2: standard (moderate focusing) - RECOMMENDED
   #                  > 2: aggressive focusing on hardest examples
