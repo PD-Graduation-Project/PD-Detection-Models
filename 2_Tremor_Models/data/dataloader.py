@@ -1,6 +1,7 @@
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from sklearn.model_selection import train_test_split
 import numpy as np
+from torch.utils.data import Subset
 
 # dataloader creator function
 # -----------------------------
@@ -10,7 +11,8 @@ def create_tremor_dataloaders(
         train_val_split: float = 0.8,
         random_seed: int = 42,
         print_details: bool = False,
-        per_movement: bool = False):
+        per_movement: bool = False,
+        split_by_subject: bool = True):
     """
     Creates PyTorch DataLoaders for tremor movement classification across all movements.
     
@@ -43,6 +45,8 @@ def create_tremor_dataloaders(
             Whether to print dataset loading details.
         per_movement : bool, default=False
             If True, returns a dataloader dict for each movement.
+        split_by_subject: bool, default=True
+            Wether to split the data based on subject_id (real data) or not (generated data)
 
     Returns:
         - If per_movement=False:
@@ -59,24 +63,35 @@ def create_tremor_dataloaders(
         data_path=data_path,
     )
     
-    # 2. Get all unique subjects and their labels
-    all_subjects = temp_dataset.get_unique_subjects()
-    
-    # Create mapping: subject_id -> label (take first occurrence)
-    subject_to_label = {}
-    for i, subject_id in enumerate(temp_dataset.subject_ids_list):
-        if subject_id not in subject_to_label:
-            subject_to_label[subject_id] = temp_dataset.labels[i]
-    
-    # 3. Split subjects (not samples!) into train/val, stratified by label
-    subject_labels = [subject_to_label[s] for s in all_subjects]
-    
-    train_subjects, val_subjects = train_test_split(
-        all_subjects,
-        test_size=1 - train_val_split,
-        stratify=subject_labels,
-        random_state=random_seed
-    )
+    # -------------------------------
+    # SPLIT: by subject or by sample
+    # -------------------------------
+    if split_by_subject:
+        # 2. Get unique subjects and labels
+        all_subjects = temp_dataset.get_unique_subjects()
+        subject_to_label = {}
+        for i, subject_id in enumerate(temp_dataset.subject_ids_list):
+            if subject_id not in subject_to_label:
+                subject_to_label[subject_id] = temp_dataset.labels[i]
+
+        subject_labels = [subject_to_label[s] for s in all_subjects]
+
+        train_subjects, val_subjects = train_test_split(
+            all_subjects,
+            test_size=1 - train_val_split,
+            stratify=subject_labels,
+            random_state=random_seed
+        )
+    else:
+        # 2b. Random sample-based split
+        all_indices = np.arange(len(temp_dataset))
+        all_labels = np.array(temp_dataset.labels)
+        train_indices, val_indices = train_test_split(
+            all_indices,
+            test_size=1 - train_val_split,
+            stratify=all_labels,
+            random_state=random_seed
+        )
     
     if print_details:
         print(f"\n{'='*60}")
@@ -103,16 +118,19 @@ def create_tremor_dataloaders(
     # --------------------------------------------------------------
     if not per_movement:
         
-        # 4. Create datasets with subject filtering
-        train_dataset = TremorDataset(
-            data_path=data_path,
-            subject_ids=train_subjects,
-        )
-        
-        val_dataset = TremorDataset(
-            data_path=data_path,
-            subject_ids=val_subjects,
-        )
+        # 4. Create datasets with optional subject filtering
+        if split_by_subject:
+            train_dataset = TremorDataset(data_path=data_path, 
+                                        subject_ids=train_subjects)
+            val_dataset   = TremorDataset(data_path=data_path, 
+                                        subject_ids=val_subjects)
+        else:
+            # simple subset using indices
+            train_dataset = Subset(temp_dataset, 
+                                train_indices)
+            val_dataset   = Subset(temp_dataset, 
+                                val_indices)
+
         
         # 5. WeightedRandomSampler for class imbalance in training set
         train_labels = np.array(train_dataset.labels)

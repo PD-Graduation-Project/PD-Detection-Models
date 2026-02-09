@@ -7,6 +7,9 @@ from tqdm import tqdm
 class TremorDataset(Dataset):
     """
     MODIFIED: Now loads FEATURES instead of raw signals.
+    Supports loading from:
+        - .npz feature files (original behavior)
+        - CSV file (new, optional)
     
     Expected .npz format:
         - features   : 1D array of shape (num_features,)  # NEW
@@ -24,13 +27,53 @@ class TremorDataset(Dataset):
         - label     : scalar (0 or 1)
     """
     def __init__(self,
-                data_path: str,
+                data_path: str = None,
+                csv_path: str = None,
                 movement_names: list = None,
                 subject_ids: list = None):
         super().__init__()
         
-        self.data_path = Path(data_path)
         self.subject_ids = set(subject_ids) if subject_ids is not None else None
+
+        # =========================
+        # NEW: Load from CSV
+        # =========================
+        if csv_path is not None:
+            df = pd.read_csv(csv_path)
+
+            # 1. Ensure numeric
+            df = df.apply(pd.to_numeric, errors="coerce")
+
+            # 2. Auto-detect feature columns
+            feature_cols = [
+                c for c in df.columns
+                if c.startswith("lh_") or c.startswith("rh_") or c.startswith("asym_")
+            ]
+
+            self.features = df[feature_cols].values.astype(np.float32)
+            self.handedness = df["handedness"].astype(int).tolist()
+            self.movements = df["movement"].astype(int).tolist()
+            self.labels = df["label"].astype(int).tolist()
+
+            # 3. Optional subject_id (removed for now)
+            if "subject_id" in df.columns:
+                self.subject_ids_list = df["subject_id"].astype(int).tolist()
+            else:
+                self.subject_ids_list = [-1] * len(df)
+
+            # 4. Movement names (optional, for compatibility) (curenntly left as idx)
+            if movement_names is None:
+                max_movement = int(df["movement"].max())
+                self.movement_names = [f"movement_{i}" for i in range(max_movement + 1)]
+            else:
+                self.movement_names = movement_names
+
+            return  # IMPORTANT: skip npz logic
+
+        # =========================
+        # ORIGINAL NPZ LOGIC
+        # =========================
+        self.data_path = Path(data_path)
         
         # 1. Auto-detect movements
         if movement_names is None:
