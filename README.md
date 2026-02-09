@@ -1,7 +1,7 @@
 # PD-Detection-Models
 Multi-modal Parkinson’s Disease detection pipelines featuring models for spiral drawing, tremor, and audio-based analysis.
 
-## Part 1: Spiral and wave drawings Model [DONE]
+## Part 1: Spiral and wave drawings Model
 ### Models compared:
 ![](1_Spiral_Drawing_Models/results/training/acc.png)
 
@@ -28,7 +28,7 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 
 ---
 
-## Part 3.1: Audio Model (Tabular)
+## Part 3: Audio Model (Tabular)
 ### Models compared:
 ![](3_Audio_Models/Tabular/results/training/acc.png)
 
@@ -46,24 +46,24 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
     - **20K**: Validation
 
 #### Real data (used in finetuning):
-- **40**: Training
-- **41**: Validation
+> Note: We used a 20:80 train–test split, allocating less data for training and more for testing, since the model had already been trained on a large amount of generated data and demonstrated strong performance.
 
+- **16**: Training
+- **65**: Validation
+
+> Note: The model becomes unstable when fine-tuned for too many epochs, so fine-tuning was stopped early after 7–10 epochs.
 
 ### Metrics:
-- Validation *Accuracy*: **100.00%**
+- Validation *Accuracy*: **98.75%**
 - Validation *Recall*: **100.00%**
-- Validation *precision*: **100.00%**
-- Validation *F1-Score*: **100.00%**
+- Validation *precision*: **96.67%**
+- Validation *F1-Score*: **98.18%**
 
 ![alt text](3_Audio_Models/Tabular/results/finetuning/output.png)
 
 ---
-## Part 3.2: Audio Model (Spectogram) 
 
----
-
-## Part 4: Subject's Metadata Model [DONE]
+## Part 4: Subject's Metadata Model 
 ### Models compared:
 ![](4_User_Data_Model/results/training/acc.png)
 
