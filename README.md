@@ -28,7 +28,27 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 
 ## Part 2: Tremor Model
 
-#### Generated data (used in pre-training):
+### Model
+- **Input**
+  → Tremor features + movement type + handedness
+
+- **Embeddings**
+  → Convert categorical inputs to learned vectors
+
+- **Projection**
+  → Map all inputs to a shared hidden space
+  
+- **Feature Attention**
+  → Learn which features matter most
+
+- **Residual Blocks**
+  → Deep feature refinement with stable training
+
+- **Classifier**
+  → Single output logit (Healthy vs. Parkinson’s)
+
+
+### Generated data (used in pre-training):
 - Model used: TVAE (Tabular VAE)
 - Generated data accuracy:
     - Column Shapes Score: **92.53**
