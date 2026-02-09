@@ -51,7 +51,7 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 ### Generated data (used in pre-training):
 - Model used: TVAE (Tabular VAE)
 - Generated data accuracy:
-    - Column Shapes Score: **92.53**
+    - Column Shapes Score: **92.53%**
     - Column Pair Trends Score: **96.8%**
     - Overall Score (Average): **94.67%**
 - Generated: 100k samples
