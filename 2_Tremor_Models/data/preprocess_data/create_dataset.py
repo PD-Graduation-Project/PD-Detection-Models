@@ -77,11 +77,11 @@ def _extract_features_from_segment(segment):
     
     return np.array(all_features, dtype=np.float32)
 
-def _extract_features_from_segment(segment):
-    # tsfresh extracts ~790 features
-    df = pd.DataFrame(segment)
-    features = extract_features(df, column_id=0, column_sort=0)
-    return features.values.flatten()
+# def _extract_features_from_segment(segment):
+#     # tsfresh extracts ~790 features
+#     df = pd.DataFrame(segment)
+#     features = extract_features(df, column_id=0, column_sort=0)
+#     return features.values.flatten()
 
 # ------------------------
 # Keep existing preprocessing utilities
