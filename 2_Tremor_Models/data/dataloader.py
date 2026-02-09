@@ -1,12 +1,14 @@
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from sklearn.model_selection import train_test_split
 import numpy as np
+import pandas as pd
 from torch.utils.data import Subset
 
 # dataloader creator function
 # -----------------------------
 def create_tremor_dataloaders(
-        data_path: str,
+        data_path: str = None,
+        csv_path: str = None,
         batch_size: int = 32,
         train_val_split: float = 0.8,
         random_seed: int = 42,
@@ -59,8 +61,10 @@ def create_tremor_dataloaders(
     from .dataset import TremorDataset
     
     # 1. Load full dataset to get subject information
+    # FIX: Pass both paths, let Dataset decide which to use
     temp_dataset = TremorDataset(
         data_path=data_path,
+        csv_path=csv_path
     )
     
     # -------------------------------
@@ -82,6 +86,27 @@ def create_tremor_dataloaders(
             stratify=subject_labels,
             random_state=random_seed
         )
+
+        if print_details:
+            print(f"\n{'='*60}")
+            print(f"Subject-Level Split (prevents data leakage)")
+            print(f"{'='*60}")
+            print(f"Total subjects: {len(all_subjects)}")
+            print(f"Train subjects: {len(train_subjects)} | Val subjects: {len(val_subjects)}")
+            
+            # Count labels per split
+            train_label_counts = {0: 0, 1: 0}
+            val_label_counts = {0: 0, 1: 0}
+            for s in train_subjects:
+                train_label_counts[subject_to_label[s]] += 1
+            for s in val_subjects:
+                val_label_counts[subject_to_label[s]] += 1
+            
+            print(f"\nTrain subjects by label:")
+            print(f"  Healthy: {train_label_counts[0]}, Parkinson: {train_label_counts[1]}")
+            print(f"Val subjects by label:")
+            print(f"  Healthy: {val_label_counts[0]}, Parkinson: {val_label_counts[1]}\n\n")
+
     else:
         # 2b. Random sample-based split
         all_indices = np.arange(len(temp_dataset))
@@ -92,26 +117,13 @@ def create_tremor_dataloaders(
             stratify=all_labels,
             random_state=random_seed
         )
+        
+        if print_details:
+            print(f"\n{'='*60}")
+            print(f"Sample-Level Random Split")
+            print(f"Train samples: {len(train_indices)} | Val samples: {len(val_indices)}")
+            print(f"{'='*60}\n")
     
-    if print_details:
-        print(f"\n{'='*60}")
-        print(f"Subject-Level Split (prevents data leakage)")
-        print(f"{'='*60}")
-        print(f"Total subjects: {len(all_subjects)}")
-        print(f"Train subjects: {len(train_subjects)} | Val subjects: {len(val_subjects)}")
-        
-        # Count labels per split
-        train_label_counts = {0: 0, 1: 0}
-        val_label_counts = {0: 0, 1: 0}
-        for s in train_subjects:
-            train_label_counts[subject_to_label[s]] += 1
-        for s in val_subjects:
-            val_label_counts[subject_to_label[s]] += 1
-        
-        print(f"\nTrain subjects by label:")
-        print(f"  Healthy: {train_label_counts[0]}, Parkinson: {train_label_counts[1]}")
-        print(f"Val subjects by label:")
-        print(f"  Healthy: {val_label_counts[0]}, Parkinson: {val_label_counts[1]}\n\n")
     
     # --------------------------------------------------------------
     # Option A: return all the movements in the same dataloader:
@@ -120,20 +132,26 @@ def create_tremor_dataloaders(
         
         # 4. Create datasets with optional subject filtering
         if split_by_subject:
-            train_dataset = TremorDataset(data_path=data_path, 
+            # FIX: Pass both paths
+            train_dataset = TremorDataset(data_path=data_path, csv_path=csv_path,
                                         subject_ids=train_subjects)
-            val_dataset   = TremorDataset(data_path=data_path, 
+            val_dataset   = TremorDataset(data_path=data_path, csv_path=csv_path,
                                         subject_ids=val_subjects)
+            
+            train_labels = np.array(train_dataset.labels)
+
         else:
             # simple subset using indices
             train_dataset = Subset(temp_dataset, 
                                 train_indices)
             val_dataset   = Subset(temp_dataset, 
                                 val_indices)
+            
+            # Helper for subsets
+            train_labels = np.array([temp_dataset.labels[i] for i in train_indices])
 
         
         # 5. WeightedRandomSampler for class imbalance in training set
-        train_labels = np.array(train_dataset.labels)
         class_counts = np.bincount(train_labels)
         class_weights = 1.0 / np.maximum(class_counts, 1)
         sample_weights = class_weights[train_labels]
@@ -164,8 +182,14 @@ def create_tremor_dataloaders(
         if print_details:
             print(f"\nSample counts:")
             print(f"Train samples: {len(train_dataset)} | Val samples: {len(val_dataset)}")
+            # Handle class distribution print safely for Subsets
+            if hasattr(train_dataset, 'get_class_distribution'):
+                dist = train_dataset.get_class_distribution()
+            else:
+                 dist = {'Healthy': np.sum(train_labels == 0), 'Parkinson': np.sum(train_labels == 1)}
+            
             print(f"\nTrain Class Distribution:")
-            for cls, count in train_dataset.get_class_distribution().items():
+            for cls, count in dist.items():
                 print(f"  {cls:12s}: {count:4d} ({count/len(train_dataset)*100:.1f}%)")
             print(f"{'='*60}\n")
             
@@ -175,27 +199,45 @@ def create_tremor_dataloaders(
     # Option B: return each movement as a separate dataloader:
     # ----------------------------------------------------------
     else:
-        # 4. Create train/val datasets with subject filtering
-        train_dataset = TremorDataset(
-            data_path=data_path,
-            subject_ids=train_subjects,
-        )
-        
-        val_dataset = TremorDataset(
-            data_path=data_path,
-            subject_ids=val_subjects,
-        )
+        # 4. Create train/val datasets with optional subject filtering
+        if split_by_subject:
+            train_dataset = TremorDataset(data_path=data_path, csv_path=csv_path,
+                                        subject_ids=train_subjects)
+            val_dataset   = TremorDataset(data_path=data_path, csv_path=csv_path,
+                                        subject_ids=val_subjects)
+            
+            # Accessors for regular dataset
+            train_all_movements = train_dataset.movements
+            val_all_movements = val_dataset.movements
+            train_all_labels = train_dataset.labels
+            movement_names = train_dataset.movement_names
+            movement_map = train_dataset.movement_to_idx
+            
+        else:
+            # simple subset using indices
+            train_dataset = Subset(temp_dataset, 
+                                train_indices)
+            val_dataset   = Subset(temp_dataset, 
+                                val_indices)
+            
+            # Accessors for Subset (must access underlying dataset via indices)
+            train_all_movements = [temp_dataset.movements[i] for i in train_indices]
+            val_all_movements = [temp_dataset.movements[i] for i in val_indices]
+            train_all_labels = [temp_dataset.labels[i] for i in train_indices]
+            movement_names = temp_dataset.movement_names
+            movement_map = temp_dataset.movement_to_idx
         
         # 5. Init movement dataloaders dict
         movement_dataloaders = {}
 
         # 6. Loop through every movement
-        for movement_name in train_dataset.movement_names:
-            movement_idx = train_dataset.movement_to_idx[movement_name]
+        for movement_name in movement_names:
+            movement_idx = movement_map[movement_name]
             
-            # Get indices for this movement in train and val
-            train_movement_indices = [i for i, m in enumerate(train_dataset.movements) if m == movement_idx]
-            val_movement_indices = [i for i, m in enumerate(val_dataset.movements) if m == movement_idx]
+            # Get indices for this movement in train and val (relative to their specific datasets)
+            # We filter the lists created above
+            train_movement_indices = [i for i, m in enumerate(train_all_movements) if m == movement_idx]
+            val_movement_indices = [i for i, m in enumerate(val_all_movements) if m == movement_idx]
             
             # Skip if no samples for this movement
             if len(train_movement_indices) == 0 or len(val_movement_indices) == 0:
@@ -204,15 +246,15 @@ def create_tremor_dataloaders(
                 continue
 
             # Create subsets
-            from torch.utils.data import Subset
             train_subset = Subset(train_dataset, train_movement_indices)
             val_subset = Subset(val_dataset, val_movement_indices)
 
             # Weighted sampler for this movement
-            train_labels = np.array([train_dataset.labels[i] for i in train_movement_indices])
-            class_counts = np.bincount(train_labels)
+            # Map subset indices back to our temporary label lists
+            train_labels_subset = np.array([train_all_labels[i] for i in train_movement_indices])
+            class_counts = np.bincount(train_labels_subset)
             class_weights = 1.0 / np.maximum(class_counts, 1)
-            sample_weights = class_weights[train_labels]
+            sample_weights = class_weights[train_labels_subset]
 
             sampler = WeightedRandomSampler(
                 weights=sample_weights,

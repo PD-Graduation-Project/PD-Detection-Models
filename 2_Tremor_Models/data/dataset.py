@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import Dataset
 from pathlib import Path
 import numpy as np
+import pandas as pd 
 from tqdm import tqdm
 
 class TremorDataset(Dataset):
@@ -43,6 +44,10 @@ class TremorDataset(Dataset):
 
             # 1. Ensure numeric
             df = df.apply(pd.to_numeric, errors="coerce")
+            
+            # 1.5 Filter by Subject ID if requested (CRITICAL FIX FOR LEAKAGE)
+            if self.subject_ids is not None and "subject_id" in df.columns:
+                df = df[df["subject_id"].isin(self.subject_ids)]
 
             # 2. Auto-detect feature columns
             feature_cols = [
@@ -55,18 +60,24 @@ class TremorDataset(Dataset):
             self.movements = df["movement"].astype(int).tolist()
             self.labels = df["label"].astype(int).tolist()
 
-            # 3. Optional subject_id (removed for now)
+            # 3. Optional subject_id
             if "subject_id" in df.columns:
                 self.subject_ids_list = df["subject_id"].astype(int).tolist()
             else:
                 self.subject_ids_list = [-1] * len(df)
 
-            # 4. Movement names (optional, for compatibility) (curenntly left as idx)
+            # 4. Movement names (optional, for compatibility)
             if movement_names is None:
-                max_movement = int(df["movement"].max())
-                self.movement_names = [f"movement_{i}" for i in range(max_movement + 1)]
+                if len(df) > 0:
+                    max_movement = int(df["movement"].max())
+                    self.movement_names = [f"movement_{i}" for i in range(max_movement + 1)]
+                else:
+                    self.movement_names = []
             else:
                 self.movement_names = movement_names
+            
+            # Add mapping dict expected by dataloader
+            self.movement_to_idx = {name: i for i, name in enumerate(self.movement_names)}
 
             return  # IMPORTANT: skip npz logic
 
@@ -83,6 +94,8 @@ class TremorDataset(Dataset):
             ])
         
         self.movement_names = movement_names
+        self.movement_to_idx = {name: i for i, name in enumerate(self.movement_names)}
+
         all_samples = []
         
         # 2. Load data from each movement folder
@@ -107,11 +120,18 @@ class TremorDataset(Dataset):
                             all_samples.append(result)
         
         # 3. Store samples
-        self.features = [s[0] for s in all_samples]  # CHANGED: features not signals
-        self.handedness = [s[1] for s in all_samples]
-        self.movements = [s[2] for s in all_samples]
-        self.labels = [s[3] for s in all_samples]
-        self.subject_ids_list = [s[4] for s in all_samples]
+        if all_samples:
+            self.features = [s[0] for s in all_samples]  # CHANGED: features not signals
+            self.handedness = [s[1] for s in all_samples]
+            self.movements = [s[2] for s in all_samples]
+            self.labels = [s[3] for s in all_samples]
+            self.subject_ids_list = [s[4] for s in all_samples]
+        else:
+            self.features = []
+            self.handedness = []
+            self.movements = []
+            self.labels = []
+            self.subject_ids_list = []
         
     def __len__(self):
         return len(self.features)
@@ -156,7 +176,7 @@ class TremorDataset(Dataset):
         return self.movement_names[movement_idx]
     
     def list_movements(self):
-        return {name: idx for idx, name in enumerate(self.movement_names)}
+        return self.movement_to_idx
     
     def get_class_distribution(self):
         return {
