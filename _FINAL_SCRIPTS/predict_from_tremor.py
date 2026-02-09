@@ -19,17 +19,17 @@ Pipeline (must match training):
     - movement index
 
 Movements indeces:
-    - 'CrossArms': 0,
-    - 'DrinkGlas': 1,
-    - 'Entrainment': 2,
-    - 'HoldWeight': 3,
-    - 'LiftHold': 4,
-    - 'PointFinger': 5,
-    - 'Relaxed': 6,
-    - 'RelaxedTask': 7,
-    - 'StretchHold': 8,
-    - 'TouchIndex': 9,
-    - 'TouchNose': 10
+    - 'CrossArms'  : 0 |  10  sec
+    - 'DrinkGlas'  : 1 |  10  sec
+    - 'Entrainment': 2 | *20* sec
+    - 'HoldWeight' : 3 |  10  sec
+    - 'LiftHold'   : 4 |  10  sec
+    - 'PointFinger': 5 |  10  sec
+    - 'Relaxed'    : 6 | *20* sec 
+    - 'RelaxedTask': 7 | *20* sec
+    - 'StretchHold': 8 |  10  sec
+    - 'TouchIndex' : 9 |  10  sec
+    - 'TouchNose'  : 10|  10  sec
     
 """
 
@@ -85,6 +85,14 @@ def _segment_signal(data, window_size, overlap):
         pad = window_size - len(data)
         data = np.pad(data, ((0, pad), (0, 0)), mode="edge")
         segments.append(data)
+    else:
+        # pad last segment if it's not long enough
+        last_start = (len(segments) - 1) * step + window_size
+        remaining = data[last_start:]
+        if len(remaining) > 0 and len(remaining) < window_size:
+            pad = window_size - len(remaining)
+            remaining = np.pad(remaining, ((0, pad), (0, 0)), mode="edge")
+            segments.append(remaining)
 
     return segments
 
@@ -135,8 +143,14 @@ def extract_features_from_txt(left_path, right_path):
         asym = np.abs(lf - rf)
         all_features.append(np.concatenate([lf, rf, asym]))
 
-    # average over segments
-    return np.mean(all_features, axis=0)
+    # return array of features (one per segment) with padding if needed
+    features_array = np.array(all_features, dtype=np.float32)
+    
+    # pad if only one segment
+    if len(features_array) == 1:
+        features_array = np.pad(features_array, ((0, 1), (0, 0)), mode='edge')
+    
+    return features_array
 
 
 # -------------------------
@@ -167,22 +181,12 @@ def predict(
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # features
-    features = extract_features_from_txt(left[0], right[0])
+    # features - returns array of shape (num_segments, feature_dim)
+    features_array = extract_features_from_txt(left[0], right[0])
 
     # metadata
     handedness_val = 0 if handedness.lower() == "left" else 1
     movement_val = movement
-
-    # convert to pytorch tensor
-    x = torch.tensor(features, dtype=torch.float32).to(device)
-    handedness_val = torch.tensor(handedness_val, dtype=torch.long).to(device)
-    movement_val = torch.tensor(movement_val, dtype=torch.long).to(device)
-    
-    # model expects batch dimension
-    x = x.unsqueeze(0)
-    handedness_val = handedness_val.unsqueeze(0)
-    movement_val = movement_val.unsqueeze(0)
 
     # model
     model = TremorClassifier().to(device)
@@ -193,8 +197,21 @@ def predict(
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
+    # make predictions for each segment and average
+    predictions = []
     with torch.inference_mode():
-        logits = model(x, handedness_val, movement_val)
-        prob = torch.sigmoid(logits).item()
+        for features in features_array:
+            x = torch.tensor(features, dtype=torch.float32).to(device)
+            handedness_tensor = torch.tensor(handedness_val, dtype=torch.long).to(device)
+            movement_tensor = torch.tensor(movement_val, dtype=torch.long).to(device)
+            
+            # add batch dimension
+            x = x.unsqueeze(0)
+            handedness_tensor = handedness_tensor.unsqueeze(0)
+            movement_tensor = movement_tensor.unsqueeze(0)
+            
+            logits = model(x, handedness_tensor, movement_tensor)
+            prob = torch.sigmoid(logits).item()
+            predictions.append(prob)
 
-    return prob
+    return np.mean(predictions)

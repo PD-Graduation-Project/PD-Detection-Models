@@ -24,7 +24,25 @@ Multi-modal Parkinson’s Disease detection pipelines featuring models for spira
 
 ![](1_Spiral_Drawing_Models/results/finetuning/output.png)
 
+---
+
 ## Part 2: Tremor Model
+
+#### Generated data (used in pre-training):
+- Model used: TVAE (Tabular VAE)
+- Generated data accuracy:
+    - Column Shapes Score: **92.53**
+    - Column Pair Trends Score: **96.8%**
+    - Overall Score (Average): **94.67%**
+- Generated: 100k samples
+    - **80K**: Training
+    - **20K**: Validation
+
+### Metrics:
+- Validation *Accuracy*: **91.17%**
+- Validation *F1-Score*: **91.16%**
+
+![alt text](2_Tremor_Models/results/training/output.png)
 
 ---
 

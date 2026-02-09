@@ -27,7 +27,7 @@ audio_data = ["examples/healthy_audio.wav",
 
 tremor_data = [
     ("Healthy tremor", "examples/tremor/healthy/", 0, "right"),
-    ("PD tremor", "examples/tremor/pd/", 10, "right"),
+    ("PD tremor", "examples/tremor/pd/", 2, "right"),
 ]
 
 # ============================================================================
