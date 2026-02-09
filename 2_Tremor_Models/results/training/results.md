@@ -17,3 +17,7 @@ Epoch 48:
 ## Peak results
 - balanced_accuracy=0.9117
 - macro_f1=0.9116
+
+## Finetuning
+- balanced_accuracy=0.6443
+- macro_f1=0.6144
