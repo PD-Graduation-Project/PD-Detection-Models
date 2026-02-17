@@ -9,7 +9,8 @@ from sdv.evaluation.single_table import evaluate_quality
 
 def train_TVAE(csv_dir: str,
             output_dir: str,
-            epochs: int = 2000,
+            epochs_healthy: int = 2000,
+            epochs_PD: int = 1000,
             create_metadata: bool = True):
     """
     Train a TVAE (Tabular VAE) model on the Parkinson's dataset.
@@ -47,10 +48,10 @@ def train_TVAE(csv_dir: str,
     # 4. Init TWO TVAE synthesizers
     # ------------------------------
     synth_healthy = TVAESynthesizer(metadata, 
-                                    epochs=epochs, 
+                                    epochs=epochs_healthy, 
                                     cuda=True, verbose=True)
     synth_pd = TVAESynthesizer(metadata, 
-                                epochs=epochs, 
+                                epochs=epochs_PD, 
                                 cuda=True, verbose=True)
     
     # 5. Train both
