@@ -38,7 +38,7 @@ import numpy as np
 import joblib
 from pathlib import Path
 
-import tsfel
+import pycatch22
 
 # -------------------------
 # Model
@@ -51,7 +51,6 @@ from models.tremorNet import TremorClassifier
 # -------------------------
 WINDOW_SIZE = 1024
 OVERLAP = 0.5
-NUM_CATCH22 = 22
 SCALER_PATH = "weights/tremor_scaler.pkl" 
 
 # -------------------------
@@ -97,23 +96,10 @@ def _segment_signal(data, window_size, overlap):
     return segments
 
 
-# def _extract_features_from_segment(segment):
-#     all_features = []
-    
-#     # Extract features from EACH channel
-#     for channel_idx in range(segment.shape[1]):
-#         channel_signal = segment[:, channel_idx]
-        
-#         # catch22 returns 22 features per channel
-#         features = pycatch22.catch22_all(channel_signal)['values']
-#         all_features.extend(features)
-    
-#     return np.array(all_features, dtype=np.float32)
-
 def _extract_features_from_segment(segment):
     """
     Extract statistical, temporal, and spectral features from a signal segment.
-    Uses TSFEL library to extract features from each channel independently,
+    Uses catch22 library to extract features from each channel independently,
     then concatenates all features.
     
     Args:
@@ -124,25 +110,17 @@ def _extract_features_from_segment(segment):
         np.ndarray of shape (num_features * num_channels,)
                 Concatenated features from all channels
     """
-    # Get all 3 domains config
-    cfg = tsfel.get_features_by_domain()  # statistical + temporal + spectral
-    
     all_features = []
     
+    # Extract features from EACH channel
     for channel_idx in range(segment.shape[1]):
         channel_signal = segment[:, channel_idx]
         
-        features_df = tsfel.time_series_features_extractor(
-            cfg,
-            channel_signal,
-            fs=100,         # sampling frequency of your device
-            verbose=0       # suppress output
-        )
-        
-        all_features.extend(features_df.values.flatten())
+        # catch22 returns 22 features per channel
+        features = pycatch22.catch22_all(channel_signal)['values']
+        all_features.extend(features)
     
     return np.array(all_features, dtype=np.float32)
-
 
 # -------------------------
 # Feature extraction
