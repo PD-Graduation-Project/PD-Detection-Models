@@ -43,7 +43,7 @@ def train_one_epoch(model: torch.nn.Module,
         # 3. unpack and move data to device
         features, handedness, movements, labels  = [b.to(device) for b in batch] 
         """
-        # features: [B, 66]
+        # features: [B, 312]
         # handedness: [B]
         # movements: [B]
         # labels: [B]

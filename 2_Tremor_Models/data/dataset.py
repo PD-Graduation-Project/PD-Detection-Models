@@ -52,7 +52,7 @@ class TremorDataset(Dataset):
             # 2. Auto-detect feature columns
             feature_cols = [
                 c for c in df.columns
-                if c.startswith("lh_") or c.startswith("rh_") or c.startswith("asym_")
+                if c.startswith("lh_") or c.startswith("rh_")
             ]
 
             self.features = df[feature_cols].values.astype(np.float32)
