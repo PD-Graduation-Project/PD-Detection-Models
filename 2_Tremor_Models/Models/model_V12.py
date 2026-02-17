@@ -164,6 +164,7 @@ class TremorClassifier(nn.Module):
         num_movements=11,
         num_classes=1,
 
+        # Embedding dimensions
         movement_embed_dim=32,
         handedness_embed_dim=8,
 

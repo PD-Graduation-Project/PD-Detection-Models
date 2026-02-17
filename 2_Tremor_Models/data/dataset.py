@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd 
 from tqdm import tqdm
 
+
 class TremorDataset(Dataset):
     """
     MODIFIED: Now loads FEATURES instead of raw signals.
@@ -144,7 +145,7 @@ class TremorDataset(Dataset):
         features = torch.tensor(
             self.features[index],
             dtype=torch.float32
-        )  # shape: (num_features,) e.g., (264,)
+        )  # shape: (num_features,) e.g., (312,)
         
         handedness = torch.tensor(self.handedness[index], dtype=torch.long)
         movement = torch.tensor(self.movements[index], dtype=torch.long)

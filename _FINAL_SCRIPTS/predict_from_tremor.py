@@ -38,7 +38,7 @@ import numpy as np
 import joblib
 from pathlib import Path
 
-import pycatch22
+import tsfel
 
 # -------------------------
 # Model
@@ -52,7 +52,7 @@ from models.tremorNet import TremorClassifier
 WINDOW_SIZE = 1024
 OVERLAP = 0.5
 NUM_CATCH22 = 22
-
+SCALER_PATH = "weights/tremor_scaler.pkl" 
 
 # -------------------------
 # Preprocessing utilities
@@ -97,16 +97,49 @@ def _segment_signal(data, window_size, overlap):
     return segments
 
 
+# def _extract_features_from_segment(segment):
+#     all_features = []
+    
+#     # Extract features from EACH channel
+#     for channel_idx in range(segment.shape[1]):
+#         channel_signal = segment[:, channel_idx]
+        
+#         # catch22 returns 22 features per channel
+#         features = pycatch22.catch22_all(channel_signal)['values']
+#         all_features.extend(features)
+    
+#     return np.array(all_features, dtype=np.float32)
+
 def _extract_features_from_segment(segment):
+    """
+    Extract statistical, temporal, and spectral features from a signal segment.
+    Uses TSFEL library to extract features from each channel independently,
+    then concatenates all features.
+    
+    Args:
+        segment: np.ndarray of shape (window_size, num_channels)
+                Time series data for a single window across channels
+    
+    Returns:
+        np.ndarray of shape (num_features * num_channels,)
+                Concatenated features from all channels
+    """
+    # Get all 3 domains config
+    cfg = tsfel.get_features_by_domain()  # statistical + temporal + spectral
+    
     all_features = []
     
-    # Extract features from EACH channel
     for channel_idx in range(segment.shape[1]):
         channel_signal = segment[:, channel_idx]
         
-        # catch22 returns 22 features per channel
-        features = pycatch22.catch22_all(channel_signal)['values']
-        all_features.extend(features)
+        features_df = tsfel.time_series_features_extractor(
+            cfg,
+            channel_signal,
+            fs=100,         # sampling frequency of your device
+            verbose=0       # suppress output
+        )
+        
+        all_features.extend(features_df.values.flatten())
     
     return np.array(all_features, dtype=np.float32)
 
@@ -140,8 +173,7 @@ def extract_features_from_txt(left_path, right_path):
     for l, r in zip(left_segs, right_segs):
         lf = _extract_features_from_segment(l)
         rf = _extract_features_from_segment(r)
-        asym = np.abs(lf - rf)
-        all_features.append(np.concatenate([lf, rf, asym]))
+        all_features.append(np.concatenate([lf, rf]))
 
     # return array of features (one per segment) with padding if needed
     features_array = np.array(all_features, dtype=np.float32)
@@ -183,6 +215,10 @@ def predict(
 
     # features - returns array of shape (num_segments, feature_dim)
     features_array = extract_features_from_txt(left[0], right[0])
+    
+    # Load and apply scaler (must match training)
+    scaler = joblib.load(SCALER_PATH)
+    features_array = scaler.transform(features_array)
 
     # metadata
     handedness_val = 0 if handedness.lower() == "left" else 1

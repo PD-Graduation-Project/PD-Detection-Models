@@ -6,7 +6,6 @@ from tqdm import tqdm
 # NEW: Feature extraction library
 import tsfel
 
-
 # ------------------------
 # NEW: Preprocessing (from paper)
 # ------------------------
@@ -25,30 +24,6 @@ def _compute_vector_magnitude(data):
     # Vector magnitude = sqrt(x² + y² + z²)
     magnitude = np.sqrt(np.sum(data**2, axis=1, keepdims=True))
     return magnitude
-
-
-def _select_more_affected_hand(left_data, right_data):
-    """
-    Detect which hand has larger tremor amplitude (like paper).
-    Paper: "detect the more-affected hand using AUC as proxy for tremor power"
-    
-    Args:
-        left_data: shape (T, num_channels)
-        right_data: shape (T, num_channels)
-    
-    Returns:
-        more_affected_data: the hand with larger tremor amplitude
-    """
-    # Calculate AUC (Area Under Curve) = sum of absolute values
-    left_auc = np.sum(np.abs(left_data))
-    right_auc = np.sum(np.abs(right_data))
-    
-    # Return the hand with larger tremor power
-    if left_auc > right_auc:
-        return left_data
-    else:
-        return right_data
-
 
 # ------------------------
 # NEW: Feature Extraction
@@ -85,6 +60,30 @@ def _extract_features_from_segment(segment):
         all_features.extend(features_df.values.flatten())
     
     return np.array(all_features, dtype=np.float32)
+
+# import pycatch22
+# from tsfresh.feature_extraction import extract_features
+# def _extract_features_from_segment(segment):
+#     """
+#     Extract time-series features from a segment using catch22.
+    
+#     Args:
+#         segment: numpy array of shape (window_size, num_channels)
+        
+#     Returns:
+#         features: 1D array of all features concatenated
+#     """
+#     all_features = []
+    
+#     # Extract features from EACH channel
+#     for channel_idx in range(segment.shape[1]):
+#         channel_signal = segment[:, channel_idx]
+        
+#         # catch22 returns 22 features per channel
+#         features = pycatch22.catch22_all(channel_signal)['values']
+#         all_features.extend(features)
+    
+#     return np.array(all_features, dtype=np.float32)
 
 # ------------------------
 #  preprocessing utilities
@@ -218,8 +217,8 @@ def create_clean_dataset(
         # Extract features and save
         for seg_idx, (left_seg, right_seg) in enumerate(zip(left_segments, right_segments)):
 
-            left_features = _extract_features_from_segment(left_seg)    # (~780,)
-            right_features = _extract_features_from_segment(right_seg)  # (~780,)
+            left_features = _extract_features_from_segment(left_seg)    # (~156,)
+            right_features = _extract_features_from_segment(right_seg)  # (~156,)
             
             # Combine: Left + Right 
             combined_features = np.concatenate([left_features, right_features])

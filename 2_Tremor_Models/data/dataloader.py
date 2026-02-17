@@ -3,6 +3,8 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 from torch.utils.data import Subset
+from sklearn.preprocessing import StandardScaler
+import joblib
 
 # dataloader creator function
 # -----------------------------
@@ -139,6 +141,14 @@ def create_tremor_dataloaders(
                                         subject_ids=val_subjects)
             
             train_labels = np.array(train_dataset.labels)
+            
+            # Fit scaler on train only, apply to both
+            scaler = StandardScaler()
+            train_dataset.features = scaler.fit_transform(train_dataset.features)
+            val_dataset.features   = scaler.transform(val_dataset.features)
+            
+            # Save it
+            joblib.dump(scaler, "tremor_scaler.pkl")
 
         else:
             # simple subset using indices
@@ -149,8 +159,21 @@ def create_tremor_dataloaders(
             
             # Helper for subsets
             train_labels = np.array([temp_dataset.labels[i] for i in train_indices])
+            
+            scaler = StandardScaler()
+
+            # fit on train indices only, transform both
+            train_features = temp_dataset.features[train_indices]
+            val_features   = temp_dataset.features[val_indices]
+
+            temp_dataset.features[train_indices] = scaler.fit_transform(train_features)
+            temp_dataset.features[val_indices]   = scaler.transform(val_features)
+            
+            # Save it
+            joblib.dump(scaler, "tremor_scaler.pkl")
 
         
+
         # 5. WeightedRandomSampler for class imbalance in training set
         class_counts = np.bincount(train_labels)
         class_weights = 1.0 / np.maximum(class_counts, 1)

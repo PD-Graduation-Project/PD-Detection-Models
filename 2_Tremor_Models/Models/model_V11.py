@@ -80,7 +80,7 @@ class TremorClassifier(nn.Module):
     """
     def __init__(
         self,
-        num_features=66,           # Left + Right + Asymmetry features
+        num_features=44,           # Left + Right + Asymmetry features
         num_movements=11,          # Number of movement types
         num_classes=1,             # Healthy vs PD -> with one preceptron only
         
