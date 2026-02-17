@@ -3,6 +3,9 @@ import pandas as pd
 from pathlib import Path
 from tqdm import tqdm
 
+NUM_FEATURES_PER_HAND = 156
+TOTAL_FEATURES = NUM_FEATURES_PER_HAND * 2  # 312
+
 
 def npz_to_csv(
     data_path: str = "../../../project_datasets/tremor/movements",
@@ -13,9 +16,8 @@ def npz_to_csv(
 
     Movements are encoded as integers [0–10].
     Features are named:
-      - lh_1 ... lh_20
-      - rh_1 ... rh_20
-      - asym_1 ... asym_20
+      - lh_1 ... lh_156  (left hand)
+      - rh_1 ... rh_156  (right hand)
     """
 
     data_path = Path(data_path)
@@ -53,31 +55,25 @@ def npz_to_csv(
                 handedness = int(data["handedness"])
                 segment_idx = int(data.get("segment_idx", 0))
 
-                if len(features) != 66:
+                if len(features) != TOTAL_FEATURES:
                     raise ValueError(
-                        f"{npz_file.name}: Expected 66 features, got {len(features)}"
+                        f"{npz_file.name}: Expected {TOTAL_FEATURES} features, got {len(features)}"
                     )
 
                 row = {
-                    "movement": movement_id,
-                    # "movement_name": movement_name,
-                    "handedness": handedness,
-                    "label": label,
-                    # "label_name": label_name,
-                    "segment_idx": segment_idx,
+                    "movement":     movement_id,
+                    "handedness":   handedness,
+                    "label":        label,
+                    "segment_idx":  segment_idx,
                 }
 
-                # Left hand features (1–22)
-                for i in range(22):
+                # Left hand features (1–156)
+                for i in range(NUM_FEATURES_PER_HAND):
                     row[f"lh_{i+1}"] = features[i]
 
-                # Right hand features (1–22)
-                for i in range(22):
-                    row[f"rh_{i+1}"] = features[22 + i]
-
-                # Asymmetry features (1–22)
-                for i in range(22):
-                    row[f"asym_{i+1}"] = features[44 + i]
+                # Right hand features (1–156)
+                for i in range(NUM_FEATURES_PER_HAND):
+                    row[f"rh_{i+1}"] = features[NUM_FEATURES_PER_HAND + i]
 
                 all_rows.append(row)
 
@@ -85,23 +81,13 @@ def npz_to_csv(
     df = pd.DataFrame(all_rows)
 
     # Column order
-    metadata_cols = [
-        "movement",
-        # "movement_name",
-        "handedness",
-        "label",
-        # "label_name",
-        "segment_idx",
-    ]
-
+    metadata_cols = ["movement", "handedness", "label", "segment_idx"]
     feature_cols = (
-        [f"lh_{i}" for i in range(1, 23)] +
-        [f"rh_{i}" for i in range(1, 23)] +
-        [f"asym_{i}" for i in range(1, 23)]
+        [f"lh_{i}" for i in range(1, NUM_FEATURES_PER_HAND + 1)] +
+        [f"rh_{i}" for i in range(1, NUM_FEATURES_PER_HAND + 1)]
     )
 
     df = df[metadata_cols + feature_cols]
-
     df.to_csv(output_csv, index=False)
 
     print("=" * 60)
@@ -112,7 +98,7 @@ def npz_to_csv(
     print(df["label"].value_counts())
     print("\nMovement mapping:")
     for k, v in movement_map.items():
-        print(f"{v}: {k}")
+        print(f"  {v}: {k}")
     print("=" * 60)
 
     return df

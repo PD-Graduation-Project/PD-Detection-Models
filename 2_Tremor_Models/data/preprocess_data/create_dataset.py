@@ -4,8 +4,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 # NEW: Feature extraction library
-from tsfresh import extract_features
-from tsfresh.feature_extraction import EfficientFCParameters, MinimalFCParameters, ComprehensiveFCParameters
+import tsfel
 
 
 # ------------------------
@@ -56,45 +55,33 @@ def _select_more_affected_hand(left_data, right_data):
 # ------------------------
 def _extract_features_from_segment(segment):
     """
-    Extract time-series features from a segment using tsfresh.
+    Extract statistical, temporal, and spectral features from a signal segment.
+    Uses TSFEL library to extract features from each channel independently,
+    then concatenates all features.
     
     Args:
-        segment: numpy array of shape (window_size, num_channels)
-        
-    Returns:
-        features: 1D array of all features concatenated (~780 per channel)
+        segment: np.ndarray of shape (window_size, num_channels)
+                Time series data for a single window across channels
     
-    Feature settings options:
-        - MinimalFCParameters:      ~10 features per channel  (fastest)
-        - EfficientFCParameters:    ~780 features per channel (recommended)
-        - ComprehensiveFCParameters: ~4000 features per channel (slowest)
+    Returns:
+        np.ndarray of shape (num_features * num_channels,)
+                Concatenated features from all channels
     """
+    # Get all 3 domains config
+    cfg = tsfel.get_features_by_domain()  # statistical + temporal + spectral
+    
     all_features = []
     
     for channel_idx in range(segment.shape[1]):
         channel_signal = segment[:, channel_idx]
         
-        # tsfresh requires a specific DataFrame format:
-        # - 'id'    : which time series (we only have 1 segment = id 0)
-        # - 'time'  : time index
-        # - 'value' : signal values
-        df = pd.DataFrame({
-            'id':    0,
-            'time':  np.arange(len(channel_signal)),
-            'value': channel_signal
-        })
-        
-        # Extract features (~780 features per channel with EfficientFCParameters)
-        features_df = extract_features(
-            df,
-            column_id='id',
-            column_sort='time',
-            column_value='value',
-            default_fc_parameters=EfficientFCParameters(),
-            disable_progressbar=True  # Suppress per-channel progress bar
+        features_df = tsfel.time_series_features_extractor(
+            cfg,
+            channel_signal,
+            fs=100,         # sampling frequency of your device
+            verbose=0       # suppress output
         )
         
-        # Convert to numpy and add to list
         all_features.extend(features_df.values.flatten())
     
     return np.array(all_features, dtype=np.float32)
