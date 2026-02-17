@@ -4,8 +4,8 @@ from pathlib import Path
 from tqdm import tqdm
 
 # NEW: Feature extraction library
-import pycatch22
-from tsfresh.feature_extraction import extract_features
+from tsfresh import extract_features
+from tsfresh.feature_extraction import EfficientFCParameters, MinimalFCParameters, ComprehensiveFCParameters
 
 
 # ------------------------
@@ -54,39 +54,54 @@ def _select_more_affected_hand(left_data, right_data):
 # ------------------------
 # NEW: Feature Extraction
 # ------------------------
-
 def _extract_features_from_segment(segment):
     """
-    Extract time-series features from a segment using catch22.
+    Extract time-series features from a segment using tsfresh.
     
     Args:
         segment: numpy array of shape (window_size, num_channels)
         
     Returns:
-        features: 1D array of all features concatenated
+        features: 1D array of all features concatenated (~780 per channel)
+    
+    Feature settings options:
+        - MinimalFCParameters:      ~10 features per channel  (fastest)
+        - EfficientFCParameters:    ~780 features per channel (recommended)
+        - ComprehensiveFCParameters: ~4000 features per channel (slowest)
     """
     all_features = []
     
-    # Extract features from EACH channel
     for channel_idx in range(segment.shape[1]):
         channel_signal = segment[:, channel_idx]
         
-        # catch22 returns 22 features per channel
-        features = pycatch22.catch22_all(channel_signal)['values']
-        all_features.extend(features)
+        # tsfresh requires a specific DataFrame format:
+        # - 'id'    : which time series (we only have 1 segment = id 0)
+        # - 'time'  : time index
+        # - 'value' : signal values
+        df = pd.DataFrame({
+            'id':    0,
+            'time':  np.arange(len(channel_signal)),
+            'value': channel_signal
+        })
+        
+        # Extract features (~780 features per channel with EfficientFCParameters)
+        features_df = extract_features(
+            df,
+            column_id='id',
+            column_sort='time',
+            column_value='value',
+            default_fc_parameters=EfficientFCParameters(),
+            disable_progressbar=True  # Suppress per-channel progress bar
+        )
+        
+        # Convert to numpy and add to list
+        all_features.extend(features_df.values.flatten())
     
     return np.array(all_features, dtype=np.float32)
 
-# def _extract_features_from_segment(segment):
-#     # tsfresh extracts ~790 features
-#     df = pd.DataFrame(segment)
-#     features = extract_features(df, column_id=0, column_sort=0)
-#     return features.values.flatten()
-
 # ------------------------
-# Keep existing preprocessing utilities
+#  preprocessing utilities
 # ------------------------
-
 def _remove_timestamp_column(data):
     """Remove timestamp column if present (column 0)."""
     if data.shape[1] == 7:
@@ -96,7 +111,7 @@ def _remove_timestamp_column(data):
 def _handle_missing_values(data):
     """Handle missing values by forward fill then backward fill."""
     df = pd.DataFrame(data)
-    df = df.fillna(method='ffill').fillna(method='bfill')
+    df = df.ffill().bfill()
     return df.values
 
 def _segment_signal(data, window_size=1024, overlap=0.5):
@@ -130,21 +145,9 @@ def create_clean_dataset(
     output_dir: Path = Path("../../../project_datasets/tremor/movements"),
     window_size: int = 1024,
     overlap: float = 0.5,
-    include_other: bool = False,
+    include_other: bool = False, 
+    ):
     
-    extract_features: bool = True,  # NEW: Toggle feature extraction
-    use_vector_magnitude: bool = True,  # NEW: Use magnitude instead of X,Y,Z
-    use_more_affected_hand: bool = False  # NEW: Select hand with larger tremor (not better in healthy vs pd)
-):
-    """
-    Create dataset with FEATURE EXTRACTION (like the paper).
-    
-    Args:
-        extract_features: If True, saves features instead of raw signals
-        use_vector_magnitude: If True, converts (X,Y,Z) to single magnitude
-        use_more_affected_hand: If True, uses only the hand with larger tremor
-    """
-
     TIME_SERIES_DIR = root_dir / time_series_subdir
     FILE_LIST = root_dir / file_list_subdir
     OUTPUT_DIR = Path(output_dir)
@@ -159,7 +162,7 @@ def create_clean_dataset(
         for _, row in labels_df.iterrows()
     }
 
-    # 2. Collect files
+    # 2. Collect and group files
     print("Collecting movement files...")
     movement_files = sorted(TIME_SERIES_DIR.glob("*.txt"))
     
@@ -170,7 +173,6 @@ def create_clean_dataset(
         movement_name = movement_full.replace("_LeftWrist", "").replace("_RightWrist", "")
         return int(subject_id), movement_name, wrist
 
-    # 3. Group files
     grouped_files = {}
     for f in movement_files:
         sid, mv, wrist = parse_filename(f)
@@ -179,22 +181,23 @@ def create_clean_dataset(
     total_segments = 0
     skipped_recordings = 0
     
-    # 4. Process paired recordings
+    # 3. Process paired recordings
     for (subject_id, movement_name), wrist_files in tqdm(grouped_files.items(), desc="Processing"):
 
+        # Require both wrists
         if 0 not in wrist_files or 1 not in wrist_files:
             skipped_recordings += 1
             continue
 
-        # 4.1. Load data
+        # Load data
         try:
             left_data = np.loadtxt(wrist_files[0], delimiter=',', dtype=np.float32)
             right_data = np.loadtxt(wrist_files[1], delimiter=',', dtype=np.float32)
-        except Exception as e:
+        except Exception:
             skipped_recordings += 1
             continue
 
-        # 4.2. Preprocess
+        # Basic preprocessing
         left_data = _remove_timestamp_column(left_data)
         right_data = _remove_timestamp_column(right_data)
         
@@ -208,115 +211,46 @@ def create_clean_dataset(
             skipped_recordings += 1
             continue
 
-        # 4.3. Handle missing values
+        # Handle missing values
         left_data = _handle_missing_values(left_data)
         right_data = _handle_missing_values(right_data)
 
-        # NEW: Apply paper's preprocessing
-        # ---------------------------------
-        
-        # 5. Convert to vector magnitude (optional, like paper)
-        if use_vector_magnitude:
-            # Use only accelerometer channels (first 3)
-            left_data = _compute_vector_magnitude(left_data[:, :3])
-            right_data = _compute_vector_magnitude(right_data[:, :3])
-            # Now: (T, 1) instead of (T, 3)
-        
-        # 5.1. Select more affected hand (optional, like paper)
-        if use_more_affected_hand:
-            # Use single hand with larger tremor
-            selected_data = _select_more_affected_hand(left_data, right_data)
-            # Segment only this hand
-            segments = _segment_signal(selected_data, window_size, overlap)
-        else:
-            # Use both hands separately (original behavior)
-            left_segments = _segment_signal(left_data, window_size, overlap)
-            right_segments = _segment_signal(right_data, window_size, overlap)
+        # Convert accelerometer (X,Y,Z) → vector magnitude
+        left_data = _compute_vector_magnitude(left_data[:, :3])   # (T, 1)
+        right_data = _compute_vector_magnitude(right_data[:, :3])  # (T, 1)
 
-        # 6. Create output directory
+        # Segment both hands
+        left_segments = _segment_signal(left_data, window_size, overlap)
+        right_segments = _segment_signal(right_data, window_size, overlap)
+
+        # Create output directory
         label_name = {0: "Healthy", 1: "Parkinson", 2: "Other"}.get(label, "Unknown")
         out_dir = OUTPUT_DIR / movement_name / label_name
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        # 7. NEW: Process and save each segment
-        if use_more_affected_hand:
-            # Single hand case (like paper)
-            for seg_idx, segment in enumerate(segments):
-                
-                if extract_features:
-                    # 7.1. Extract features from single hand
-                    features = _extract_features_from_segment(segment)
-                    
-                    save_dict = {
-                        'features': features,
-                        'label': label,
-                        'handedness': handedness,
-                        'subject_id': subject_id,
-                        'movement_name': movement_name,
-                        'segment_idx': seg_idx
-                    }
-                else:
-                    # 7.2. Save raw signal from single hand
-                    save_dict = {
-                        'signal': segment.astype(np.float32),
-                        'label': label,
-                        'handedness': handedness,
-                        'subject_id': subject_id,
-                        'movement_name': movement_name,
-                        'segment_idx': seg_idx
-                    }
-                
-                filename = f"{subject_id}_seg{seg_idx:03d}.npz"
-                np.savez_compressed(out_dir / filename, **save_dict)
-                total_segments += 1
-        
-        else:
-            # 7.3. Both hands case (original behavior)
-            for seg_idx, (left_seg, right_seg) in enumerate(zip(left_segments, right_segments)):
-                
-                if extract_features:
-                    # Extract features from both hands
-                    left_features = _extract_features_from_segment(left_seg)
-                    right_features = _extract_features_from_segment(right_seg)
-                    
-                    # NEW: Asymmetry features
-                    """
-                    Healthy = low amplitude + low asymmetry
-                    PD = high amplitude + high asymmetry
-                    """
-                    asymmetry_features = np.abs(left_features - right_features)
-                    
-                    combined_features = np.concatenate([left_features, right_features, asymmetry_features])
-                    
-                    save_dict = {
-                        'features': combined_features,
-                        'label': label,
-                        'handedness': handedness,
-                        'subject_id': subject_id,
-                        'movement_name': movement_name,
-                        'segment_idx': seg_idx
-                    }
-                else:
-                    # 7.4. Save raw signals from both hands
-                    save_dict = {
-                        'signal': (left_seg.astype(np.float32), right_seg.astype(np.float32)),
-                        'label': label,
-                        'handedness': handedness,
-                        'subject_id': subject_id,
-                        'movement_name': movement_name,
-                        'segment_idx': seg_idx
-                    }
-                
-                filename = f"{subject_id}_seg{seg_idx:03d}.npz"
-                np.savez_compressed(out_dir / filename, **save_dict)
-                total_segments += 1
+        # Extract features and save
+        for seg_idx, (left_seg, right_seg) in enumerate(zip(left_segments, right_segments)):
 
-    # Summary
+            left_features = _extract_features_from_segment(left_seg)    # (~780,)
+            right_features = _extract_features_from_segment(right_seg)  # (~780,)
+            
+            # Combine: Left + Right 
+            combined_features = np.concatenate([left_features, right_features])
+
+            np.savez_compressed(
+                out_dir / f"{subject_id}_seg{seg_idx:03d}.npz",
+                features=combined_features,
+                label=label,
+                handedness=handedness,
+                subject_id=subject_id,
+                movement_name=movement_name,
+                segment_idx=seg_idx
+            )
+            total_segments += 1
+
     print(f"\n{'='*60}")
     print(f"Dataset creation complete!")
     print(f"Output directory: {OUTPUT_DIR.resolve()}")
     print(f"Total segments: {total_segments}")
-    print(f"Mode: {'FEATURES' if extract_features else 'RAW SIGNALS'}")
-    print(f"Vector magnitude: {use_vector_magnitude}")
-    print(f"More-affected hand: {use_more_affected_hand}")
+    print(f"Skipped: {skipped_recordings}")
     print(f"{'='*60}")
