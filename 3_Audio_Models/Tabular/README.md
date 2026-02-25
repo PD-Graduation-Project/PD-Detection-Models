@@ -8,19 +8,19 @@
 - TVAE (Tabular VAE)
 
 ```
-(1/2) Evaluating Column Shapes: |██████████| 26/26 [00:00<00:00, 72.99it/s]|
-Column Shapes Score: 87.43%
+(1/2) Evaluating Column Shapes: |██████████| 26/26 [00:00<00:00, 88.13it/s]|
+Column Shapes Score: 88.81%
 
-(2/2) Evaluating Column Pair Trends: |██████████| 325/325 [00:05<00:00, 57.29it/s]|
-Column Pair Trends Score: 92.2%
+(2/2) Evaluating Column Pair Trends: |██████████| 325/325 [00:04<00:00, 75.31it/s]|
+Column Pair Trends Score: 93.18%
 
-Overall Score (Average): 89.81%
+Overall Score (Average): 91.0%
 
-Overall Quality Score: 0.8981411166402432
+Overall Quality Score: 0.9099564680282488
 Detailed Properties:
              Property     Score
-0       Column Shapes  0.874290
-1  Column Pair Trends  0.921992
+0       Column Shapes  0.888114
+1  Column Pair Trends  0.931799
 -----------------------------------
 ```
 

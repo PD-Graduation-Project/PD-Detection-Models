@@ -9,7 +9,7 @@ preprocessed_dataset/
 # -------------
 __pycache__/
 .vscode/
-folderico-vdmEDi.ico
+*.ico
 desktop.ini
 
 # Models
