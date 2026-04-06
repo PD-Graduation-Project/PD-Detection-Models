@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-NUM_HAND_FEATURES = 22  # lh_1...lh_156 and rh_1...rh_156
+NUM_HAND_FEATURES = 27  # lh_1...lh_27 and rh_1...rh_27
 
 
 # ==========================================
@@ -151,7 +151,7 @@ class TremorClassifier(nn.Module):
         7. Self-attention → residual blocks → classification
 
     Input (from CSV):
-        features:   (batch, 312) = [lh_1...lh_156, rh_1...rh_156]
+        features:   (batch, 27*2) = [lh_1...lh_27, rh_1...rh_27]
         handedness: (batch,)     - 0=Left-handed, 1=Right-handed
         movement:   (batch,)     - movement ID 0-10
 
@@ -160,7 +160,7 @@ class TremorClassifier(nn.Module):
     """
     def __init__(
         self,
-        num_hand_features=NUM_HAND_FEATURES,  # 156 per hand
+        num_hand_features=NUM_HAND_FEATURES,  # 27 per hand
         num_movements=11,
         num_classes=1,
 
@@ -228,11 +228,11 @@ class TremorClassifier(nn.Module):
 
     def _split_features(self, features):
         """
-        Split (batch, 312) into left and right hand features.
+        Split (batch, 27*2) into left and right hand features.
         
         Returns:
-            lh: (batch, 156) - left hand features
-            rh: (batch, 156) - right hand features
+            lh: (batch, 27) - left hand features
+            rh: (batch, 27) - right hand features
         """
         lh = features[:, :self.num_hand_features]   # lh_1...lh_156
         rh = features[:, self.num_hand_features:]   # rh_1...rh_156
@@ -247,8 +247,8 @@ class TremorClassifier(nn.Module):
                     1 = Right-handed (right hand is dominant)
         
         Returns:
-            dominant:     (batch, 156)
-            nondominant:  (batch, 156)
+            dominant:     (batch, 27)
+            nondominant:  (batch, 27)
         """
         # handedness mask: True where right-handed (dominant = right)
         is_right_handed = handedness.bool().unsqueeze(1)  # (batch, 1)
@@ -263,7 +263,7 @@ class TremorClassifier(nn.Module):
     def forward(self, features, handedness, movement):
         """
         Args:
-            features:   (batch, 312) - [lh_1...lh_156, rh_1...rh_156]
+            features:   (batch, 27*2) - [lh_1...lh_27, rh_1...rh_27]
             handedness: (batch,)     - 0=left-handed, 1=right-handed
             movement:   (batch,)     - movement ID
 
@@ -274,7 +274,7 @@ class TremorClassifier(nn.Module):
         lh, rh = self._split_features(features)
 
         # 2. Compute asymmetry BEFORE routing
-        asymmetry = torch.abs(lh - rh)  # (batch, 156)
+        asymmetry = torch.abs(lh - rh)  # (batch, 27)
 
         # 3. Route to dominant / non-dominant based on handedness
         dominant, nondominant = self._route_hands(lh, rh, handedness)
