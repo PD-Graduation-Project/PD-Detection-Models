@@ -1,0 +1,62 @@
+tremor_losses:
+  # Loss component weights
+  bce_weight: 1.0
+  focal_weight: 0.3
+  tversky_weight: 0.3
+  # Class imbalance correction (for 77% PD, 23% Healthy)
+  healthy_weight: 1.0     
+  parkinson_weight: 1.0
+  # Focal loss params 
+  focal_alpha: 0.1 
+  focal_gamma: 5.0 
+  # Tversky params 
+  tversky_alpha: 0.6 
+  tversky_beta: 0.4  
+
+drawing_losses:
+  # Loss component weights
+  bce_weight: 1.0
+  focal_weight: 0.5
+  tversky_weight: 0.5
+  # Positive-class (PD) weighting
+  pos_weight: 1.5
+  # Focal params
+  focal_alpha: 0.6
+  focal_gamma: 1.5
+  # Tversky params
+  tversky_alpha: 0.6
+  tversky_beta: 0.4
+
+questionnaire_losses:
+  # Loss component weights
+  bce_weight: 0.5
+  focal_weight: 1.0
+  tversky_weight: 0.5
+  # Label smoothing
+  label_smoothing: 0.03
+  # Class imbalance correction
+  healthy_weight: 1.5
+  parkinson_weight: 1.0
+  # Focal params
+  focal_alpha: 0.23
+  focal_gamma: 2.0
+  # Tversky params
+  tversky_alpha: 0.5
+  tversky_beta: 0.5
+
+audio_losses:
+  # Loss component weights
+  bce_weight: 0.5
+  focal_weight: 1.0
+  tversky_weight: 0.5
+  # Label smoothing
+  label_smoothing: 0.03
+  # Class imbalance correction
+  healthy_weight: 1.5
+  parkinson_weight: 1.0
+  # Focal params
+  focal_alpha: 0.23
+  focal_gamma: 2.0
+  # Tversky params
+  tversky_alpha: 0.5
+  tversky_beta: 0.5
