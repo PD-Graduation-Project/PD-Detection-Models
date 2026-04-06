@@ -212,27 +212,7 @@ def train(model: torch.nn.Module,
         print(f"  Loss: Train={train_loss:.4f}, Val={val_loss:.4f}")
         print(f"  Balanced Acc: Train={train_overall['balanced_accuracy']:.3f}, Val={val_overall['balanced_accuracy']:.3f}")
         
-        # 11. Save per-movement stats to text file
-        # -----------------------------------------
-        if 'per_movement_counts' in val_overall:
-            movement_stats = val_overall['per_movement_counts']
-            movements_log_path = os.path.join(checkpoint_dir, f"{model_name}_per_movement_stats.txt")
-
-            # Make sure checkpoint_dir exists
-            os.makedirs(checkpoint_dir, exist_ok=True)
-
-            with open(movements_log_path, "a") as f:  # append mode
-                f.write(f"Epoch {epoch + 1}:\n")
-                for m_id, stats in movement_stats.items():
-                    correct = stats['correct']
-                    wrong = stats['wrong']
-                    total = correct + wrong
-                    acc_percent = (correct / total * 100) if total > 0 else 0.0
-                    f.write(f"  Movement {m_id}: Correct={correct}, Wrong={wrong} ==> Accuracy={acc_percent:.2f}%\n")
-                f.write("\n")
-
-        
-        # 12. Extra details for debugging mode
+        # 11. Extra details for debugging mode
         # -------------------------------------
         if debug_mode:
             print(f"  Macro F1: Train={train_overall['macro_f1']:.3f}, Val={val_overall['macro_f1']:.3f}")
@@ -248,6 +228,6 @@ def train(model: torch.nn.Module,
         
         print("=" * 35, "\n")
 
-    # 13. close writer
+    # 12. close writer
     if Tboard:
         writer.close()
