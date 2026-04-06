@@ -6,7 +6,6 @@ from scipy.signal import stft
 
 # NEW: Feature extraction library
 import pycatch22
-from tsfresh.feature_extraction import extract_features
 
 # ------------------------
 # NEW: Preprocessing (from paper)
@@ -135,8 +134,8 @@ def _extract_features_from_segment(segment, fs: float = 100.0, tremor_band=(3.0,
     for channel_idx in range(segment.shape[1]):
         channel_signal = segment[:, channel_idx]
         
-        # catch22 returns 22 features per channel (plus 2 statistical ones using `catch22_all`)
-        features = pycatch22.catch22_all(channel_signal)['values']
+        # Force catch24=True so we include mean and std (24 total catch features).
+        features = pycatch22.catch22_all(channel_signal, catch24=True)['values']
         all_features.extend(features)
         
     # NEW: append STFT tremor-band power ratio as LAST feature
@@ -192,18 +191,21 @@ def create_clean_dataset(
     root_dir: Path = Path("../../../project_datasets/tremor/Tremor_dataset"),
     time_series_subdir: str = "movement/timeseries",
     file_list_subdir: str = "preprocessed/file_list.csv",
-    output_dir: Path = Path("../../../project_datasets/tremor/movements"),
+    
+    output_csv: Path = Path("../../../project_datasets/tremor/tremor_features.csv"),
+    
     window_size: int = 1024,
     overlap: float = 0.5,
+    
     include_other: bool = False, 
-    sampling_rate: float = 100.0,         # NEW
-    pd_tremor_band=(3.0, 7.0),            # NEW
+    sampling_rate: float = 100.0,         
+    pd_tremor_band=(3.0, 7.0),            
     ):
     
     TIME_SERIES_DIR = root_dir / time_series_subdir
     FILE_LIST = root_dir / file_list_subdir
-    OUTPUT_DIR = Path(output_dir)
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    OUTPUT_CSV = Path(output_csv)
+    OUTPUT_CSV.parent.mkdir(parents=True, exist_ok=True)
 
     # 1. Load labels
     print("Loading labels...")
@@ -229,6 +231,14 @@ def create_clean_dataset(
     for f in movement_files:
         sid, mv, wrist = parse_filename(f)
         grouped_files.setdefault((sid, mv), {})[wrist] = f
+
+    # Stable movement encoding (0..N-1) for downstream tabular models.
+    movement_names = sorted({mv for (_, mv) in grouped_files.keys()})
+    movement_map = {name: idx for idx, name in enumerate(movement_names)}
+
+    all_rows = []
+    num_left_features = None
+    num_right_features = None
 
     total_segments = 0
     skipped_recordings = 0
@@ -275,12 +285,7 @@ def create_clean_dataset(
         left_segments = _segment_signal(left_data, window_size, overlap)
         right_segments = _segment_signal(right_data, window_size, overlap)
 
-        # Create output directory
-        label_name = {0: "Healthy", 1: "Parkinson", 2: "Other"}.get(label, "Unknown")
-        out_dir = OUTPUT_DIR / movement_name / label_name
-        out_dir.mkdir(parents=True, exist_ok=True)
-
-        # Extract features and save
+        # Extract features and add to CSV rows
         for seg_idx, (left_seg, right_seg) in enumerate(zip(left_segments, right_segments)):
 
             left_features = _extract_features_from_segment(
@@ -290,23 +295,53 @@ def create_clean_dataset(
                 right_seg, fs=sampling_rate, tremor_band=pd_tremor_band
             )
             
-            # Combine: Left + Right 
-            combined_features = np.concatenate([left_features, right_features])
+            if num_left_features is None:
+                num_left_features = len(left_features)
+            if num_right_features is None:
+                num_right_features = len(right_features)
 
-            np.savez_compressed(
-                out_dir / f"{subject_id}_seg{seg_idx:03d}.npz",
-                features=combined_features,
-                label=label,
-                handedness=handedness,
-                subject_id=subject_id,
-                movement_name=movement_name,
-                segment_idx=seg_idx
-            )
+            if len(left_features) != num_left_features or len(right_features) != num_right_features:
+                skipped_recordings += 1
+                continue
+
+            row = {
+                "movement": movement_map[movement_name],
+                "handedness": int(handedness),
+                "label": int(label),
+                "segment_idx": int(seg_idx),
+            }
+
+            for i, value in enumerate(left_features, start=1):
+                row[f"lh_{i}"] = float(value)
+
+            for i, value in enumerate(right_features, start=1):
+                row[f"rh_{i}"] = float(value)
+
+            all_rows.append(row)
             total_segments += 1
+
+    print("\nCreating CSV...")
+    df = pd.DataFrame(all_rows)
+
+    if df.empty:
+        metadata_cols = ["movement", "handedness", "label", "segment_idx"]
+        df = pd.DataFrame(columns=metadata_cols)
+    else:
+        metadata_cols = ["movement", "handedness", "label", "segment_idx"]
+        left_cols = [f"lh_{i}" for i in range(1, num_left_features + 1)]
+        right_cols = [f"rh_{i}" for i in range(1, num_right_features + 1)]
+        df = df[metadata_cols + left_cols + right_cols]
+
+    df.to_csv(OUTPUT_CSV, index=False)
 
     print(f"\n{'='*60}")
     print(f"Dataset creation complete!")
-    print(f"Output directory: {OUTPUT_DIR.resolve()}")
+    print(f"CSV saved: {OUTPUT_CSV.resolve()}")
     print(f"Total segments: {total_segments}")
-    print(f"Skipped: {skipped_recordings}")
+    print(f"Skipped (others): {skipped_recordings}")
+    print("Movement mapping:")
+    for name, idx in movement_map.items():
+        print(f"  {idx}: {name}")
     print(f"{'='*60}")
+
+    return df
