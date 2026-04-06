@@ -14,6 +14,19 @@ def _ensure_batch_dim(x: torch.Tensor) -> torch.Tensor:
     return x.unsqueeze(0) if x.dim() == 1 else x
 
 
+def _ensure_batch_vector(x: torch.Tensor) -> torch.Tensor:
+    """Ensure metadata tensor shape is [batch] for embedding/indexing ops."""
+    if x.dim() == 0:
+        return x.unsqueeze(0)
+    return x.view(-1)
+
+
+def _set_batchnorm_eval(module: torch.nn.Module) -> None:
+    """Freeze BatchNorm running-stat behavior for single-sample finetuning."""
+    if isinstance(module, torch.nn.modules.batchnorm._BatchNorm):
+        module.eval()
+
+
 def _load_tremor_loss_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     """Load tremor loss configuration from YAML file."""
     final_path = Path(config_path) if config_path else Path(__file__).with_name("config.yaml")
@@ -93,11 +106,12 @@ def finetune(
     model.load_state_dict(checkpoint["model_state_dict"])
 
     model.train()
+    model.apply(_set_batchnorm_eval)
 
-    features = _ensure_batch_dim(features).to(device)
-    handedness = _ensure_batch_dim(handedness).to(device)
-    movement = _ensure_batch_dim(movement).to(device)
-    label = _ensure_batch_dim(label).to(device)
+    features = _ensure_batch_dim(features).float().to(device)
+    handedness = _ensure_batch_vector(handedness).long().to(device)
+    movement = _ensure_batch_vector(movement).long().to(device)
+    label = _ensure_batch_vector(label).float().to(device)
 
     last_loss = None
     last_logits = None
@@ -124,7 +138,7 @@ def finetune(
 
     probs = torch.sigmoid(last_logits)
     preds = (probs >= 0.5).long()
-    metrics = compute_metrics(last_logits, label, movement_ids=movement)
+    metrics = compute_metrics(last_logits, label)
 
     result = {
         "loss": float(last_loss.item()),

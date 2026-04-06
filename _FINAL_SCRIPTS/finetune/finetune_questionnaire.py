@@ -14,6 +14,12 @@ def _ensure_batch_dim(x: torch.Tensor) -> torch.Tensor:
     return x.unsqueeze(0) if x.dim() == 1 else x
 
 
+def _set_batchnorm_eval(module: torch.nn.Module) -> None:
+    """Freeze BatchNorm running-stat behavior for single-sample finetuning."""
+    if isinstance(module, torch.nn.modules.batchnorm._BatchNorm):
+        module.eval()
+
+
 def _load_questionnaire_loss_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     """Load questionnaire loss configuration from YAML file."""
     final_path = Path(config_path) if config_path else Path(__file__).with_name("config.yaml")
@@ -84,6 +90,7 @@ def finetune(
     loss_fn = CombinedLoss(**merged_loss_kwargs)
 
     model.train()
+    model.apply(_set_batchnorm_eval)
 
     features = _ensure_batch_dim(features).to(device)
     label = _ensure_batch_dim(label).float().to(device)

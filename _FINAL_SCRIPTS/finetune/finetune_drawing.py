@@ -1,4 +1,5 @@
 import os
+import inspect
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -7,7 +8,7 @@ import torch.nn.functional as F
 from torch import nn
 from torch.nn.utils import clip_grad_norm_
 import yaml
-from .losses_binary import CombinedLoss, compute_metrics
+from .losses_binary import CombinedLoss, _binary_metrics
 
 def _ensure_batch_dim(x: torch.Tensor) -> torch.Tensor:
     """Convert a single sample tensor into batch size 1 when needed."""
@@ -29,6 +30,25 @@ def _load_drawing_loss_config(config_path: Optional[str] = None) -> Dict[str, An
         raise ValueError("Missing or invalid 'drawing_losses' section in config file")
 
     return drawing_losses
+
+
+def _normalize_drawing_loss_kwargs(loss_kwargs: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Normalize drawing loss kwargs to the signature expected by losses_binary.CombinedLoss.
+
+    Backward compatibility:
+    - Old drawing config used `pos_weight`.
+    - losses_binary.CombinedLoss expects `healthy_weight` and `parkinson_weight`.
+    """
+    normalized = dict(loss_kwargs)
+
+    if "pos_weight" in normalized:
+        pos_weight = normalized.pop("pos_weight")
+        normalized.setdefault("parkinson_weight", pos_weight)
+        normalized.setdefault("healthy_weight", 1.0)
+
+    valid_keys = set(inspect.signature(CombinedLoss.__init__).parameters.keys()) - {"self"}
+    return {k: v for k, v in normalized.items() if k in valid_keys}
 
 
 def finetune(
@@ -81,6 +101,7 @@ def finetune(
 
     cfg_loss_kwargs = _load_drawing_loss_config(config_path=config_path)
     merged_loss_kwargs = {**cfg_loss_kwargs, **(loss_kwargs or {})}
+    merged_loss_kwargs = _normalize_drawing_loss_kwargs(merged_loss_kwargs)
     loss_fn = CombinedLoss(**merged_loss_kwargs)
 
     model.train()

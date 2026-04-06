@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
+from typing import Dict, Optional
 
 # Weighted Combined Losses class
 # -------------------------------
@@ -253,3 +254,24 @@ def compute_metrics(preds, labels, movement_ids=None, threshold=0.5):
     }
 
 
+def _binary_metrics(preds: torch.Tensor, labels: torch.Tensor, threshold: float = 0.5) -> Dict[str, float]:
+    """Compute binary metrics for a single-sample update."""
+    probs = torch.sigmoid(preds).view(-1)
+    labels = labels.view(-1)
+    preds_bin = (probs >= threshold).float()
+
+    tp = ((preds_bin == 1) & (labels == 1)).float().sum()
+    fn = ((preds_bin == 0) & (labels == 1)).float().sum()
+    fp = ((preds_bin == 1) & (labels == 0)).float().sum()
+
+    accuracy = (preds_bin == labels).float().mean()
+    recall = tp / (tp + fn + 1e-8)
+    precision = tp / (tp + fp + 1e-8)
+    f1_score = 2 * (precision * recall) / (precision + recall + 1e-8)
+
+    return {
+        "accuracy": float(accuracy.item()),
+        "recall": float(recall.item()),
+        "precision": float(precision.item()),
+        "f1": float(f1_score.item()),
+    }
