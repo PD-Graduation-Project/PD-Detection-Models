@@ -1,4 +1,21 @@
 ## TVAE
+### NEWEST
+```md
+(1/2) Evaluating Column Shapes: |██████████| 58/58 [00:01<00:00, 51.68it/s]|
+Column Shapes Score: 93.03%
+
+(2/2) Evaluating Column Pair Trends: |██████████| 1653/1653 [00:20<00:00, 81.10it/s]|
+Column Pair Trends Score: 95.43%
+
+Overall Score (Average): 94.23%
+
+Overall Quality Score: 0.9423045724293038
+Detailed Properties:
+             Property     Score
+0       Column Shapes  0.930272
+1  Column Pair Trends  0.954337
+-----------------------------------
+```
 
 ```md
 (1/2) Evaluating Column Shapes: |██████████| 70/70 [00:01<00:00, 58.31it/s]|
@@ -34,6 +51,26 @@ Detailed Properties:
 ```
 
 ## GAN
+### NEWEST
+```md
+(1/2) Evaluating Column Shapes: |██████████| 58/58 [00:00<00:00, 64.51it/s]|
+Column Shapes Score: 85.94%
+
+(2/2) Evaluating Column Pair Trends: |██████████| 1653/1653 [00:23<00:00, 71.73it/s]|
+Column Pair Trends Score: 94.61%
+
+Overall Score (Average): 90.28%
+
+
+Overall Quality Score: 0.9027578178977184
+Detailed Properties:
+             Property     Score
+0       Column Shapes  0.859439
+1  Column Pair Trends  0.946076
+----------------------------------------
+```
+
+
 ```md
 (1/2) Evaluating Column Shapes: |██████████| 70/70 [00:01<00:00, 59.84it/s]|
 Column Shapes Score: 86.95%
