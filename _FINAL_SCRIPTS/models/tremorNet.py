@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-NUM_HAND_FEATURES = 22  # lh_1...lh_22 and rh_1...rh_22
+NUM_HAND_FEATURES = 27  # lh_1...lh_27 and rh_1...rh_27
 
 
 # ==========================================

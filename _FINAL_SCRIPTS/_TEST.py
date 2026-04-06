@@ -27,7 +27,7 @@ audio_data = ["examples/healthy_audio.wav",
 
 tremor_data = [
     ("Healthy tremor", "examples/tremor/healthy/", 0, "right"),
-    ("PD tremor", "examples/tremor/pd/", 2, "right"),
+    ("PD tremor", "examples/tremor/pd/", 10, "right"),
 ]
 
 # ============================================================================
@@ -161,4 +161,4 @@ def run_tests(mode="all"):
 
 if __name__ == "__main__":
     # Change mode here
-    run_tests(mode="all")
+    run_tests(mode="tremor")

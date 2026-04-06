@@ -11,7 +11,8 @@ Pipeline (must match training):
 2. Keep accelerometer only (X, Y, Z)
 3. Convert to vector magnitude
 4. Segment signal
-5. Extract catch22 features
+5. Extract catch22 features (22 features +2 catch24 features)
+6. Compute short time fourier transform (STFT) (+3 features)
 6. Concatenate:
     [left_features, right_features, asymmetry_features]
 7. Append metadata:
@@ -38,6 +39,7 @@ import numpy as np
 import joblib
 from pathlib import Path
 
+from scipy.signal import stft
 import pycatch22
 
 # -------------------------
@@ -95,6 +97,88 @@ def _segment_signal(data, window_size, overlap):
 
     return segments
 
+def _compute_stft_pd_feature(
+    segment: np.ndarray,
+    fs: float = 100.0,
+    tremor_band=(3.0, 8.0)
+):
+    """
+    Compute STFT-based PD features:
+    - Tremor band power ratio
+    - Tremor stability (std over time)
+    - Peak frequency
+
+    Returns:
+        (ratio, stability, peak_freq)
+    """
+
+    # Extract 1D signal (handle single or multi-channel input)
+    signal_1d = segment[:, 0] if segment.ndim == 2 else segment
+    signal_1d = np.asarray(signal_1d, dtype=np.float32)
+
+    # Return zeros if signal too short for meaningful STFT
+    if signal_1d.size < 8:
+        return 0.0, 0.0, 0.0
+
+    # Normalize signal to remove amplitude bias across subjects
+    signal_1d = (signal_1d - np.mean(signal_1d)) / (np.std(signal_1d) + 1e-8)
+
+    # Set STFT window length (~2 seconds for good low-frequency resolution)
+    nperseg = int(fs * 2)
+
+    # Ensure window is not longer than signal
+    nperseg = min(nperseg, signal_1d.size)
+
+    # Use high overlap to improve temporal smoothness
+    noverlap = int(nperseg * 0.75)
+
+    # Compute STFT using Hann window without padding artifacts
+    f, _, Zxx = stft(
+        signal_1d,
+        fs=fs,
+        window="hann",
+        nperseg=nperseg,
+        noverlap=noverlap,
+        boundary=None,
+        padded=False,
+    )
+
+    # Compute spectrogram power from complex STFT output
+    power = np.abs(Zxx) ** 2
+
+    # Return zeros if STFT failed or is empty
+    if power.size == 0:
+        return 0.0, 0.0, 0.0
+
+    # Create mask for tremor frequency band (3–8 Hz)
+    band_mask = (f >= tremor_band[0]) & (f <= tremor_band[1])
+
+    # Compute total power across all frequencies and time
+    total_power = power.sum() + 1e-12
+
+    # Compute total tremor-band power across all time frames
+    band_power = power[band_mask, :].sum() if np.any(band_mask) else 0.0
+
+    # Compute tremor power ratio (how dominant tremor band is) -> 1
+    tremor_ratio = band_power / total_power
+
+    # Compute time-varying tremor power per frame (captures intermittency)
+    band_power_t = (
+        power[band_mask, :].mean(axis=0)
+        if np.any(band_mask)
+        else np.zeros(power.shape[1])
+    )
+
+    # Compute tremor stability as std over time (higher = more fluctuation) -> 2
+    tremor_stability = np.std(band_power_t)
+
+    # Compute average spectrum across time
+    avg_spectrum = power.mean(axis=1)
+
+    # Extract dominant (peak) frequency from average spectrum -> 3
+    peak_freq = f[np.argmax(avg_spectrum)] if len(f) > 0 else 0.0
+
+    return float(tremor_ratio), float(tremor_stability), float(peak_freq)
 
 def _extract_features_from_segment(segment):
     """
@@ -116,9 +200,17 @@ def _extract_features_from_segment(segment):
     for channel_idx in range(segment.shape[1]):
         channel_signal = segment[:, channel_idx]
         
-        # catch22 returns 22 features per channel
-        features = pycatch22.catch22_all(channel_signal)['values']
+        # Force catch24=True so we include mean and std (24 total catch features).
+        features = pycatch22.catch22_all(channel_signal, catch24=True)['values']
         all_features.extend(features)
+        
+    # NEW: append STFT tremor-band power ratio as LAST feature
+    stft_ratio, stft_stability, peak_freq = _compute_stft_pd_feature(
+            segment,
+            fs=100,
+            tremor_band=(3.0, 7.0)
+        )
+    all_features.extend([stft_ratio, stft_stability, peak_freq])
     
     return np.array(all_features, dtype=np.float32)
 
